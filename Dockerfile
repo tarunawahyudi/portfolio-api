@@ -1,4 +1,13 @@
-FROM ubuntu:latest
-LABEL authors="wahyu"
+FROM jarredsumner/bun:latest
 
-ENTRYPOINT ["top", "-b"]
+WORKDIR /app
+
+COPY package.json bun.lock* ./
+
+RUN bun install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["bun", "run", "src/index.ts"]

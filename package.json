@@ -3,13 +3,22 @@
   "version": "1.0.50",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "lint" : "bunx eslint ."
   },
   "dependencies": {
-    "elysia": "latest"
+    "elysia": "latest",
+    "yaml": "^2.8.1"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "@eslint/js": "^9.33.0",
+    "bun-types": "latest",
+    "eslint": "^9.33.0",
+    "globals": "^16.3.0",
+    "prettier": "^3.6.2",
+    "semver": "^7.7.2",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.39.0"
   },
   "module": "src/index.js"
 }

@@ -1,0 +1,70 @@
+app:
+  name: bun-api-starter
+  environment: ${APP_ENV}
+  port: 3000
+  baseUrl: http://localhost:3000
+
+database:
+  client: postgresql
+  host: localhost
+  port: 5432
+  username: ${DB_USER}
+  password: ${DB_PASS}
+  database: ${DB_NAME}
+  pool:
+    min: 2
+    max: 10
+  ssl: false
+
+logger:
+  level: info
+  file: logs/app.log
+  maxSize: 10m
+  maxFiles: 5
+
+api:
+  prefix: /api/v1
+  timeout: 30000
+  rateLimit:
+    enabled: true
+    windowMs: 60000
+    maxRequests: 100
+
+auth:
+  jwtSecret: ${JWT_SECRET}
+  tokenExpiration: 1h
+  refreshTokenExpiration: 7d
+
+cors:
+  enabled: true
+  origin:
+    - http://localhost:3000
+    - https://yourfrontend.com
+  methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+  headers:
+    - Content-Type
+    - Authorization
+
+services:
+  email:
+    provider:
+    host:
+    port:
+    username:
+    password:
+  redis:
+    host:
+    port:
+    password:
+
+features:
+  enableNewFeatureX: false
+  enableBetaMode: true
+
+misc:
+  timezone: Asia/Jakarta
+  maxUploadSize: 10MB

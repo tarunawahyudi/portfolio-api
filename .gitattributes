@@ -1,0 +1,26 @@
+* text=auto eol=lf
+
+*.ts   text
+*.tsx  text
+*.js   text
+*.jsx  text
+*.json text
+*.md   text
+*.yml  text
+*.yaml text
+
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.mp4  binary
+*.mov  binary
+*.pdf  binary
+
+bun.lockb binary
+
+*.env text eol=lf
+
+*.min.js -diff
+*.min.css -diff

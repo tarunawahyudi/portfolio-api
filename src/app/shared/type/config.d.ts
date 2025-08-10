@@ -1,6 +1,7 @@
 export interface AppYamlConfig {
   app: {
     name: string
+    version: string
     environment: string
     port: number
     baseUrl: string
@@ -18,11 +19,33 @@ export interface AppYamlConfig {
     }
     ssl: boolean
   }
+  resources: {
+    banner: string
+    dictionary: {
+      error: string
+    }
+  },
   logger: {
+    path: string
     level: string
-    file: string
-    maxSize: string
-    maxFiles: number
+    sentry: {
+      enabled: boolean
+      dsn: string
+    },
+    axiom: {
+      enabled: boolean
+      axiomDataset: string
+      axiomToken: string
+      axiomOrgId: string
+    }
+  },
+  swagger: {
+    path: string
+    version: string
+    provider: string
+    darkMode: boolean
+    title: string
+    description: string
   }
   api: {
     prefix: string
@@ -41,8 +64,6 @@ export interface AppYamlConfig {
   cors: {
     enabled: boolean
     origin: string[]
-    methods: string[]
-    headers: string[]
   }
   services: {
     email: {

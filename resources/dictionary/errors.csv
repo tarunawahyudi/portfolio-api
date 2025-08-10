@@ -1,0 +1,6 @@
+code,module,message,httpStatus
+AUTH-001,AUTH,Invalid credentials,401
+AUTH-002,AUTH,Token expired,401
+USER-001,USER,Email already exists,400
+USER-002,USER,User not found,404
+DB-001,DB,Database connection lost,500

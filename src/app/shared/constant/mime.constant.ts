@@ -1,0 +1,15 @@
+export const MIME = {
+  JSON: "application/json",
+  FORM_URLENCODED: "application/x-www-form-urlencoded",
+  MULTIPART_FORM_DATA: "multipart/form-data",
+  TEXT_PLAIN: "text/plain",
+  HTML: "text/html",
+  XML: "application/xml",
+  JPEG: "image/jpeg",
+  PNG: "image/png",
+  GIF: "image/gif",
+  SVG: "image/svg+xml",
+  PDF: "application/pdf",
+  CSV: "text/csv",
+  ZIP: "application/zip",
+} as const

@@ -1,5 +1,6 @@
 app:
-  name: bun-api-starter
+  name: BunStack
+  version: 1.0.0
   environment: ${APP_ENV}
   port: 3000
   baseUrl: http://localhost:3000
@@ -16,11 +17,30 @@ database:
     max: 10
   ssl: false
 
+resources:
+  banner: resources/branding/banner.txt
+  dictionary:
+    error: resources/dictionary/errors.csv
+
 logger:
+  path: logs/app.log
   level: info
-  file: logs/app.log
-  maxSize: 10m
-  maxFiles: 5
+  sentry:
+    enabled: false
+    dsn: ${SENTRY_DSN}
+  axiom:
+    enabled: false
+    axiomDataset: BunStack
+    axiomToken: ${AXIOM_TOKEN}
+    axiomOrgId: ${AXIOM_ORG}
+
+swagger:
+  path: /docs
+  version: 3.0.0
+  provider: swagger-ui
+  darkMode: false
+  title: BunStack API Documentation
+  description: API documentation generated for the starter project
 
 api:
   prefix: /api/v1
@@ -40,14 +60,6 @@ cors:
   origin:
     - http://localhost:3000
     - https://yourfrontend.com
-  methods:
-    - GET
-    - POST
-    - PUT
-    - DELETE
-  headers:
-    - Content-Type
-    - Authorization
 
 services:
   email:

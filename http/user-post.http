@@ -1,0 +1,15 @@
+# Variabel untuk base URL. Ubah jika server Anda berjalan di port yang berbeda.
+@hostname = http://localhost:3000
+
+###
+POST {{hostname}}/users
+Content-Type: application/json
+
+{
+  "email": "asd@example.com",
+  "password": "password123"
+}
+
+
+###
+GET {{hostname}}/users/test.user@example.com

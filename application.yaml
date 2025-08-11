@@ -23,8 +23,8 @@ resources:
     error: resources/dictionary/errors.csv
 
 logger:
-  path: logs/app.log
-  level: debug
+  path: resources/logs
+  level: info
   sentry:
     enabled: false
     dsn: ${SENTRY_DSN}

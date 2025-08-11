@@ -6,11 +6,14 @@ import { swaggerPlugin } from "@core/config/swagger.config"
 import config from "@core/config"
 import cors from "@elysiajs/cors"
 import { AppException } from "@core/exception/app.exception"
+import { loggerMiddleware } from '@core/middleware/logger.middleware'
 
 async function main() {
   await setupContainer()
 
   const app = new Elysia()
+    .use(loggerMiddleware)
+    .use(swaggerPlugin)
     .onError(({ error, set }) => {
       if (error instanceof AppException) {
         set.status = error.httpStatus
@@ -25,7 +28,6 @@ async function main() {
         return { message: "Internal Server Error" }
       }
     })
-    .use(swaggerPlugin)
 
   if (config.cors.enabled) {
     app.use(

@@ -7,7 +7,7 @@ import config from '@core/config'
 const logDir = config.logger.path
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true })
 
-function getLogFilePath() {
+export function getLogFilePath() {
   const d = new Date()
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, '0')
@@ -39,7 +39,7 @@ const logger = pino(
   logFileStream
 )
 
-export const customLogger = {
+export const log = {
   info: (msg: string) => {
     console.log(formatLog('info', msg))
     logger.info(msg)

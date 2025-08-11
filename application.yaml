@@ -24,7 +24,7 @@ resources:
 
 logger:
   path: logs/app.log
-  level: info
+  level: debug
   sentry:
     enabled: false
     dsn: ${SENTRY_DSN}

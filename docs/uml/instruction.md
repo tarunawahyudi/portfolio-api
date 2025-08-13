@@ -1,6 +1,6 @@
 # UML Diagram Generator
 
-This feature allows you to automatically generate diagrams from PlantUML (`.puml`) source files into PNG images (`.png`). No more manual conversions—just run the provided commands to get your diagrams.
+This feature allows you to automatically generate diagrams from PlantUML (`.puml`) source files into PNG images (`.png`). No more manual conversions just run the provided commands to get your diagrams.
 
 ---
 

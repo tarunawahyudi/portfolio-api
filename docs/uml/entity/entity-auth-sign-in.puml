@@ -1,0 +1,23 @@
+@startuml
+title Auth Sign-in Entity Diagram
+
+entity "User" as User {
+  * id : UUID <<PK>>
+  * email : VARCHAR(255)
+  * password_hash : VARCHAR(255)
+  * full_name : VARCHAR(255)
+  * created_at : TIMESTAMP
+  * updated_at : TIMESTAMP
+}
+
+entity "RefreshToken" as RefreshToken {
+  * id : UUID <<PK>>
+  * user_id : UUID <<FK>>
+  * token : VARCHAR(255)
+  * expires_at : TIMESTAMP
+  * created_at : TIMESTAMP
+}
+
+User ||--o{ RefreshToken : has
+
+@enduml

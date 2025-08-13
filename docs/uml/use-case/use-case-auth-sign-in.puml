@@ -1,0 +1,12 @@
+@startuml
+title User Login Use Case
+
+actor User
+rectangle "Authentication System" {
+    User --> (Login)
+    (Login) --> (Validate Credentials)
+    (Validate Credentials) --> (Success)
+    (Validate Credentials) --> (Failure)
+}
+
+@enduml

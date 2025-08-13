@@ -6,6 +6,7 @@ interface ErrorEntry {
   code: string
   module: string
   message: string
+  logLevel: string
   httpStatus: number
 }
 
@@ -27,6 +28,7 @@ function loadErrorCatalog() {
       code: entry["code"]!,
       module: entry["module"]!,
       message: entry["message"]!,
+      logLevel: entry["logLevel"]!,
       httpStatus: parseInt(entry["httpStatus"]!, 10)
     }
   })

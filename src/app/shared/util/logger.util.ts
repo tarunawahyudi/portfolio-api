@@ -1,59 +1,74 @@
-import pino from 'pino'
-import chalk from 'chalk'
 import fs from 'fs'
 import path from 'path'
+import chalk from 'chalk'
 import config from '@core/config'
 
-const logDir = config.logger.path
-if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true })
-
-export function getLogFilePath() {
-  const d = new Date()
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return path.join(logDir, `${y}${m}${day}.log`)
+const logDirectory = path.resolve(process.cwd(), config.logger.path)
+if (!fs.existsSync(logDirectory)) {
+  fs.mkdirSync(logDirectory, { recursive: true })
 }
 
-function formatLog(level: string, message: string) {
-  const time = new Date().toISOString()
+function getDailyLogFilePath(): string {
+  const date = new Date()
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return path.join(logDirectory, `app-${year}${month}${day}.log`)
+}
+
+function formatConsoleLog(level: string, message: string): string {
+  const time = chalk.gray(new Date().toISOString())
   const levelColor =
-    level === 'error' ? chalk.red :
-      level === 'warn' ? chalk.yellow :
-        chalk.blue
-  return `[${chalk.gray(time)}][${levelColor(level.toUpperCase())}] ${message}`
+    level === 'error'
+      ? chalk.red.bold
+      : level === 'warn'
+        ? chalk.yellow.bold
+        : level === 'debug'
+          ? chalk.magenta.bold
+          : chalk.cyan.bold
+
+  return `[${time}][${levelColor(level.toUpperCase())}] ${message}`
 }
 
-const logFileStream = fs.createWriteStream(getLogFilePath(), { flags: 'a' })
+function formatFileLog(level: string, message: string): string {
+  const time = new Date().toISOString()
+  return `[${time}][${level.toUpperCase()}] ${message}`
+}
 
-const logger = pino(
-  {
-    level: config.logger.level,
-    timestamp: () => `,"time":"${new Date().toISOString()}"`,
-    formatters: {
-      level(label) {
-        return { level: label }
-      }
+
+const levelPriority: Record<string, number> = {
+  error: 0,
+  warn: 1,
+  info: 2,
+  debug: 3
+}
+const minLevel = config.logger.level || 'info'
+
+function writeToFile(text: string) {
+  const logFilePath = getDailyLogFilePath()
+  fs.appendFileSync(logFilePath, text + '\n', { encoding: 'utf-8' })
+}
+
+export const logger = {
+  log: (level: keyof typeof levelPriority, message: string) => {
+    if (levelPriority[level] <= levelPriority[minLevel]) {
+      const consoleFormatted = formatConsoleLog(level, message)
+      const fileFormatted = formatFileLog(level, message)
+
+      console.log(consoleFormatted)
+      writeToFile(fileFormatted)
     }
   },
-  logFileStream
-)
-
-export const log = {
-  info: (msg: string) => {
-    console.log(formatLog('info', msg))
-    logger.info(msg)
+  info: (message: string) => {
+    logger.log('info', message)
   },
-  warn: (msg: string) => {
-    console.log(formatLog('warn', msg))
-    logger.warn(msg)
+  warn: (message: string) => {
+    logger.log('warn', message)
   },
-  error: (msg: string) => {
-    console.log(formatLog('error', msg))
-    logger.error(msg)
+  error: (message: string) => {
+    logger.log('error', message)
   },
-  debug: (msg: string) => {
-    console.log(formatLog('debug', msg))
-    logger.debug(msg)
+  debug: (message: string) => {
+    logger.log('debug', message)
   }
 }

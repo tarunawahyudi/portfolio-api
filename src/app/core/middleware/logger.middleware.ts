@@ -1,22 +1,11 @@
 import { Elysia } from 'elysia'
-import { logger, fileLogger, createPinoLogger } from '@bogeychan/elysia-logger'
-import { getLogFilePath } from '@shared/util/logger.util'
+import { logger } from '@shared/util/logger.util'
 
-export const log = createPinoLogger({
-  level: 'info',
-})
-
-export const loggerMiddleware = () => {
-  return new Elysia({ name: 'multi-logger' })
-    .use(
-      logger({
-        level: 'info',
-      })
-    )
-    .use(
-      fileLogger({
-        level: 'info',
-        file: getLogFilePath()
-      })
-    )
-}
+export const loggerMiddleware = (app: Elysia) =>
+  app.onAfterHandle(({ response, request }) => {
+    const { method, url } = request
+    const status = (response as { code: number }).code
+    const path = new URL(url).pathname
+    const logMessage = `${method} ${path} ${status}`
+    logger.info(logMessage)
+  })

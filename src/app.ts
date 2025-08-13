@@ -3,43 +3,55 @@ import { setupContainer } from "@core/container"
 import { registerUserRoutes } from "@module/user/user.route"
 import { startup } from "@core/startup"
 import { swaggerPlugin } from "@core/config/swagger.config"
-import config from "@core/config"
-import cors from "@elysiajs/cors"
-import { AppException } from "@core/exception/app.exception"
 import { loggerMiddleware } from '@core/middleware/logger.middleware'
+import { errorMiddleware } from '@core/middleware/error.middleware'
+import { corsMiddleware } from '@core/middleware/cors.middleware'
 
+/**
+ * Application entry point.
+ *
+ * Initializes the dependency container, registers middlewares,
+ * sets up routes, and starts the HTTP server.
+ */
 async function main() {
+  // Initialize dependency injection container
   await setupContainer()
 
   const app = new Elysia()
+    /**
+     * Global logger middleware
+     * Handles logging for all incoming requests and system events
+     */
     .use(loggerMiddleware)
+
+    /**
+     * CORS middleware
+     * Enables Cross-Origin Resource Sharing based on configured policies
+     */
+    .use(corsMiddleware())
+
+    /**
+     * Swagger API documentation plugin
+     * Automatically generates and serves OpenAPI documentation
+     */
     .use(swaggerPlugin)
-    .onError(({ error, set }) => {
-      if (error instanceof AppException) {
-        set.status = error.httpStatus
-        return {
-          code: error.code,
-          message: error.message,
-          ticket: error.ticketCode,
-          timestamp: new Date().toISOString()
-        }
-      } else {
-        set.status = 500
-        return { message: "Internal Server Error" }
-      }
-    })
 
-  if (config.cors.enabled) {
-    app.use(
-      cors({
-        origin: config.cors.origin
-      })
-    )
-  }
+    /**
+     * Global error handler
+     * Catches exceptions and returns standardized error responses
+     */
+    .use(errorMiddleware)
 
-  app.use(registerUserRoutes)
+    /**
+     * Application routes
+     * Registers all route handlers for the User module
+     */
+    .use(registerUserRoutes)
 
+  // Run startup tasks
   startup()
+
+  // Start HTTP server
   app.listen(process.env.APP_PORT ?? 8080)
 }
 

@@ -2,8 +2,8 @@ app:
   name: BunStack
   version: 1.0.0
   environment: ${APP_ENV}
-  port: 8181
-  baseUrl: http://localhost:8181
+  port: ${APP_PORT}
+  baseUrl: ${APP_BASE_URL}
 
 database:
   client: postgresql

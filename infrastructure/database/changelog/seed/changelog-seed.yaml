@@ -1,6 +1,0 @@
-
-  - changeSet:
-      id: 20250814180046-add_users
-      author: developer
-      include: 20250814180046-add_users.yaml
-  

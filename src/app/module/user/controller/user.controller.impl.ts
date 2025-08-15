@@ -8,20 +8,20 @@ import type {UserService} from "@module/user/service/user.service"
 export class UserControllerImpl implements UserController {
   constructor(@inject("UserService") private readonly userService: UserService) {}
 
-  create = async (ctx: Context) => {
+  async create(ctx: Context) {
     const data = ctx.body
     const user = await this.userService.createUser(data as Partial<User>)
     return { success: true, user }
   }
 
-  getByEmail = async (ctx: Context) => {
+  async getByEmail(ctx: Context) {
     const email = ctx.params.email
     const user = await this.userService.getUserByEmail(email)
     if (!user) return ctx.status(400, { error: "email or password" })
     return user
   }
 
-  getAll = async (ctx: Context) => {
+  async getAll(ctx: Context) {
     const users = await this.userService.getAll()
     return ctx.status(200, { users })
   }

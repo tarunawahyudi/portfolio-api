@@ -8,7 +8,7 @@ export function registerUserRoutes(app: Elysia) {
 
   return app.group("/users", (group) =>
     group
-      .post(ROOT, userController.create, {
+      .post(ROOT, userController.create.bind(userController), {
           body: t.Object({
             email: t.String({ required: true, format: "email" }),
             password: t.String({ minLength: 6 }),
@@ -19,14 +19,14 @@ export function registerUserRoutes(app: Elysia) {
           }
         }
       )
-      .get("/:email", userController.getByEmail, {
+      .get("/:email", userController.getByEmail.bind(userController), {
           detail: {
             tags: ["User"],
             summary: "Get user by email"
           }
         }
       )
-      .get(ROOT, userController.getAll, {
+      .get(ROOT, userController.getAll.bind(userController), {
           detail: {
             tags: ["User"],
             summary: "Get all users"

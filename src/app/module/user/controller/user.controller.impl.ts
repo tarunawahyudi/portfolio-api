@@ -3,6 +3,7 @@ import { Context } from "elysia"
 import {User} from "@module/user/entity/user"
 import type {UserController} from "@module/user/controller/user.controller"
 import type {UserService} from "@module/user/service/user.service"
+import { successResponse } from '@shared/util/response.util'
 
 @injectable()
 export class UserControllerImpl implements UserController {
@@ -11,18 +12,17 @@ export class UserControllerImpl implements UserController {
   async create(ctx: Context) {
     const data = ctx.body
     const user = await this.userService.createUser(data as Partial<User>)
-    return { success: true, user }
+    return successResponse(ctx, user, "User created successfully", 201)
   }
 
   async getByEmail(ctx: Context) {
     const email = ctx.params.email
     const user = await this.userService.getUserByEmail(email)
-    if (!user) return ctx.status(400, { error: "email or password" })
-    return user
+    return successResponse(ctx, user, "User fetch by email successfully", 200)
   }
 
   async getAll(ctx: Context) {
     const users = await this.userService.getAll()
-    return ctx.status(200, { users })
+    return successResponse(ctx, users, "User fetched successfully", 200)
   }
 }

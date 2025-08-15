@@ -17,7 +17,9 @@ export class UserServiceImpl implements UserService {
   }
 
   async getUserByEmail(email: string) {
-    return this.userRepository.findByEmail(email)
+    const user = await this.userRepository.findByEmail(email)
+    if (!user) throw new AppException("USER-002")
+    return user
   }
 
   async getAll(): Promise<User[]> {

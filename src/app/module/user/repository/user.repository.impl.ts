@@ -1,5 +1,5 @@
 import {Repository} from "typeorm"
-import {User} from "@module/user/entity/user"
+import {User} from "@module/user/entity/user.entity"
 import {injectable} from "tsyringe"
 import type {UserRepository} from "@module/user/repository/user.repository"
 

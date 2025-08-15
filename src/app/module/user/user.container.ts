@@ -1,6 +1,6 @@
 import {container} from "tsyringe"
 import {Repository} from "typeorm"
-import {User} from "./entity/user"
+import {User} from "./entity/user.entity"
 import {UserRepository} from "./repository/user.repository"
 import {UserRepositoryImpl} from "./repository/user.repository.impl"
 import {UserService} from "./service/user.service"

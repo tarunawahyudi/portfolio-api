@@ -1,5 +1,5 @@
 import {inject, injectable} from "tsyringe"
-import {User} from "@module/user/entity/user"
+import {User} from "@module/user/entity/user.entity"
 import type {UserService} from "@module/user/service/user.service"
 import type {UserRepository} from "@module/user/repository/user.repository"
 import {AppException} from "@core/exception/app.exception"

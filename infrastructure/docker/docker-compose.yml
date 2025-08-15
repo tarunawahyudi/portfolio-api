@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16
-    container_name: bun-starter
+    container_name: portfolio-api
     restart: always
     environment:
       POSTGRES_USER: root

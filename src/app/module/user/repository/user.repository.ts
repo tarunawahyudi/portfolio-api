@@ -1,4 +1,4 @@
-import {User} from "@module/user/entity/user"
+import {User} from "@module/user/entity/user.entity"
 
 export interface UserRepository {
   create(data: Partial<User>): User

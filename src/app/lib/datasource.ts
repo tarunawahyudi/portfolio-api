@@ -1,6 +1,5 @@
 import {DataSource} from "typeorm"
 import {User} from "@module/user/entity/user.entity"
-import { BlogPost } from '../blog/entity/blog-post.entity'
 import { Certificate } from '@module/certificate/entity/certificate.entity'
 import { PersonalInfo } from '@module/personal-info/entity/personal-info.entity'
 import { Project } from '@module/project/entity/project.entity'
@@ -9,6 +8,7 @@ import { SocialMedia } from '@module/social-media/entity/social-media.entity'
 import { Testimonial } from '@module/testimonial/entity/testimonial.entity'
 import { Education } from '@module/education/entity/education.entity'
 import { WorkExperience } from '@module/work-experience/entity/work-experience.entity'
+import { BlogPost } from '@module/blog-post/entity/blog-post.entity'
 
 export const AppDataSource = new DataSource({
   type: "postgres",

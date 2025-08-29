@@ -2,7 +2,7 @@ import {DataSource} from "typeorm"
 import {User} from "@module/user/entity/user.entity"
 import { Certificate } from '@module/certificate/entity/certificate.entity'
 import { PersonalInfo } from '@module/personal-info/entity/personal-info.entity'
-import { Project } from '@module/project/entity/project.entity'
+import { Project } from '@module/project/entity/portfolio.entity'
 import { Skill } from '@module/skill/entity/skill.entity'
 import { SocialMedia } from '@module/social-media/entity/social-media.entity'
 import { Testimonial } from '@module/testimonial/entity/testimonial.entity'

@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm'
+import { User } from '@module/user/entity/user.entity'
 
 @Entity({ name: 'certificates' })
 export class Certificate {
@@ -44,7 +45,7 @@ export class Certificate {
   @UpdateDateColumn()
   updatedAt!: Date
 
-  @ManyToOne('PersonalInfo', 'certificates', { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'personal_info_id' })
-  personalInfo!: any
+  @ManyToOne(() => User, (user: User) => user.certificates, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user!: User
 }

@@ -1,7 +1,5 @@
-import {User} from "@module/user/entity/user.entity"
+import { CreateUserRequest, UserSignupResponse } from '@module/user/dto/user.dto'
 
 export interface UserService {
-  createUser(data: Partial<User>): Promise<User>
-  getAll(): Promise<User[]>
-  getUserByEmail(email: string): Promise<User | null>
+  create(data: CreateUserRequest): Promise<UserSignupResponse>
 }

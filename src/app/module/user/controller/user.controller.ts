@@ -1,7 +1,6 @@
 import {Context} from "elysia"
+import { AppResponse } from '@shared/type/global'
 
 export interface UserController {
-  create(ctx: Context): Promise<any>
-  getByEmail(ctx: Context): Promise<any>
-  getAll(ctx: Context): Promise<any>
+  signup(ctx: Context): Promise<AppResponse>
 }

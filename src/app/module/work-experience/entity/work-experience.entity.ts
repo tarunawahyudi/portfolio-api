@@ -1,73 +1,44 @@
+import { User } from '@module/user/entity/user'
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  JoinColumn,
   CreateDateColumn,
-  UpdateDateColumn
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
-
-export enum EmploymentType {
-  FULL_TIME = 'full_time',
-  PART_TIME = 'part_time',
-  CONTRACT = 'contract',
-  INTERNSHIP = 'internship',
-  FREELANCE = 'freelance'
-}
 
 @Entity({ name: 'work_experiences' })
 export class WorkExperience {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string
+  @PrimaryGeneratedColumn('increment')
+  id!: number
 
-  @Column({ length: 200 })
-  jobTitle!: string
+  @ManyToOne(() => User, (user) => user.workExperiences, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user!: User
 
-  @Column({ length: 200 })
+  @Column()
   company!: string
 
-  @Column({ length: 200, nullable: true })
-  location?: string
+  @Column()
+  position!: string
 
-  @Column({
-    type: 'enum',
-    enum: EmploymentType,
-    default: EmploymentType.FULL_TIME
-  })
-  employmentType!: EmploymentType
-
-  @Column('date')
+  @Column({ type: 'date' })
   startDate!: Date
 
-  @Column('date', { nullable: true })
+  @Column({ type: 'date', nullable: true })
   endDate?: Date
 
   @Column({ default: false })
-  isCurrentJob!: boolean
+  isCurrent!: boolean
 
-  @Column('text')
-  description!: string
-
-  @Column('simple-array', { nullable: true })
-  achievements?: string[]
-
-  @Column('simple-array', { nullable: true })
-  technologies?: string[]
-
-  @Column({ length: 200, nullable: true })
-  website?: string
-
-  @Column({ nullable: true })
-  logo?: string
+  @Column({ type: 'text', nullable: true })
+  description?: string
 
   @CreateDateColumn()
   createdAt!: Date
 
   @UpdateDateColumn()
   updatedAt!: Date
-
-  @ManyToOne('PersonalInfo', 'workExperiences', { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'personal_info_id' })
-  personalInfo!: any
 }

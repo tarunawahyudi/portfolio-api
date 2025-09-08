@@ -1,8 +1,8 @@
-import {User} from "@module/user/entity/user.entity"
+import { NewUser, User } from '@module/user/entity/user'
 
 export interface UserRepository {
-  create(data: Partial<User>): User
-  save(user: User): Promise<User>
-  findAll(): Promise<User[]>
+  save(data: NewUser): Promise<User>
+  findByUsername(username: string): Promise<User | null>
   findByEmail(email: string): Promise<User | null>
+  markVerified(userId: number): Promise<void>
 }

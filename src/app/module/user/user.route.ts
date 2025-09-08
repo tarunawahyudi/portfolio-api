@@ -8,28 +8,16 @@ export function registerUserRoutes(app: Elysia) {
 
   return app.group("/users", (group) =>
     group
-      .post(ROOT, userController.create.bind(userController), {
+      .post(ROOT, userController.signup.bind(userController), {
           body: t.Object({
+            name: t.String({ required: true }),
+            username: t.String({ required: true }),
             email: t.String({ required: true, format: "email" }),
             password: t.String({ minLength: 6 }),
           }),
           detail: {
             tags: ["User"],
             summary: "Create a new user"
-          }
-        }
-      )
-      .get("/:email", userController.getByEmail.bind(userController), {
-          detail: {
-            tags: ["User"],
-            summary: "Get user by email"
-          }
-        }
-      )
-      .get(ROOT, userController.getAll.bind(userController), {
-          detail: {
-            tags: ["User"],
-            summary: "Get all users"
           }
         }
       )

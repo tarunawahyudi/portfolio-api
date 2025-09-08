@@ -1,26 +1,50 @@
-import {Repository} from "typeorm"
-import {User} from "@module/user/entity/user.entity"
+import { NewUser, User } from '@module/user/entity/user'
 import {injectable} from "tsyringe"
 import type {UserRepository} from "@module/user/repository/user.repository"
+import { db } from '@db/index'
+import { users } from '@db/schema'
+import { eq } from 'drizzle-orm'
+import { getDbOrTx } from '@shared/decorator/transactional.decorator'
 
 @injectable()
 export class UserRepositoryImpl implements UserRepository {
-  constructor(private readonly userRepository: Repository<User>) {
+
+  async save(data: NewUser): Promise<User> {
+    const [inserted] = await db
+      .insert(users)
+      .values(data)
+      .returning()
+
+    return inserted
   }
 
-  create(data: Partial<User>): User {
-    return this.userRepository.create(data)
+  async markVerified(userId: number): Promise<void> {
+    const dbOrTx = getDbOrTx()
+    await dbOrTx
+      .update(users)
+      .set({
+        isVerified: true,
+        status: 'active',
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
   }
 
-  save(user: User): Promise<User> {
-    return this.userRepository.save(user)
+  async findByUsername(username: string): Promise<User | null> {
+    const row = await db.query.users
+      .findFirst({
+        where: eq(users.username, username),
+      })
+
+    return row ?? null
   }
 
-  findAll(): Promise<User[]> {
-    return this.userRepository.find()
-  }
+  async findByEmail(email: string): Promise<User | null> {
+    const row = await db.query.users
+      .findFirst({
+        where: eq(users.email, email)
+      })
 
-  findByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { email } })
+    return row ?? null
   }
 }

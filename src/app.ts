@@ -7,6 +7,7 @@ import { loggerMiddleware } from '@core/middleware/logger.middleware'
 import { errorMiddleware } from '@core/middleware/error.middleware'
 import { corsMiddleware } from '@core/middleware/cors.middleware'
 import { registerAuthRoutes } from '@module/auth/auth.route'
+import cookie from '@elysiajs/cookie'
 
 /**
  * Application entry point.
@@ -19,6 +20,7 @@ async function main() {
   await setupContainer()
 
   const app = new Elysia()
+    .use(cookie())
     /**
      * Global logger middleware
      * Handles logging for all incoming requests and system events

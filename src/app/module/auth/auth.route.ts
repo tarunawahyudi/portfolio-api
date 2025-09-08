@@ -1,6 +1,7 @@
 import { Elysia, t } from 'elysia'
 import { container } from 'tsyringe'
 import { AuthControllerImpl } from '@module/auth/controller/auth.controller.impl'
+import { authGuard } from '@core/middleware/auth.middleware'
 
 export function registerAuthRoutes(app: Elysia) {
   const authController = container.resolve(AuthControllerImpl)
@@ -15,6 +16,36 @@ export function registerAuthRoutes(app: Elysia) {
           detail: {
             tags: ["Authentication"],
             summary: "Verify email token"
+          }
+        }
+      )
+      .post("/sign-in", authController.postSignIn.bind(authController), {
+          body: t.Object({
+            usernameOrEmail: t.String(),
+            password: t.String(),
+            ipAddress: t.Optional(t.String()),
+            userAgent: t.Optional(t.String())
+          }),
+          detail: {
+            tags: ["Authentication"],
+            summary: "Sign in to get tokens"
+          }
+        }
+      )
+
+      .post("/refresh", authController.postRefreshToken.bind(authController), {
+          detail: {
+            tags: ["Authentication"],
+            summary: "Get a new access token using a refresh token"
+          }
+        }
+      )
+
+      .post("/sign-out", authController.postSignOut.bind(authController), {
+          beforeHandle: authGuard,
+          detail: {
+            tags: ["Authentication"],
+            summary: "Sign out and invalidate refresh token"
           }
         }
       )

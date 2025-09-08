@@ -1,4 +1,4 @@
-import { Elysia, NotFoundError, ParseError } from 'elysia'
+import { Elysia, NotFoundError, ParseError, ValidationError } from 'elysia'
 import { logger } from '@shared/util/logger.util'
 import { AppException } from '@core/exception/app.exception'
 
@@ -40,6 +40,29 @@ export const errorMiddleware = (app: Elysia) =>
         code: 'BAD_REQUEST',
         message: error.message,
         error: null,
+        timestamp: new Date().toISOString()
+      }
+    }
+
+    if (error instanceof ValidationError) {
+      set.status = 422
+      let message = error.message
+
+      try {
+        const parsed = JSON.parse(error.message)
+        if (parsed.summary) {
+          message = parsed.summary
+        }
+      } catch {
+        // ignored
+      }
+
+      logger.warn(`${method} ${path} 422 - Validation Error: ${message}`)
+
+      return {
+        success: false,
+        code: error.code,
+        message,
         timestamp: new Date().toISOString()
       }
     }

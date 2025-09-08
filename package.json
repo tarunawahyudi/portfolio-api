@@ -27,6 +27,7 @@
     "elysia": "latest",
     "js-yaml": "^4.1.0",
     "logixlysia": "^5.1.0",
+    "nodemailer": "^7.0.6",
     "pg": "^8.16.3",
     "pino": "^9.8.0",
     "pino-pretty": "^13.1.1",
@@ -40,6 +41,7 @@
   "devDependencies": {
     "@eslint/js": "^9.33.0",
     "@types/js-yaml": "^4.0.9",
+    "@types/nodemailer": "^7.0.1",
     "bun-types": "latest",
     "drizzle-kit": "^0.31.4",
     "eslint": "^9.33.0",

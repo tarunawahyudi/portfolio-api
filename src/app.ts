@@ -6,6 +6,7 @@ import { swaggerPlugin } from "@core/config/swagger.config"
 import { loggerMiddleware } from '@core/middleware/logger.middleware'
 import { errorMiddleware } from '@core/middleware/error.middleware'
 import { corsMiddleware } from '@core/middleware/cors.middleware'
+import { registerAuthRoutes } from '@module/auth/auth.route'
 
 /**
  * Application entry point.
@@ -47,6 +48,7 @@ async function main() {
      * Registers all route handlers for the User module
      */
     .use(registerUserRoutes)
+    .use(registerAuthRoutes)
 
   // Run startup tasks
   startup()

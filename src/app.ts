@@ -8,6 +8,7 @@ import { errorMiddleware } from '@core/middleware/error.middleware'
 import { corsMiddleware } from '@core/middleware/cors.middleware'
 import { registerAuthRoutes } from '@module/auth/auth.route'
 import cookie from '@elysiajs/cookie'
+import { registerAppRoute } from '@module/app.route'
 
 /**
  * Application entry point.
@@ -49,6 +50,7 @@ async function main() {
      * Application routes
      * Registers all route handlers for the User module
      */
+    .use(registerAppRoute)
     .use(registerUserRoutes)
     .use(registerAuthRoutes)
 

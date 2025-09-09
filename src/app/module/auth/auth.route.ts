@@ -32,6 +32,9 @@ export function registerAuthRoutes(app: Elysia) {
       )
 
       .post("/refresh", authController.postRefreshToken.bind(authController), {
+          body: t.Object({
+            refreshToken: t.String(),
+          }),
           detail: {
             tags: ["Authentication"],
             summary: "Get a new access token using a refresh token"

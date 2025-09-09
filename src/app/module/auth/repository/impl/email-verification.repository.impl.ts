@@ -8,7 +8,7 @@ import { getDbOrTx } from '@shared/decorator/transactional.decorator'
 
 @injectable()
 export class EmailVerificationRepositoryImpl implements EmailVerificationRepository {
-  async findLatestValid(userId: number): Promise<EmailVerification | null> {
+  async findLatestValid(userId: string): Promise<EmailVerification | null> {
     const now = new Date()
 
     const dbOrTx = getDbOrTx()

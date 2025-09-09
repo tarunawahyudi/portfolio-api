@@ -8,21 +8,23 @@ export function registerAuthRoutes(app: Elysia) {
 
   return app.group("/auth", (group) =>
     group
-      .get("/verify", authController.getEmailVerification.bind(authController), {
-          query: t.Object({
-            token: t.String(),
-            uid: t.String(),
+      .post("/sign-up", authController.postSignUp.bind(authController), {
+          body: t.Object({
+            name: t.String({ required: true }),
+            username: t.String({ required: true }),
+            email: t.String({ required: true, format: "email" }),
+            password: t.String({ minLength: 6 }),
           }),
           detail: {
             tags: ["Authentication"],
-            summary: "Verify email token"
+            summary: "Register a new user"
           }
         }
       )
       .post("/sign-in", (ctx) => authController.postSignIn(ctx), {
           body: t.Object({
             usernameOrEmail: t.String(),
-            password: t.String(),
+            password: t.String({ minLength: 6 }),
           }),
           detail: {
             tags: ["Authentication"],
@@ -30,7 +32,17 @@ export function registerAuthRoutes(app: Elysia) {
           }
         }
       )
-
+      .get("/verify", authController.getEmailVerification.bind(authController), {
+          query: t.Object({
+            token: t.String(),
+            uid: t.String({ format: 'uuid' }),
+          }),
+          detail: {
+            tags: ["Authentication"],
+            summary: "Verify email token"
+          }
+        }
+      )
       .post("/refresh", (ctx) => authController.postRefreshToken(ctx), {
           detail: {
             tags: ["Authentication"],

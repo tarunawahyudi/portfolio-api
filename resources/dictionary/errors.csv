@@ -1,4 +1,5 @@
 code,module,message,logLevel,httpStatus
+AUTH-000,AUTH,Authorization header is missing or invalid,warn,401
 AUTH-001,AUTH,Invalid credentials,warn,401
 AUTH-002,AUTH,Token expired,warn,401
 AUTH-003,AUTH,Account is locked please try again later,warn,401

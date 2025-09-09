@@ -18,7 +18,7 @@ export class UserRepositoryImpl implements UserRepository {
     return inserted
   }
 
-  async markVerified(userId: number): Promise<void> {
+  async markVerified(userId: string): Promise<void> {
     const dbOrTx = getDbOrTx()
     await dbOrTx
       .update(users)

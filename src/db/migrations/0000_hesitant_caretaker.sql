@@ -1,7 +1,7 @@
 CREATE TYPE "public"."user_status" AS ENUM('pending', 'active', 'inactive', 'banned', 'deleted');--> statement-breakpoint
 CREATE TABLE "articles" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"slug" varchar(255),
 	"content" text,
@@ -15,7 +15,7 @@ CREATE TABLE "articles" (
 --> statement-breakpoint
 CREATE TABLE "awards" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
 	"title" varchar(100) NOT NULL,
 	"description" text,
 	"images" text[],
@@ -25,7 +25,7 @@ CREATE TABLE "awards" (
 --> statement-breakpoint
 CREATE TABLE "certificates" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"organization" varchar(255),
 	"issue_date" date,
@@ -38,7 +38,7 @@ CREATE TABLE "certificates" (
 --> statement-breakpoint
 CREATE TABLE "courses" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
 	"institution" varchar NOT NULL,
 	"course_name" varchar NOT NULL,
 	"start_date" date NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE "courses" (
 --> statement-breakpoint
 CREATE TABLE "educations" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
 	"institution" varchar(200) NOT NULL,
 	"degree" varchar(200),
 	"field_of_study" varchar(200),
@@ -64,7 +64,7 @@ CREATE TABLE "educations" (
 --> statement-breakpoint
 CREATE TABLE "email_verifications" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
 	"token_hash" text NOT NULL,
 	"expires_at" timestamp NOT NULL,
 	"is_verified" boolean DEFAULT false,
@@ -73,9 +73,23 @@ CREATE TABLE "email_verifications" (
 	CONSTRAINT "email_verifications_user_id_unique" UNIQUE("user_id")
 );
 --> statement-breakpoint
+CREATE TABLE "login_attempts" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" uuid NOT NULL,
+	"attempt_time" timestamp with time zone DEFAULT now() NOT NULL,
+	"success" boolean NOT NULL,
+	"ip_address" varchar(50),
+	"user_agent" varchar(255),
+	"device" varchar(50),
+	"browser" varchar(50),
+	"os" varchar(50),
+	"cpu" varchar(50),
+	"created_at" timestamp with time zone DEFAULT now()
+);
+--> statement-breakpoint
 CREATE TABLE "portfolios" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
 	"title" varchar NOT NULL,
 	"description" text,
 	"thumbnail" text,
@@ -86,7 +100,7 @@ CREATE TABLE "portfolios" (
 --> statement-breakpoint
 CREATE TABLE "profiles" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
 	"phone_number" varchar(20),
 	"full_name" varchar,
 	"display_name" varchar(100),
@@ -101,18 +115,29 @@ CREATE TABLE "profiles" (
 	CONSTRAINT "profiles_user_id_unique" UNIQUE("user_id")
 );
 --> statement-breakpoint
+CREATE TABLE "sessions" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" uuid NOT NULL,
+	"expires_at" timestamp with time zone NOT NULL,
+	"ip_address" varchar(50),
+	"user_agent" text,
+	"device" varchar(50),
+	"os" varchar(50),
+	"browser" varchar(50)
+);
+--> statement-breakpoint
 CREATE TABLE "settings" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"key" varchar(100) NOT NULL,
 	"value" text NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "skills" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"proficiency" integer NOT NULL,
 	"category" varchar,
@@ -122,7 +147,7 @@ CREATE TABLE "skills" (
 --> statement-breakpoint
 CREATE TABLE "testimonials" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
 	"message" text NOT NULL,
 	"author" varchar(100) NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now(),
@@ -130,13 +155,16 @@ CREATE TABLE "testimonials" (
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(100) NOT NULL,
 	"email" varchar(150) NOT NULL,
 	"username" varchar(100) NOT NULL,
 	"password_hash" varchar NOT NULL,
 	"status" "user_status" DEFAULT 'pending' NOT NULL,
+	"current_hashed_refresh_token" text,
 	"is_verified" boolean DEFAULT false,
+	"failed_attempts" integer DEFAULT 0 NOT NULL,
+	"lock_until" timestamp with time zone,
 	"last_login" timestamp with time zone,
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
@@ -146,7 +174,7 @@ CREATE TABLE "users" (
 --> statement-breakpoint
 CREATE TABLE "work_experiences" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
 	"company" varchar(100) NOT NULL,
 	"position" varchar(100) NOT NULL,
 	"start_date" date NOT NULL,
@@ -163,8 +191,10 @@ ALTER TABLE "certificates" ADD CONSTRAINT "certificates_user_id_users_id_fk" FOR
 ALTER TABLE "courses" ADD CONSTRAINT "courses_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "educations" ADD CONSTRAINT "educations_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "email_verifications" ADD CONSTRAINT "email_verifications_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "login_attempts" ADD CONSTRAINT "login_attempts_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "portfolios" ADD CONSTRAINT "portfolios_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "settings" ADD CONSTRAINT "settings_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "skills" ADD CONSTRAINT "skills_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "testimonials" ADD CONSTRAINT "testimonials_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

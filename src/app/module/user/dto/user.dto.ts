@@ -6,9 +6,15 @@ export interface CreateUserRequest {
 }
 
 export interface UserSignupResponse {
-  id: number;
+  id: string;
   email: string;
   name: string;
   username: string;
   status: string;
+}
+
+export interface ShowUserResponse {
+  id: string;
+  username: string;
+  name: string;
 }

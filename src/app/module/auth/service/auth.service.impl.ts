@@ -18,7 +18,7 @@ export class AuthServiceImpl implements AuthService {
   ) {}
 
   @Transactional()
-  async verifyEmail(rawToken: string, userId: number): Promise<{message: string}> {
+  async verifyEmail(rawToken: string, userId: string): Promise<{message: string}> {
     const verification = await this.emailVerificationRepository.findLatestValid(userId)
     if (!verification) {
       throw new AppException('EMAIL-VERIFY-001', 'Invalid or expired verification link')
@@ -127,7 +127,7 @@ export class AuthServiceImpl implements AuthService {
     return { accessToken }
   }
 
-  async signOut(userId: number): Promise<{ message: string }> {
+  async signOut(userId: string): Promise<{ message: string }> {
     await this.authRepository.updateRefreshToken(userId, null)
     return { message: 'Successfully signed out' }
   }

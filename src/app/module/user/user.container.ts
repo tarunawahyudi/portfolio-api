@@ -1,6 +1,6 @@
 import {container} from "tsyringe"
 import {UserRepository} from "./repository/user.repository"
-import {UserRepositoryImpl} from "./repository/user.repository.impl"
+import {UserRepositoryImpl} from "./repository/impl/user.repository.impl"
 import {UserService} from "./service/user.service"
 import {UserServiceImpl} from "./service/user.service.impl"
 import {UserControllerImpl} from "./controller/user.controller.impl"

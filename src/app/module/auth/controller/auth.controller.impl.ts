@@ -7,10 +7,21 @@ import { successResponse } from '@shared/util/response.util'
 import { LoginRequest } from '@module/auth/dto/auth.dto'
 import { AppException } from '@core/exception/app.exception'
 import { UAParser } from 'ua-parser-js'
+import { CreateUserRequest } from '@module/user/dto/user.dto'
+import type { UserService } from '@module/user/service/user.service'
 
 @injectable()
 export class AuthControllerImpl implements AuthController {
-  constructor(@inject('AuthService') private authService: AuthService) {}
+  constructor(
+    @inject('AuthService') private authService: AuthService,
+    @inject('UserService') private userService: UserService,
+  ) {}
+
+  async postSignUp(ctx: Context): Promise<AppResponse> {
+    const data = ctx.body as CreateUserRequest
+    const user = await this.userService.create(data)
+    return successResponse(ctx, user, "User created successfully", 201)
+  }
 
   async postSignIn(ctx: Context): Promise<AppResponse> {
     const { body, request, server } = ctx
@@ -64,8 +75,7 @@ export class AuthControllerImpl implements AuthController {
   }
 
   async getEmailVerification(ctx: Context): Promise<AppResponse> {
-    const { token, uid } = ctx.query
-    const userId = Number(uid)
+    const { token, uid: userId } = ctx.query
     const response = await this.authService.verifyEmail(token, userId)
     return successResponse(ctx, response)
   }

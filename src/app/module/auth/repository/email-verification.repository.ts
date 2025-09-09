@@ -2,6 +2,6 @@ import { EmailVerification, NewEmailVerification } from '@module/auth/entity/ema
 
 export interface EmailVerificationRepository {
   save(data: NewEmailVerification): Promise<void>;
-  findLatestValid(userId: number): Promise<EmailVerification | null>
+  findLatestValid(userId: string): Promise<EmailVerification | null>
   markUsed(id: number): Promise<void>
 }

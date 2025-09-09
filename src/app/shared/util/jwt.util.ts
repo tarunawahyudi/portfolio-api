@@ -9,7 +9,7 @@ if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET) {
 }
 
 export interface JwtPayload {
-  sub: number;
+  sub: string;
 }
 
 export function generateTokens(payload: JwtPayload): { accessToken: string; refreshToken: string } {

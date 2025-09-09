@@ -6,7 +6,7 @@ export const authGuard = (ctx: Context) => {
   const authHeader = ctx.request.headers.get('authorization')
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new AppException('AUTH-010', 'Authorization header is missing or invalid')
+    throw new AppException('AUTH-000')
   }
 
   const token = authHeader.split(' ')[1]

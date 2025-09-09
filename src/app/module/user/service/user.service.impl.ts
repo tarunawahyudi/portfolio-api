@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe'
-import { randomBytes } from "crypto"
+import { randomBytes } from 'crypto'
 import type { UserService } from '@module/user/service/user.service'
 import type { UserRepository } from '@module/user/repository/user.repository'
-import { CreateUserRequest, UserSignupResponse } from '@module/user/dto/user.dto'
+import { CreateUserRequest, ShowUserResponse, UserSignupResponse } from '@module/user/dto/user.dto'
 import config from '@core/config'
 import type { EmailService } from '@core/service/email.service'
 import type { EmailVerificationRepository } from '@module/auth/repository/email-verification.repository'
@@ -11,10 +11,24 @@ import { AppException } from '@core/exception/app.exception'
 @injectable()
 export class UserServiceImpl implements UserService {
   constructor(
-    @inject("UserRepository") private readonly userRepository: UserRepository,
-    @inject("EmailService") private readonly emailService: EmailService,
-    @inject("EmailVerificationRepository") private readonly emailVerificationRepository: EmailVerificationRepository,
+    @inject('UserRepository') private readonly userRepository: UserRepository,
+    @inject('EmailService') private readonly emailService: EmailService,
+    @inject('EmailVerificationRepository')
+    private readonly emailVerificationRepository: EmailVerificationRepository,
   ) {}
+
+  async showByUsername(username: string): Promise<ShowUserResponse> {
+    const user = await this.userRepository.findByUsername(username)
+    if (!user) {
+      throw new AppException('USER-002')
+    }
+
+    return {
+      id: user.id,
+      username: user.username,
+      name: user.name,
+    }
+  }
 
   private async validate(username: string, email: string): Promise<void> {
     await this.validateUsername(username)

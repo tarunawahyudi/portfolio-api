@@ -23,28 +23,28 @@ export class AuthRepositoryImpl implements AuthRepository {
     await db.insert(loginAttempts).values(data)
   }
 
-  async resetFailedAttempts(userId: number): Promise<void> {
+  async resetFailedAttempts(userId: string): Promise<void> {
     await db
       .update(users)
       .set({ failedAttempts: 0, lockUntil: null })
       .where(eq(users.id, userId))
   }
 
-  async updateFailedAttempt(userId: number, failedAttempts: number, lockUntil?: Date): Promise<void> {
+  async updateFailedAttempt(userId: string, failedAttempts: number, lockUntil?: Date): Promise<void> {
     await db
       .update(users)
       .set({ failedAttempts, lockUntil })
       .where(eq(users.id, userId))
   }
 
-  async findById(userId: number): Promise<User | null> {
+  async findById(userId: string): Promise<User | null> {
     const row = await db.query.users.findFirst({
       where: eq(users.id, userId),
     })
     return row ?? null
   }
 
-  async updateRefreshToken(userId: number, tokenHash: string | null): Promise<void> {
+  async updateRefreshToken(userId: string, tokenHash: string | null): Promise<void> {
     await db
       .update(users)
       .set({ currentHashedRefreshToken: tokenHash })

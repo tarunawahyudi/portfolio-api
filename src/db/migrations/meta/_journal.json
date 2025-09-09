@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1757359673591,
-      "tag": "0000_freezing_mystique",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1757366727864,
-      "tag": "0001_illegal_punisher",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1757393386314,
-      "tag": "0002_familiar_mole_man",
+      "when": 1757452700168,
+      "tag": "0000_hesitant_caretaker",
       "breakpoints": true
     }
   ]

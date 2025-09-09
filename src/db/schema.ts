@@ -21,17 +21,24 @@ export const userStatusEnum = pgEnum('user_status', [
   'deleted',
 ])
 
+export const oauthProviderEnum = pgEnum('oauth_provider', [
+  'google',
+  'github',
+  'linkedin',
+  'facebook',
+])
+
 export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 100 }).notNull(),
   email: varchar('email', { length: 150 }).notNull().unique(),
   username: varchar('username', { length: 100 }).notNull().unique(),
-  passwordHash: varchar('password_hash').notNull(),
+  passwordHash: varchar('password_hash'),
   status: userStatusEnum('status').default('pending').notNull(),
   currentHashedRefreshToken: text('current_hashed_refresh_token'),
   isVerified: boolean('is_verified').default(false),
-  failedAttempts: integer("failed_attempts").default(0).notNull(),
-  lockUntil: timestamp("lock_until", { withTimezone: true }),
+  failedAttempts: integer('failed_attempts').default(0).notNull(),
+  lockUntil: timestamp('lock_until', { withTimezone: true }),
 
   lastLogin: timestamp('last_login', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
@@ -40,7 +47,7 @@ export const users = pgTable('users', {
 
 export const loginAttempts = pgTable('login_attempts', {
   id: serial('id').primaryKey(),
-  userId: integer('user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   attemptTime: timestamp('attempt_time', { withTimezone: true }).defaultNow().notNull(),
@@ -56,7 +63,7 @@ export const loginAttempts = pgTable('login_attempts', {
 
 export const profiles = pgTable('profiles', {
   id: serial('id').primaryKey(),
-  userId: integer('user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' })
     .unique(),
@@ -77,7 +84,7 @@ export const settings = pgTable('settings', {
   id: serial('id').primaryKey(),
   key: varchar('key', { length: 100 }).notNull(),
   value: text('value').notNull(),
-  userId: integer('user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
@@ -86,7 +93,7 @@ export const settings = pgTable('settings', {
 
 export const testimonials = pgTable('testimonials', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: integer('user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   message: text('message').notNull(),
@@ -97,7 +104,7 @@ export const testimonials = pgTable('testimonials', {
 
 export const articles = pgTable('articles', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: integer('user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
@@ -112,7 +119,7 @@ export const articles = pgTable('articles', {
 
 export const certificates = pgTable('certificates', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: integer('user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
@@ -127,7 +134,7 @@ export const certificates = pgTable('certificates', {
 
 export const skills = pgTable('skills', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: integer('user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 255 }).notNull(),
@@ -139,7 +146,7 @@ export const skills = pgTable('skills', {
 
 export const educations = pgTable('educations', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: integer('user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   institution: varchar('institution', { length: 200 }).notNull(),
@@ -155,7 +162,7 @@ export const educations = pgTable('educations', {
 
 export const courses = pgTable('courses', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: integer('user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   institution: varchar('institution').notNull(),
@@ -169,7 +176,7 @@ export const courses = pgTable('courses', {
 
 export const workExperiences = pgTable('work_experiences', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: integer('user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   company: varchar('company', { length: 100 }).notNull(),
@@ -184,7 +191,7 @@ export const workExperiences = pgTable('work_experiences', {
 
 export const portfolios = pgTable('portfolios', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: integer('user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   title: varchar('title').notNull(),
@@ -197,7 +204,7 @@ export const portfolios = pgTable('portfolios', {
 
 export const awards = pgTable('awards', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: integer('user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 100 }).notNull(),
@@ -209,7 +216,7 @@ export const awards = pgTable('awards', {
 
 export const emailVerification = pgTable('email_verifications', {
   id: serial('id').primaryKey(),
-  userId: integer('user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' })
     .unique(),
@@ -218,6 +225,27 @@ export const emailVerification = pgTable('email_verifications', {
   used: boolean('is_verified').default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+})
+
+export const sessions = pgTable('sessions', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }).notNull(),
+  ipAddress: varchar('ip_address', { length: 50 }),
+  userAgent: text('user_agent'),
+  device: varchar('device', { length: 50 }),
+  os: varchar('os', { length: 50 }),
+  browser: varchar('browser', { length: 50 }),
+})
+
+export const oauthAccounts = pgTable('oauth_accounts', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  provider: oauthProviderEnum('provider').notNull(),
+  providerUserId: text('provider_user_id').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 })
 
 // RELATIONS
@@ -233,6 +261,15 @@ export const userRelations = relations(users, ({ one, many }) => ({
   workExperiences: many(workExperiences),
   portfolios: many(portfolios),
   awards: many(awards),
+  oauthAccounts: many(oauthAccounts),
+  session: many(sessions),
+}))
+
+export const oauthAccountRelations = relations(oauthAccounts, ({ one }) => ({
+  user: one(users, {
+    fields: [oauthAccounts.userId],
+    references: [users.id],
+  }),
 }))
 
 export const profileRelations = relations(profiles, ({ one }) => ({

@@ -3,7 +3,7 @@ import { db } from '@db/index'
 import { eq, or } from 'drizzle-orm'
 import { loginAttempts, users } from '@db/schema'
 import { User } from '@module/user/entity/user'
-import { LoginAttempt } from '@module/auth/entity/login-attempt'
+import { NewLoginAttempt } from '@module/auth/entity/login-attempt'
 import { injectable } from 'tsyringe'
 
 @injectable()
@@ -19,7 +19,7 @@ export class AuthRepositoryImpl implements AuthRepository {
     return row ?? null
   }
 
-  async logAttempt(data: LoginAttempt): Promise<void> {
+  async logAttempt(data: NewLoginAttempt): Promise<void> {
     await db.insert(loginAttempts).values(data)
   }
 

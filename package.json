@@ -38,6 +38,7 @@
     "reflect-metadata": "^0.2.2",
     "tsyringe": "^4.10.0",
     "typeorm": "^0.3.25",
+    "ua-parser-js": "^2.0.4",
     "winston": "^3.17.0",
     "winston-transport": "^4.9.0",
     "yaml": "^2.8.1"

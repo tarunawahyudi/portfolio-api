@@ -7,6 +7,7 @@ import { Transactional } from '@shared/decorator/transactional.decorator'
 import { LoginRequest, LoginResponse } from '@module/auth/dto/auth.dto'
 import type { AuthRepository } from '@module/auth/repository/auth.repository'
 import { generateTokens, verifyRefreshToken } from '@shared/util/jwt.util'
+import { getReadableLockDuration } from '@shared/util/common.util'
 
 @injectable()
 export class AuthServiceImpl implements AuthService {
@@ -37,6 +38,7 @@ export class AuthServiceImpl implements AuthService {
 
   async signIn(data: LoginRequest): Promise<LoginResponse> {
     const user = await this.authRepository.findByEmailOrUsername(data.usernameOrEmail)
+
     if (!user) {
       throw new AppException('AUTH-001', "User not found")
     }
@@ -49,8 +51,15 @@ export class AuthServiceImpl implements AuthService {
       throw new AppException('AUTH-007')
     }
 
+    if (user.lockUntil && user.lockUntil <= new Date()) {
+      await this.authRepository.resetFailedAttempts(user.id)
+      user.failedAttempts = 0
+      user.lockUntil = null
+    }
+
     if (user.lockUntil && user.lockUntil > new Date()) {
-      throw new AppException('AUTH-003', "Lock until expired")
+      throw new AppException('AUTH-003',
+        `Account is locked for 3 minutes. Try again in ${getReadableLockDuration(user.lockUntil)}`)
     }
 
     const isMatch = await Bun.password.verify(data.password, user.passwordHash)
@@ -58,8 +67,8 @@ export class AuthServiceImpl implements AuthService {
       const attempts = user.failedAttempts + 1
       let lockUntil: Date | undefined
 
-      if (attempts >= 5) {
-        lockUntil = new Date(Date.now() + 15 * 60 * 1000)
+      if (attempts >= 3) {
+        lockUntil = new Date(Date.now() + 3 * 60 * 1000)
       }
 
       await this.authRepository.updateFailedAttempt(user.id, attempts, lockUntil)
@@ -68,6 +77,10 @@ export class AuthServiceImpl implements AuthService {
         success: false,
         ipAddress: data.ipAddress,
         userAgent: data.userAgent,
+        browser: data.browser,
+        cpu: data.cpu,
+        device: data.device,
+        os: data.os
       })
 
       throw new AppException("AUTH-001", "Invalid credentials")
@@ -76,9 +89,13 @@ export class AuthServiceImpl implements AuthService {
     await this.authRepository.resetFailedAttempts(user.id)
     await this.authRepository.logAttempt({
       userId: user.id,
-      success: false,
+      success: true,
       ipAddress: data.ipAddress,
       userAgent: data.userAgent,
+      browser: data.browser,
+      cpu: data.cpu,
+      device: data.device,
+      os: data.os
     })
 
     const payload = { sub: user.id }

@@ -47,6 +47,11 @@ export const loginAttempts = pgTable('login_attempts', {
   success: boolean('success').notNull(),
   ipAddress: varchar('ip_address', { length: 50 }),
   userAgent: varchar('user_agent', { length: 255 }),
+  device: varchar('device', { length: 50 }),
+  browser: varchar('browser', { length: 50 }),
+  os: varchar('os', { length: 50 }),
+  cpu: varchar('cpu', { length: 50 }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 })
 
 export const profiles = pgTable('profiles', {

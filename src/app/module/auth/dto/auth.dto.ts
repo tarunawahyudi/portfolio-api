@@ -3,6 +3,10 @@ export interface LoginRequest {
   password: string;
   ipAddress?: string;
   userAgent?: string;
+  browser?: string;
+  cpu?: string;
+  device?: string;
+  os?: string;
 }
 
 export interface LoginResponse {

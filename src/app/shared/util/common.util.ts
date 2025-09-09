@@ -64,7 +64,7 @@ export const formatRupiah = (number: number): string => {
 }
 
 /**
- * Formats a number with thousand separators.
+ * Formats a number with a thousand separators.
  *
  * @example
  * ```typescript
@@ -290,3 +290,40 @@ export const generateUUID = (): string => {
 export const sleep = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
+
+/**
+ * Formats the duration between now and a future date (e.g., lockUntil)
+ * into a human-readable string like "14 minutes 20 seconds".
+ *
+ * If the target time is in the past, it will return "Lock has expired".
+ *
+ * @example
+ * ```typescript
+ * getReadableLockDuration(new Date(Date.now() + 900000)) // -> "15 minutes"
+ * ```
+ * @param futureTime A future Date object (e.g., `lockUntil`)
+ * @returns A formatted string like "14 minutes 30 seconds"
+ */
+export const getReadableLockDuration = (futureTime: Date): string => {
+  const now = new Date()
+  const diffMs = futureTime.getTime() - now.getTime()
+
+  if (diffMs <= 0) return 'Lock has expired'
+
+  const totalSeconds = Math.floor(diffMs / 1000)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+
+  const parts: string[] = []
+
+  if (minutes > 0) {
+    parts.push(`${minutes} minute${minutes !== 1 ? 's' : ''}`)
+  }
+
+  if (seconds > 0) {
+    parts.push(`${seconds} second${seconds !== 1 ? 's' : ''}`)
+  }
+
+  return parts.join(' ')
+}
+

@@ -6,6 +6,7 @@ import { Context } from 'elysia'
 import { successResponse } from '@shared/util/response.util'
 import { LoginRequest } from '@module/auth/dto/auth.dto'
 import { AppException } from '@core/exception/app.exception'
+import { UAParser } from 'ua-parser-js'
 
 @injectable()
 export class AuthControllerImpl implements AuthController {
@@ -19,6 +20,13 @@ export class AuthControllerImpl implements AuthController {
 
     data.ipAddress = ipAddress ?? '127.0.0.1'
     data.userAgent = request.headers.get('user-agent') ?? undefined
+
+    const { browser, cpu, device, os } = UAParser(data.userAgent)
+
+    data.browser = browser.name
+    data.cpu = cpu.architecture
+    data.device = device.type
+    data.os = os.name
 
     const response = await this.authService.signIn(data)
     return successResponse(ctx, response)

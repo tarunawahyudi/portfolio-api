@@ -7,7 +7,7 @@ import { loggerMiddleware } from '@core/middleware/logger.middleware'
 import { errorMiddleware } from '@core/middleware/error.middleware'
 import { corsMiddleware } from '@core/middleware/cors.middleware'
 import { registerAuthRoutes } from '@module/auth/auth.route'
-import cookie from '@elysiajs/cookie'
+import { cookie } from '@elysiajs/cookie'
 import { registerAppRoute } from '@module/app.route'
 
 /**

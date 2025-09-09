@@ -29,15 +29,26 @@ export class AuthControllerImpl implements AuthController {
     data.os = os.name
 
     const response = await this.authService.signIn(data)
-    return successResponse(ctx, response)
+
+    ctx.cookie['refreshToken'].set({
+      value: response.refreshToken,
+      httpOnly: true,
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.APP_ENV == 'production',
+      maxAge: 60 * 60 * 24 * 7
+    })
+
+    return successResponse(ctx, { accessToken: response.accessToken })
   }
 
   async postRefreshToken(ctx: Context): Promise<AppResponse> {
-    const { refreshToken } = ctx.body as { refreshToken: string }
-    if (!refreshToken) {
+    const token = ctx.cookie['refreshToken'].value
+    if (!token) {
       throw new AppException('AUTH-008', 'Refresh token not found')
     }
-    const response = await this.authService.refreshToken(refreshToken)
+
+    const response = await this.authService.refreshToken(token)
     return successResponse(ctx, response)
   }
 
@@ -47,6 +58,8 @@ export class AuthControllerImpl implements AuthController {
       throw new AppException('AUTH-001', 'User not authenticated')
     }
     const response = await this.authService.signOut(userId)
+
+    ctx.cookie['refreshToken'].remove()
     return successResponse(ctx, response)
   }
 

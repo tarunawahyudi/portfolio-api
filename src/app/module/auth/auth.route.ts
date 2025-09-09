@@ -19,7 +19,7 @@ export function registerAuthRoutes(app: Elysia) {
           }
         }
       )
-      .post("/sign-in", authController.postSignIn.bind(authController), {
+      .post("/sign-in", (ctx) => authController.postSignIn(ctx), {
           body: t.Object({
             usernameOrEmail: t.String(),
             password: t.String(),
@@ -31,10 +31,7 @@ export function registerAuthRoutes(app: Elysia) {
         }
       )
 
-      .post("/refresh", authController.postRefreshToken.bind(authController), {
-          body: t.Object({
-            refreshToken: t.String(),
-          }),
+      .post("/refresh", (ctx) => authController.postRefreshToken(ctx), {
           detail: {
             tags: ["Authentication"],
             summary: "Get a new access token using a refresh token"
@@ -42,7 +39,7 @@ export function registerAuthRoutes(app: Elysia) {
         }
       )
 
-      .post("/sign-out", authController.postSignOut.bind(authController), {
+      .post("/sign-out", (ctx) => authController.postSignOut(ctx), {
           beforeHandle: authGuard,
           detail: {
             tags: ["Authentication"],

@@ -4,6 +4,8 @@ AUTH-002,AUTH,Token expired,warn,401
 AUTH-003,AUTH,Account is locked please try again later,warn,401
 AUTH-004,AUTH,Access denied,warn,401
 AUTH-005,AUTH,Refresh token is revoked or invalid,warn,401
+AUTH-006,AUTH,Account is not verified,warn,401
+AUTH-007,AUTH,Account is not active,warn,401
 EMAIL-VERIFY-001,AUTH,Invalid or expired verification link, warn, 403
 EMAIL-VERIFY-002,AUTH,Invalid token, warn, 403
 USER-001,USER,Email already exists,warn,400

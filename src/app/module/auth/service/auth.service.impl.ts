@@ -41,6 +41,14 @@ export class AuthServiceImpl implements AuthService {
       throw new AppException('AUTH-001', "User not found")
     }
 
+    if (!user.isVerified) {
+      throw new AppException('AUTH-006')
+    }
+
+    if (user.status != 'active') {
+      throw new AppException('AUTH-007')
+    }
+
     if (user.lockUntil && user.lockUntil > new Date()) {
       throw new AppException('AUTH-003', "Lock until expired")
     }

@@ -23,8 +23,6 @@ export function registerAuthRoutes(app: Elysia) {
           body: t.Object({
             usernameOrEmail: t.String(),
             password: t.String(),
-            ipAddress: t.Optional(t.String()),
-            userAgent: t.Optional(t.String())
           }),
           detail: {
             tags: ["Authentication"],

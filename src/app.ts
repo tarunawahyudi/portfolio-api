@@ -9,6 +9,7 @@ import { corsMiddleware } from '@core/middleware/cors.middleware'
 import { registerAuthRoutes } from '@module/auth/auth.route'
 import { cookie } from '@elysiajs/cookie'
 import { registerAppRoute } from '@module/app.route'
+import { registerWorkerExperienceRoutes } from '@module/work-experience/work-experience.route'
 
 /**
  * Application entry point.
@@ -53,6 +54,7 @@ async function main() {
     .use(registerAppRoute)
     .use(registerUserRoutes)
     .use(registerAuthRoutes)
+    .use(registerWorkerExperienceRoutes)
 
   // Run startup tasks
   startup()

@@ -1,4 +1,4 @@
-import { Elysia, t } from 'elysia'
+import { Elysia } from 'elysia'
 import {UserControllerImpl} from "@module/user/controller/user.controller.impl"
 import {container} from "tsyringe"
 

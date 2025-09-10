@@ -11,8 +11,7 @@ export class UserControllerImpl implements UserController {
 
   async getByUsername(ctx: Context): Promise<AppResponse> {
     const { username } = ctx.params
-    console.log(username)
     const response = await this.userService.showByUsername(username)
-    return successResponse(ctx, response, "User created successfully", 201)
+    return successResponse(ctx, response, "User found", 201)
   }
-} 
+}

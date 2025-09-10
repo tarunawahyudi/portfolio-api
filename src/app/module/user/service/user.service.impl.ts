@@ -7,7 +7,7 @@ import config from '@core/config'
 import type { EmailService } from '@core/service/email.service'
 import type { EmailVerificationRepository } from '@module/auth/repository/email-verification.repository'
 import { AppException } from '@core/exception/app.exception'
-import { ProfileResponse } from '@module/user/dto/profile.dto'
+import { ProfileResponse, UpdateProfileRequest } from '@module/user/dto/profile.dto'
 import type { ProfileRepository } from '@module/user/repository/profile.repository'
 import { Transactional } from '@shared/decorator/transactional.decorator'
 
@@ -110,5 +110,10 @@ export class UserServiceImpl implements UserService {
       hobbies: row.hobbies ?? [],
       website: row.website ?? '',
     }
+  }
+
+  async updateProfile(userId: string, request: UpdateProfileRequest): Promise<void> {
+    const row = this.profileRepository.update(userId, request)
+    if (!row) throw new AppException('DB-002')
   }
 }

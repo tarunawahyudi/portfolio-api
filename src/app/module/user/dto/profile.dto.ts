@@ -18,3 +18,13 @@ export interface CreateProfileDto {
   displayName: string;
 }
 
+export interface UpdateProfileRequest {
+  fullName?: string;
+  displayName?: string;
+  phoneNumber?: string;
+  bio?: string;
+  address?: string;
+  website?: string;
+  socials?: Record<string, string>;
+  hobbies?: string[];
+}

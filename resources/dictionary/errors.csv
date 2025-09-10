@@ -9,8 +9,10 @@ AUTH-006,AUTH,Account is not verified,warn,401
 AUTH-007,AUTH,Account is not active,warn,401
 EMAIL-VERIFY-001,AUTH,Invalid or expired verification link, warn, 403
 EMAIL-VERIFY-002,AUTH,Invalid token, warn, 403
+USER-000,USER,User not authenticated, warn, 403
 USER-001,USER,Email already exists,warn,409
 USER-002,USER,User not found,warn,404
 USER-003,USER,Username already exists,warn,409
 DB-001,DB,Database connection lost,error,500
+DB-002,DB,Failed update data,error,500
 WE-001,WE,Work experience not found,warn,404

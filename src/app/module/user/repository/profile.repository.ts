@@ -1,6 +1,7 @@
-import { NewProfile, Profile } from '@module/user/entity/profile'
+import { NewProfile, Profile, ProfileWithEmail } from '@module/user/entity/profileWithEmail'
 
 export interface ProfileRepository {
   save(data: NewProfile): Promise<void>
-  findByUserId(userId: string): Promise<Profile | null>
+  findByUserId(userId: string): Promise<ProfileWithEmail | null>
+  update(userId: string, data: Partial<NewProfile>): Promise<Profile>
 }

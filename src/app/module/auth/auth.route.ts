@@ -8,6 +8,13 @@ export function registerAuthRoutes(app: Elysia) {
 
   return app.group("/auth", (group) =>
     group
+      .get("/me", authController.getProfileInfo.bind(authController), {
+        beforeHandle: authGuard,
+        detail: {
+          tags: ["Authentication"],
+          summary: "Get profile information",
+        }
+      })
       .post("/sign-up", authController.postSignUp.bind(authController), {
           body: t.Object({
             name: t.String({ required: true }),

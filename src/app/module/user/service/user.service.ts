@@ -6,4 +6,5 @@ export interface UserService {
   showByUsername(username: string): Promise<ShowUserResponse>
   showUserProfileByUserId(userId: string): Promise<ProfileResponse>
   updateProfile(userId: string, request: UpdateProfileRequest): Promise<void>
+  uploadAvatar(userId: string, avatarFile: File): Promise<{ avatarUrl: string }>
 }

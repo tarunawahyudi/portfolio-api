@@ -6,7 +6,7 @@ export interface ProfileResponse {
   displayName: string;
   bio: string;
   address: string;
-  avatar: string;
+  avatarUrl: string;
   socials: Record<string, string>;
   website: string;
   hobbies: string[];

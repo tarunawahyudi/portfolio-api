@@ -5,9 +5,11 @@ import { container } from 'tsyringe'
 import { EmailService } from '@core/service/email.service'
 import { EmailServiceImpl } from '@core/service/email.service.impl'
 import { registerWorkExperienceModule } from '@module/work-experience/work-experience.container'
+import { StorageService } from '@core/service/storage.service'
 
 export async function setupContainer() {
   container.register<EmailService>("EmailService", { useClass: EmailServiceImpl })
+  container.registerSingleton(StorageService)
 
   await registerUserModule()
   await registerAuthModule()

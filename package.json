@@ -16,6 +16,7 @@
     "docker:logs": "docker compose --env-file .env -f infrastructure/docker/docker-compose.yml logs -f"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.886.0",
     "@axiomhq/js": "^1.3.1",
     "@bogeychan/elysia-logger": "^0.1.10",
     "@elysiajs/cookie": "^0.8.0",

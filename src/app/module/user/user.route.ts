@@ -32,5 +32,18 @@ export function registerUserRoutes(app: Elysia) {
           summary: "Update the current user's profile"
         }
       })
+      .post('/avatar', userController.uploadAvatar.bind(userController), {
+        beforeHandle: authGuard,
+        body: t.Object({
+          avatar: t.File({
+            maxSize: '5m',
+            type: ['image/jpeg', 'image/png', 'image/webp'],
+          })
+        }),
+        detail: {
+          tags: ["User"],
+          summary: "Upload or update the current user's avatar"
+        }
+      })
   )
 }

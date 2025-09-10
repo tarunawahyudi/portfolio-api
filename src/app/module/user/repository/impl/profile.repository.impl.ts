@@ -43,5 +43,12 @@ export class ProfileRepositoryImpl implements ProfileRepository {
 
     return updatedProfile
   }
+
+  async updateAvatar(userId: string, avatarKey: string): Promise<void> {
+    await db
+      .update(profiles)
+      .set({ avatar: avatarKey, updatedAt: new Date() })
+      .where(eq(profiles.userId, userId))
+  }
 }
 

@@ -37,7 +37,6 @@ export const toPascalCase = (str: string): string => {
   return camelCase.charAt(0).toUpperCase() + camelCase.slice(1)
 }
 
-
 /**
  * --- NUMERIC AND CURRENCY UTILITIES ---
  */
@@ -78,7 +77,6 @@ export const formatNumberWithCommas = (number: number): string => {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
-
 /**
  * --- DATE AND TIME UTILITIES ---
  */
@@ -115,7 +113,6 @@ export const parseDate = (dateString: string): Date => {
   const [year, month, day] = dateString.split('-').map(Number)
   return new Date(year, month - 1, day)
 }
-
 
 /**
  * --- VALIDATION UTILITIES ---
@@ -157,7 +154,6 @@ export const isValidUrl = (url: string): boolean => {
     return false
   }
 }
-
 
 /**
  * --- SECURITY UTILITIES (HASHING, ENCODING, ETC) ---
@@ -203,7 +199,6 @@ export const generateRandomToken = (length: number = 32): string => {
   }
   return result
 }
-
 
 /**
  * --- ARRAY AND OBJECT UTILITIES ---
@@ -251,7 +246,6 @@ export const shuffleArray = <T>(array: T[]): T[] => {
 export const getPropertyOrDefault = <T, K extends keyof T>(obj: T, key: K, defaultValue: T[K]): T[K] => {
   return obj[key] !== undefined ? obj[key] : defaultValue
 }
-
 
 /**
  * --- OTHER COMMON UTILITIES ---
@@ -327,3 +321,30 @@ export const getReadableLockDuration = (futureTime: Date): string => {
   return parts.join(' ')
 }
 
+/**
+ * Converts a relative storage path (e.g., from a database) into a full, absolute CDN or public URL.
+ * It safely handles null or undefined paths and ensures the base URL is configured.
+ *
+ * @example
+ * ```typescript
+ * // Assuming process.env.R2_PUBLIC_URL = "[https://cdn.example.com](https://cdn.example.com)"
+ * cdnUrl("avatars/user123.jpg") // -> "[https://cdn.example.com/avatars/user123.jpg](https://cdn.example.com/avatars/user123.jpg)"
+ * cdnUrl(null) // -> null
+ * ```
+ * @param relativePath The relative path of the asset (e.g., 'avatars/xyz.jpg').
+ * @returns The full public URL for the asset, or `null` if the input path is empty or the base URL is not configured.
+ */
+export const generateCdnUrl = (relativePath: string | null | undefined): string | null => {
+  if (!relativePath) {
+    return null
+  }
+
+  const baseUrl = process.env.R2_PUBLIC_URL ?? process.env.CDN_PUBLIC_URL
+
+  if (!baseUrl) {
+    console.error('CDN_PUBLIC_URL or R2_PUBLIC_URL is not defined in environment variables.')
+    return null
+  }
+
+  return `${baseUrl}/${relativePath}`
+}

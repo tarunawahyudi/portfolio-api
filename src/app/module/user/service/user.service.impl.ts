@@ -10,10 +10,13 @@ import { AppException } from '@core/exception/app.exception'
 import { ProfileResponse, UpdateProfileRequest } from '@module/user/dto/profile.dto'
 import type { ProfileRepository } from '@module/user/repository/profile.repository'
 import { Transactional } from '@shared/decorator/transactional.decorator'
+import { StorageService } from '@core/service/storage.service'
+import { generateCdnUrl } from '@shared/util/common.util'
 
 @injectable()
 export class UserServiceImpl implements UserService {
   constructor(
+    private readonly storageService: StorageService,
     @inject('UserRepository') private readonly userRepository: UserRepository,
     @inject('EmailService') private readonly emailService: EmailService,
     @inject('EmailVerificationRepository') private readonly emailVerificationRepository: EmailVerificationRepository,
@@ -103,7 +106,7 @@ export class UserServiceImpl implements UserService {
       address: row.address ?? '',
       bio: row.bio ?? '',
       displayName: row.displayName ?? '',
-      avatar: row.avatar ?? '',
+      avatarUrl: generateCdnUrl(row.avatar) ?? '',
       fullName: row.fullName ?? '',
       phoneNumber: row.phoneNumber ?? '',
       socials: row.socials ?? {},
@@ -115,5 +118,13 @@ export class UserServiceImpl implements UserService {
   async updateProfile(userId: string, request: UpdateProfileRequest): Promise<void> {
     const row = this.profileRepository.update(userId, request)
     if (!row) throw new AppException('DB-002')
+  }
+
+  async uploadAvatar(userId: string, avatarFile: File): Promise<{ avatarUrl: string }> {
+    const { key } = await this.storageService.upload(avatarFile, 'avatar')
+    await this.profileRepository.updateAvatar(userId, key)
+    const avatarUrl = `${process.env.R2_PUBLIC_URL}/${key}`
+
+    return { avatarUrl }
   }
 }

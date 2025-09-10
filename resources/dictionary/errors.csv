@@ -13,3 +13,4 @@ USER-001,USER,Email already exists,warn,409
 USER-002,USER,User not found,warn,404
 USER-003,USER,Username already exists,warn,409
 DB-001,DB,Database connection lost,error,500
+WE-001,WE,Work experience not found,warn,404

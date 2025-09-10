@@ -17,3 +17,12 @@ export interface CreateWorkExperienceRequest {
   isCurrent?: boolean;
   jobDescription?: string;
 }
+
+export type UpdateWorkExperienceRequest = {
+  company?: string;
+  position?: string;
+  startDate?: string;
+  endDate?: string;
+  isCurrent?: boolean;
+  jobDescription?: string;
+}

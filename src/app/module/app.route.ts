@@ -5,7 +5,7 @@ export function registerAppRoute(app: Elysia) {
   return app.get('/hello', 'Hello world!', {
     beforeHandle: authGuard,
     detail: {
-      tags: ["Application"],
+      tags: ["Hello World"],
       summary: "Test of API application",
     }
   })

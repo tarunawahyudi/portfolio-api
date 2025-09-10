@@ -1,5 +1,5 @@
 app:
-  name: BunStack
+  name: Portfolio API
   version: 1.0.0
   environment: ${APP_ENV}
   port: ${APP_PORT}
@@ -39,8 +39,8 @@ swagger:
   version: 3.0.0
   provider: swagger-ui
   darkMode: false
-  title: BunStack API Documentation
-  description: API documentation generated for the starter project
+  title: Portfolio API Documentation
+  description: API documentation for portfolio apps
 
 api:
   prefix: /api/v1

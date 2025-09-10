@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { AppException } from '@core/exception/app.exception'
+import { Context } from 'elysia'
 
 const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET!
 const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET!
@@ -9,7 +10,8 @@ if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET) {
 }
 
 export interface JwtPayload {
-  sub: string;
+  sub: string
+  role: string
 }
 
 export function generateTokens(payload: JwtPayload): { accessToken: string; refreshToken: string } {
@@ -34,4 +36,17 @@ export function verifyRefreshToken(token: string): JwtPayload {
     console.error(error)
     throw new AppException('AUTH-005', 'Invalid or expired refresh token')
   }
+}
+
+export function extractUserFromHeader(ctx: Context) {
+  const authHeader = ctx.request.headers.get('authorization')
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new AppException('AUTH-000', 'Unauthorized: Access token is missing or invalid.')
+  }
+
+  const token = authHeader.split(' ')[1]
+  const payload = verifyAccessToken(token)
+  ;(ctx as any).user = payload
+  return payload
 }

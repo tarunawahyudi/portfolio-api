@@ -7,14 +7,16 @@ import config from '@core/config'
 import type { EmailService } from '@core/service/email.service'
 import type { EmailVerificationRepository } from '@module/auth/repository/email-verification.repository'
 import { AppException } from '@core/exception/app.exception'
+import { ProfileResponse } from '../dto/profile.dto'
+import { ProfileRepository } from '@module/user/repository/profile.repository'
 
 @injectable()
 export class UserServiceImpl implements UserService {
   constructor(
     @inject('UserRepository') private readonly userRepository: UserRepository,
     @inject('EmailService') private readonly emailService: EmailService,
-    @inject('EmailVerificationRepository')
-    private readonly emailVerificationRepository: EmailVerificationRepository,
+    @inject('EmailVerificationRepository') private readonly emailVerificationRepository: EmailVerificationRepository,
+    @inject('ProfileRepository') private readonly profileRepository: ProfileRepository,
   ) {}
 
   async showByUsername(username: string): Promise<ShowUserResponse> {
@@ -80,6 +82,23 @@ export class UserServiceImpl implements UserService {
       name: row.name,
       username: row.username,
       status: row.status,
+    }
+  }
+
+  async showUserProfileByUserId(userId: string): Promise<ProfileResponse> {
+    const row = await this.profileRepository.findByUserId(userId)
+    if (!row) throw new AppException('USER-002')
+    return {
+      email: row.email,
+      address: row.address ?? '',
+      bio: row.bio ?? '',
+      displayName: row.displayName ?? '',
+      avatar: row.avatar ?? '',
+      fullName: row.fullName ?? '',
+      phoneNumber: row.phoneNumber ?? '',
+      socials: row.socials ?? {},
+      hobbies: row.hobbies ?? [],
+      website: row.website ?? '',
     }
   }
 }

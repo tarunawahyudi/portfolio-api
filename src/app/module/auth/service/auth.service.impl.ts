@@ -8,17 +8,19 @@ import { LoginRequest, LoginResponse } from '@module/auth/dto/auth.dto'
 import type { AuthRepository } from '@module/auth/repository/auth.repository'
 import { generateTokens, verifyRefreshToken } from '@shared/util/jwt.util'
 import { getReadableLockDuration } from '@shared/util/common.util'
+import { logger } from '@shared/util/logger.util'
 
 @injectable()
 export class AuthServiceImpl implements AuthService {
   constructor(
-    @inject("AuthRepository") private authRepository: AuthRepository,
-    @inject("EmailVerificationRepository") private readonly emailVerificationRepository: EmailVerificationRepository,
-    @inject("UserRepository") private readonly userRepository: UserRepository
+    @inject('AuthRepository') private authRepository: AuthRepository,
+    @inject('EmailVerificationRepository')
+    private readonly emailVerificationRepository: EmailVerificationRepository,
+    @inject('UserRepository') private readonly userRepository: UserRepository,
   ) {}
 
   @Transactional()
-  async verifyEmail(rawToken: string, userId: string): Promise<{message: string}> {
+  async verifyEmail(rawToken: string, userId: string): Promise<{ message: string }> {
     const verification = await this.emailVerificationRepository.findLatestValid(userId)
     if (!verification) {
       throw new AppException('EMAIL-VERIFY-001', 'Invalid or expired verification link')
@@ -40,7 +42,12 @@ export class AuthServiceImpl implements AuthService {
     const user = await this.authRepository.findByEmailOrUsername(data.usernameOrEmail)
 
     if (!user) {
-      throw new AppException('AUTH-001', "User not found")
+      throw new AppException('AUTH-001', 'User not found')
+    }
+
+    if (!user.role) {
+      logger.error(`Fatal: User with ID ${user.id} has no assigned role.`)
+      throw new AppException('AUTH-009')
     }
 
     if (!user.isVerified) {
@@ -58,8 +65,10 @@ export class AuthServiceImpl implements AuthService {
     }
 
     if (user.lockUntil && user.lockUntil > new Date()) {
-      throw new AppException('AUTH-003',
-        `Account is locked for 3 minutes. Try again in ${getReadableLockDuration(user.lockUntil)}`)
+      throw new AppException(
+        'AUTH-003',
+        `Account is locked for 3 minutes. Try again in ${getReadableLockDuration(user.lockUntil)}`,
+      )
     }
 
     const isMatch = await Bun.password.verify(data.password, user.passwordHash)
@@ -80,10 +89,10 @@ export class AuthServiceImpl implements AuthService {
         browser: data.browser,
         cpu: data.cpu,
         device: data.device,
-        os: data.os
+        os: data.os,
       })
 
-      throw new AppException("AUTH-001", "Invalid credentials")
+      throw new AppException('AUTH-001', 'Invalid credentials')
     }
 
     await this.authRepository.resetFailedAttempts(user.id)
@@ -95,17 +104,18 @@ export class AuthServiceImpl implements AuthService {
       browser: data.browser,
       cpu: data.cpu,
       device: data.device,
-      os: data.os
+      os: data.os,
     })
 
-    const payload = { sub: user.id }
+    const payload = { sub: user.id, role: user.role.name }
     const { accessToken, refreshToken } = generateTokens(payload)
 
     const hashedRefreshToken = await Bun.password.hash(refreshToken)
     await this.authRepository.updateRefreshToken(user.id, hashedRefreshToken)
 
     return {
-      accessToken, refreshToken
+      accessToken,
+      refreshToken,
     }
   }
 
@@ -117,11 +127,16 @@ export class AuthServiceImpl implements AuthService {
       throw new AppException('AUTH-004', 'Access denied. Please login again.')
     }
 
+    if (!user.role) {
+      logger.error(`Fatal: User with ID ${user.id} has no assigned role.`)
+      throw new AppException('AUTH-009')
+    }
+
     const isTokenMatch = await Bun.password.verify(token, user.currentHashedRefreshToken)
     if (!isTokenMatch) {
       throw new AppException('AUTH-005', 'Refresh token is revoked or invalid.')
     }
-    const newPayload = { sub: user.id }
+    const newPayload = { sub: user.id, role: user.role.name }
     const { accessToken } = generateTokens(newPayload)
 
     return { accessToken }

@@ -2,18 +2,21 @@ import { AuthRepository } from '@module/auth/repository/auth.repository'
 import { db } from '@db/index'
 import { eq, or } from 'drizzle-orm'
 import { loginAttempts, users } from '@db/schema'
-import { User } from '@module/user/entity/user'
+import { User, UserWithRole } from '@module/user/entity/user'
 import { NewLoginAttempt } from '@module/auth/entity/login-attempt'
 import { injectable } from 'tsyringe'
 
 @injectable()
 export class AuthRepositoryImpl implements AuthRepository {
-  async findByEmailOrUsername(identifier: string): Promise<User | null> {
+  async findByEmailOrUsername(identifier: string): Promise<UserWithRole | null> {
     const row = await db.query.users.findFirst({
         where: or(
           eq(users.email, identifier),
           eq(users.username, identifier)
-        )
+        ),
+        with: {
+          role: true
+        }
       })
 
     return row ?? null
@@ -37,9 +40,12 @@ export class AuthRepositoryImpl implements AuthRepository {
       .where(eq(users.id, userId))
   }
 
-  async findById(userId: string): Promise<User | null> {
+  async findById(userId: string): Promise<UserWithRole | null> {
     const row = await db.query.users.findFirst({
       where: eq(users.id, userId),
+      with: {
+        role: true,
+      }
     })
     return row ?? null
   }

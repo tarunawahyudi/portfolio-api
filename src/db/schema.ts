@@ -21,6 +21,30 @@ export const userStatusEnum = pgEnum('user_status', [
   'deleted',
 ])
 
+export const roles = pgTable('roles', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 50 }).notNull().unique(),
+  description: text('description'),
+})
+
+export const menus = pgTable('menus', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 100 }).notNull(),
+  path: varchar('path', { length: 100 }),
+  iconName: varchar('icon_name', { length: 50 }),
+  parentId: integer('parent_id'),
+})
+
+export const roleMenus = pgTable('role_menus', {
+  id: serial('id').primaryKey(),
+  roleId: integer('role_id')
+    .notNull()
+    .references(() => roles.id, { onDelete: 'cascade' }),
+  menuId: integer('menu_id')
+    .notNull()
+    .references(() => menus.id, { onDelete: 'cascade' }),
+})
+
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 100 }).notNull(),
@@ -32,6 +56,10 @@ export const users = pgTable('users', {
   isVerified: boolean('is_verified').default(false),
   failedAttempts: integer("failed_attempts").default(0).notNull(),
   lockUntil: timestamp("lock_until", { withTimezone: true }),
+
+  roleId: integer('role_id')
+    .notNull()
+    .references(() => roles.id, { onDelete: 'restrict' }),
 
   lastLogin: timestamp('last_login', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
@@ -235,6 +263,10 @@ export const emailVerification = pgTable('email_verifications', {
 
 // RELATIONS
 export const userRelations = relations(users, ({ one, many }) => ({
+  role: one(roles, {
+    fields: [users.roleId],
+    references: [roles.id],
+  }),
   profile: one(profiles),
   settings: many(settings),
   testimonials: many(testimonials),
@@ -246,7 +278,27 @@ export const userRelations = relations(users, ({ one, many }) => ({
   workExperiences: many(workExperiences),
   portfolios: many(portfolios),
   awards: many(awards),
-  emailVerifications: many(emailVerification)
+  emailVerifications: many(emailVerification),
+}))
+
+export const roleRelations = relations(roles, ({ many }) => ({
+  users: many(users),
+  roleMenus: many(roleMenus),
+}))
+
+export const menuRelations = relations(menus, ({ many }) => ({
+  roleMenus: many(roleMenus),
+}))
+
+export const roleMenuRelations = relations(roleMenus, ({ one }) => ({
+  role: one(roles, {
+    fields: [roleMenus.roleId],
+    references: [roles.id],
+  }),
+  menu: one(menus, {
+    fields: [roleMenus.menuId],
+    references: [menus.id],
+  }),
 }))
 
 export const profileRelations = relations(profiles, ({ one }) => ({

@@ -1,7 +1,6 @@
 import { injectable } from 'tsyringe'
 import { EmailVerificationRepository } from '@module/auth/repository/email-verification.repository'
 import { EmailVerification, NewEmailVerification } from '@module/auth/entity/email-verification'
-import { db } from '@db/index'
 import { emailVerification } from '@db/schema'
 import { and, desc, eq, gt } from 'drizzle-orm'
 import { getDbOrTx } from '@shared/decorator/transactional.decorator'
@@ -29,7 +28,9 @@ export class EmailVerificationRepositoryImpl implements EmailVerificationReposit
   }
 
   async save(data: NewEmailVerification): Promise<void> {
-    await db.insert(emailVerification).values(data)
+    const dbOrTx = getDbOrTx()
+    await dbOrTx.insert(emailVerification).values(data)
+
   }
 
   async markUsed(id: number): Promise<void> {

@@ -1,5 +1,6 @@
-import { User } from '@module/user/entity/user'
+import { NewProfile, Profile } from '@module/user/entity/profile'
 
 export interface ProfileRepository {
-  findByUserId(userId: string): Promise<User | null>
+  save(data: NewProfile): Promise<void>
+  findByUserId(userId: string): Promise<Profile | null>
 }

@@ -6,4 +6,5 @@ export interface AuthController {
   postSignIn(ctx: Context): Promise<AppResponse>
   getEmailVerification(ctx: Context): Promise<AppResponse>
   postRefreshToken(ctx: Context): Promise<AppResponse>
+  getProfileInfo(ctx: Context): Promise<AppResponse>
 }

@@ -7,14 +7,17 @@ import config from '@core/config'
 import type { EmailService } from '@core/service/email.service'
 import type { EmailVerificationRepository } from '@module/auth/repository/email-verification.repository'
 import { AppException } from '@core/exception/app.exception'
+import { ProfileResponse } from '@module/user/dto/profile.dto'
+import type { ProfileRepository } from '@module/user/repository/profile.repository'
+import { Transactional } from '@shared/decorator/transactional.decorator'
 
 @injectable()
 export class UserServiceImpl implements UserService {
   constructor(
     @inject('UserRepository') private readonly userRepository: UserRepository,
     @inject('EmailService') private readonly emailService: EmailService,
-    @inject('EmailVerificationRepository')
-    private readonly emailVerificationRepository: EmailVerificationRepository,
+    @inject('EmailVerificationRepository') private readonly emailVerificationRepository: EmailVerificationRepository,
+    @inject('ProfileRepository') private readonly profileRepository: ProfileRepository
   ) {}
 
   async showByUsername(username: string): Promise<ShowUserResponse> {
@@ -45,7 +48,9 @@ export class UserServiceImpl implements UserService {
     if (user) throw new AppException('USER-001')
   }
 
-  async create(data: CreateUserRequest): Promise<UserSignupResponse> {
+  @Transactional()
+  async create(request: any): Promise<UserSignupResponse> {
+    const data = request as CreateUserRequest
     await this.validate(data.username, data.email)
     const passwordHash = await Bun.password.hash(data.password, {
       algorithm: 'bcrypt',
@@ -57,6 +62,12 @@ export class UserServiceImpl implements UserService {
       email: data.email,
       username: data.username,
       passwordHash,
+    })
+
+    await this.profileRepository.save({
+      userId: row.id,
+      fullName: row.name,
+      displayName: row.name
     })
 
     const rawToken = randomBytes(32).toString('hex')
@@ -80,6 +91,24 @@ export class UserServiceImpl implements UserService {
       name: row.name,
       username: row.username,
       status: row.status,
+    }
+  }
+
+  async showUserProfileByUserId(userId: string): Promise<ProfileResponse> {
+    const row = await this.profileRepository.findByUserId(userId)
+    if (!row) throw new AppException('USER-002')
+    return {
+      userId: row.userId,
+      email: row.email,
+      address: row.address ?? '',
+      bio: row.bio ?? '',
+      displayName: row.displayName ?? '',
+      avatar: row.avatar ?? '',
+      fullName: row.fullName ?? '',
+      phoneNumber: row.phoneNumber ?? '',
+      socials: row.socials ?? {},
+      hobbies: row.hobbies ?? [],
+      website: row.website ?? '',
     }
   }
 }

@@ -80,15 +80,11 @@ export class AuthControllerImpl implements AuthController {
     return successResponse(ctx, response)
   }
 
-  async getProfileInfo(ctx: Context): Promise<any> {
+  async getProfileInfo(ctx: Context): Promise<AppResponse> {
     const user = (ctx as any).user
     const userId = user.sub
 
-    return {
-      message: "User profile info",
-      userId,
-      email: user.email,
-      role: user.roleId
-    }
+    const response = await this.userService.showUserProfileByUserId(userId)
+    return successResponse(ctx, response)
   }
 }

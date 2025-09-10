@@ -15,4 +15,4 @@ export class UserControllerImpl implements UserController {
     const response = await this.userService.showByUsername(username)
     return successResponse(ctx, response, "User created successfully", 201)
   }
-}
+} 

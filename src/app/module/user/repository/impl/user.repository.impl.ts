@@ -10,7 +10,8 @@ import { getDbOrTx } from '@shared/decorator/transactional.decorator'
 export class UserRepositoryImpl implements UserRepository {
 
   async save(data: NewUser): Promise<User> {
-    const [inserted] = await db
+    const dbOrTx = getDbOrTx()
+    const [inserted] = await dbOrTx
       .insert(users)
       .values(data)
       .returning()

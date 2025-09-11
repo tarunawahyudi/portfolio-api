@@ -57,7 +57,7 @@ export class AuthRepositoryImpl implements AuthRepository {
       .values(data)
   }
 
-  async findPasswordResetToken(
+  async findPasswordReset(
     tokenHash: string,
   ): Promise<{ token: PasswordReset; user: User } | null> {
     const row = await db.query.passwordResets.findFirst({

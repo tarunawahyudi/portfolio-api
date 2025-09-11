@@ -268,6 +268,13 @@ export const profileRelations = relations(profiles, ({ one }) => ({
   }),
 }))
 
+export const passwordResetRelations = relations(passwordResets, ({ one }) => ({
+  user: one(users, {
+    fields: [passwordResets.userId],
+    references: [users.id],
+  })
+}))
+
 export const emailVerificationRelations = relations(emailVerification, ({ one }) => ({
   user: one(users, {
     fields: [emailVerification.userId],

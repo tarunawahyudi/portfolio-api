@@ -10,7 +10,7 @@ export interface AuthRepository {
   findById(userId: string): Promise<User | null>;
   updateRefreshToken(userId: string, tokenHash: string | null): Promise<void>;
   createPasswordResetToken(data: NewPasswordReset): Promise<void>
-  findPasswordResetToken(tokenHash: string): Promise<{ token: PasswordReset; user: User } | null>
+  findPasswordReset(tokenHash: string): Promise<{ token: PasswordReset; user: User } | null>
   deletePasswordResetToken(id: string): Promise<void>
   markPasswordResetTokenAsUsed(id: string): Promise<void>
 }

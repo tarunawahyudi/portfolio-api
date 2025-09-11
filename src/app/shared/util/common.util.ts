@@ -348,3 +348,19 @@ export const generateCdnUrl = (relativePath: string | null | undefined): string 
 
   return `${baseUrl}/${relativePath}`
 }
+
+/**
+ * Generate a future Date by adding a number of minutes to the current time.
+ *
+ * This function is useful for generating expiration times such as
+ * verification tokens, password reset links, or session lifetimes.
+ *
+ * @param minutes - The number of minutes to add from the current time.
+ *                  Accepts positive integers for future time,
+ *                  or negative integers to get a pastime.
+ *
+ * @returns A Date object representing the future (or past) time
+ */
+export function addMinutes(minutes: number): Date {
+  return new Date(Date.now() + minutes * 60 * 1000)
+}

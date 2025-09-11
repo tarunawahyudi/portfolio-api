@@ -7,11 +7,12 @@ import { Transactional } from '@shared/decorator/transactional.decorator'
 import { LoginRequest, LoginResponse } from '@module/auth/dto/auth.dto'
 import type { AuthRepository } from '@module/auth/repository/auth.repository'
 import { generateTokens, verifyRefreshToken } from '@shared/util/jwt.util'
-import { getReadableLockDuration } from '@shared/util/common.util'
-import { db } from '@db/index'
-import { passwordResets, users } from '@db/schema'
-import { eq } from 'drizzle-orm'
-import { randomBytes } from 'crypto'
+import {
+  addMinutes,
+  generateRandomToken,
+  getReadableLockDuration,
+  hashData,
+} from '@shared/util/common.util'
 import type { EmailService } from '@core/service/email.service'
 
 @injectable()
@@ -142,9 +143,9 @@ export class AuthServiceImpl implements AuthService {
     const user = await this.authRepository.findByEmailOrUsername(email)
 
     if (user) {
-      const token = randomBytes(32).toString('hex')
-      const tokenHash = await Bun.password.hash(token)
-      const expiresAt = new Date(Date.now() + 15 * 60 * 1000)
+      const token = generateRandomToken(32)
+      const tokenHash = hashData(token)
+      const expiresAt = addMinutes(15)
 
       await this.authRepository.createPasswordResetToken({
         userId: user.id,
@@ -158,8 +159,8 @@ export class AuthServiceImpl implements AuthService {
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
-    const tokenHash = await Bun.password.hash(token)
-    const result = await this.authRepository.findPasswordResetToken(tokenHash)
+    const tokenHash = hashData(token)
+    const result = await this.authRepository.findPasswordReset(tokenHash)
     if (!result) throw new AppException("AUTH-008")
 
     const { token: resetToken, user } = result
@@ -172,13 +173,7 @@ export class AuthServiceImpl implements AuthService {
     }
 
     const newPasswordHash = await Bun.password.hash(newPassword)
-    await db.transaction(async (tx) => {
-      await tx.update(users)
-        .set({ passwordHash: newPasswordHash })
-        .where(eq(users.id, user.id))
-
-      await tx.delete(passwordResets)
-        .where(eq(passwordResets.id, resetToken.id))
-    })
+    await this.authRepository.markPasswordResetTokenAsUsed(resetToken.id)
+    await this.userRepository.updatePassword(user.id, newPasswordHash)
   }
 }

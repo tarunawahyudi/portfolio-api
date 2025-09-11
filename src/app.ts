@@ -10,6 +10,7 @@ import { registerAuthRoutes } from '@module/auth/auth.route'
 import { cookie } from '@elysiajs/cookie'
 import { registerAppRoute } from '@module/app.route'
 import { registerWorkerExperienceRoutes } from '@module/work-experience/work-experience.route'
+import { registerPortfolioRoutes } from '@module/portfolio/portfolio.route'
 
 /**
  * Application entry point.
@@ -55,6 +56,7 @@ async function main() {
     .use(registerUserRoutes)
     .use(registerAuthRoutes)
     .use(registerWorkerExperienceRoutes)
+    .use(registerPortfolioRoutes)
 
   // Run startup tasks
   startup()

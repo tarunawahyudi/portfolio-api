@@ -24,3 +24,12 @@ export interface PaginatedResponse<T> {
   data: T[]
   pagination: PaginationMetadata
 }
+
+export interface PageResponse<T> {
+  success: boolean;
+  message: string;
+  data: T[];
+  pagination: PaginationMetadata;
+  timestamp: string;
+}
+

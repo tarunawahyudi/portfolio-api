@@ -21,3 +21,4 @@ DB-002,DB,Failed update data,error,500
 WE-001,WE,Work experience not found,warn,404
 MEDIA-001,MEDIA,No file uploaded or file is empty,warn,400
 MEDIA-002,MEDIA,Unsupported file type,warn,400
+PORTFOLIO-001,PORTFOLIO,Portfolio not found or you do not have permission to view it,warn,403

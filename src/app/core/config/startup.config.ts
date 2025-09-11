@@ -1,8 +1,8 @@
 import {readFileSync} from "fs"
-import config from "./config"
+import config from "./index"
 import {COLORS} from "@shared/constant/colors.constant"
 
-export function startup() {
+export function startupConfig() {
   try {
     const banner = readFileSync(config.resources.banner, "utf-8")
     console.log(`${banner}${COLORS.RESET}`)

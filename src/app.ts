@@ -1,16 +1,12 @@
 import { Elysia } from "elysia"
-import { setupContainer } from "@core/container"
-import { registerUserRoutes } from "@module/user/user.route"
-import { startup } from "@core/startup"
+import { startupConfig } from "@core/config/startup.config"
 import { swaggerPlugin } from "@core/config/swagger.config"
 import { loggerMiddleware } from '@core/middleware/logger.middleware'
 import { errorMiddleware } from '@core/middleware/error.middleware'
 import { corsMiddleware } from '@core/middleware/cors.middleware'
-import { registerAuthRoutes } from '@module/auth/auth.route'
 import { cookie } from '@elysiajs/cookie'
-import { registerAppRoute } from '@module/app.route'
-import { registerWorkerExperienceRoutes } from '@module/work-experience/work-experience.route'
-import { registerPortfolioRoutes } from '@module/portfolio/portfolio.route'
+import { setupContainer } from '@module/app.container'
+import { ApplicationRoutes } from '@module/app.route'
 
 /**
  * Application entry point.
@@ -52,14 +48,10 @@ async function main() {
      * Application routes
      * Registers all route handlers for the User module
      */
-    .use(registerAppRoute)
-    .use(registerUserRoutes)
-    .use(registerAuthRoutes)
-    .use(registerWorkerExperienceRoutes)
-    .use(registerPortfolioRoutes)
+    .use(ApplicationRoutes)
 
   // Run startup tasks
-  startup()
+  startupConfig()
 
   // Start HTTP server
   app.listen(process.env.APP_PORT ?? 8080)

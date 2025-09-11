@@ -16,9 +16,9 @@ import { generateCdnUrl } from '@shared/util/common.util'
 @injectable()
 export class UserServiceImpl implements UserService {
   constructor(
-    private readonly storageService: StorageService,
-    @inject('UserRepository') private readonly userRepository: UserRepository,
+    @inject('StorageService') private readonly storageService: StorageService,
     @inject('EmailService') private readonly emailService: EmailService,
+    @inject('UserRepository') private readonly userRepository: UserRepository,
     @inject('EmailVerificationRepository') private readonly emailVerificationRepository: EmailVerificationRepository,
     @inject('ProfileRepository') private readonly profileRepository: ProfileRepository
   ) {}

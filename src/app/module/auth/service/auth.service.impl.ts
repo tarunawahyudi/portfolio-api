@@ -18,7 +18,7 @@ import type { EmailService } from '@core/service/email.service'
 @injectable()
 export class AuthServiceImpl implements AuthService {
   constructor(
-    @inject('EmailService') private readonly emailService: EmailService,
+    @inject("EmailService") private readonly emailService: EmailService,
     @inject("AuthRepository") private authRepository: AuthRepository,
     @inject("EmailVerificationRepository") private readonly emailVerificationRepository: EmailVerificationRepository,
     @inject("UserRepository") private readonly userRepository: UserRepository

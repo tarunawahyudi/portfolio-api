@@ -1,12 +1,13 @@
 import { Elysia } from 'elysia'
-import { authGuard } from '@core/middleware/auth.middleware'
+import { registerUserRoutes } from '@module/user/user.route'
+import { registerAuthRoutes } from '@module/auth/auth.route'
+import { registerWorkerExperienceRoutes } from '@module/work-experience/work-experience.route'
+import { registerPortfolioRoutes } from '@module/portfolio/portfolio.route'
 
-export function registerAppRoute(app: Elysia) {
-  return app.get('/hello', 'Hello world!', {
-    beforeHandle: authGuard,
-    detail: {
-      tags: ["Hello World"],
-      summary: "Test of API application",
-    }
-  })
+export function ApplicationRoutes(app: Elysia) {
+  return app
+    .use(registerAuthRoutes)
+    .use(registerUserRoutes)
+    .use(registerPortfolioRoutes)
+    .use(registerWorkerExperienceRoutes)
 }

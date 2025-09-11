@@ -8,10 +8,16 @@ import { LoginRequest, LoginResponse } from '@module/auth/dto/auth.dto'
 import type { AuthRepository } from '@module/auth/repository/auth.repository'
 import { generateTokens, verifyRefreshToken } from '@shared/util/jwt.util'
 import { getReadableLockDuration } from '@shared/util/common.util'
+import { db } from '@db/index'
+import { passwordResets, users } from '@db/schema'
+import { eq } from 'drizzle-orm'
+import { randomBytes } from 'crypto'
+import type { EmailService } from '@core/service/email.service'
 
 @injectable()
 export class AuthServiceImpl implements AuthService {
   constructor(
+    @inject('EmailService') private readonly emailService: EmailService,
     @inject("AuthRepository") private authRepository: AuthRepository,
     @inject("EmailVerificationRepository") private readonly emailVerificationRepository: EmailVerificationRepository,
     @inject("UserRepository") private readonly userRepository: UserRepository
@@ -130,5 +136,49 @@ export class AuthServiceImpl implements AuthService {
   async signOut(userId: string): Promise<{ message: string }> {
     await this.authRepository.updateRefreshToken(userId, null)
     return { message: 'Successfully signed out' }
+  }
+
+  async requestPasswordReset(email: string): Promise<void> {
+    const user = await this.authRepository.findByEmailOrUsername(email)
+
+    if (user) {
+      const token = randomBytes(32).toString('hex')
+      const tokenHash = await Bun.password.hash(token)
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000)
+
+      await this.authRepository.createPasswordResetToken({
+        userId: user.id,
+        tokenHash,
+        expiresAt,
+      })
+
+      const resetUrl = `${process.env.FRONTEND_URL}/auth/reset-password?token=${token}`
+      await this.emailService.sendPasswordResetEmail(user.email, user.name, resetUrl)
+    }
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const tokenHash = await Bun.password.hash(token)
+    const result = await this.authRepository.findPasswordResetToken(tokenHash)
+    if (!result) throw new AppException("AUTH-008")
+
+    const { token: resetToken, user } = result
+
+    if (resetToken.isUsed) throw new AppException('AUTH-010')
+
+    if (new Date > resetToken.expiresAt) {
+      await this.authRepository.deletePasswordResetToken(resetToken.id)
+      throw new AppException("AUTH-009")
+    }
+
+    const newPasswordHash = await Bun.password.hash(newPassword)
+    await db.transaction(async (tx) => {
+      await tx.update(users)
+        .set({ passwordHash: newPasswordHash })
+        .where(eq(users.id, user.id))
+
+      await tx.delete(passwordResets)
+        .where(eq(passwordResets.id, resetToken.id))
+    })
   }
 }

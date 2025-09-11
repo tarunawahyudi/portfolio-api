@@ -5,4 +5,6 @@ export interface AuthService {
   verifyEmail(rawToken: string, userId: string): Promise<{ message: string }>
   refreshToken(token: string): Promise<{ accessToken: string }>
   signOut(userId: string): Promise<{ message: string }>
+  requestPasswordReset(email: string): Promise<void>
+  resetPassword(token: string, newPassword: string): Promise<void>
 }

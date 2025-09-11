@@ -7,4 +7,6 @@ export interface AuthController {
   getEmailVerification(ctx: Context): Promise<AppResponse>
   postRefreshToken(ctx: Context): Promise<AppResponse>
   getProfileInfo(ctx: Context): Promise<AppResponse>
+  requestPasswordReset(ctx: Context): Promise<AppResponse>
+  resetPassword(ctx: Context): Promise<AppResponse>
 }

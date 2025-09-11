@@ -66,5 +66,30 @@ export function registerAuthRoutes(app: Elysia) {
           }
         }
       )
+      .post('/forgot-password', authController.requestPasswordReset.bind(authController), {
+        body: t.Object({
+          email: t.String({
+            format: 'email',
+            error: 'Invalid email format'
+          }),
+        }),
+        detail: {
+          tags: ["Authentication"],
+          summary: "Request a password reset link",
+        },
+      })
+      .post('/reset-password', authController.resetPassword.bind(authController), {
+        body: t.Object({
+          token: t.String({ error: 'Token is required' }),
+          password: t.String({
+            minLength: 6,
+            error: 'Password must be at least 6 characters'
+          }),
+        }),
+        detail: {
+          tags: ["Authentication"],
+          summary: "Reset password with a valid token",
+        },
+      })
   )
 }

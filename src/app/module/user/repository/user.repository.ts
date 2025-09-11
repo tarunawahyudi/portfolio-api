@@ -5,4 +5,5 @@ export interface UserRepository {
   findByUsername(username: string): Promise<User | null>
   findByEmail(email: string): Promise<User | null>
   markVerified(userId: string): Promise<void>
+  updatePassword(userId: string, passwordHash: string): Promise<void>
 }

@@ -3,7 +3,7 @@ import { AppResponse } from '@shared/type/global'
 import { inject, injectable } from 'tsyringe'
 import type { AuthService } from '@module/auth/service/auth.service'
 import { Context } from 'elysia'
-import { successResponse } from '@shared/util/response.util'
+import { noResponse, successResponse } from '@shared/util/response.util'
 import { LoginRequest } from '@module/auth/dto/auth.dto'
 import { AppException } from '@core/exception/app.exception'
 import { UAParser } from 'ua-parser-js'
@@ -20,7 +20,7 @@ export class AuthControllerImpl implements AuthController {
   async postSignUp(ctx: Context): Promise<AppResponse> {
     const data = ctx.body as CreateUserRequest
     const user = await this.userService.create(data)
-    return successResponse(ctx, user, "User created successfully", 201)
+    return successResponse(ctx, user, 'User created successfully', 201)
   }
 
   async postSignIn(ctx: Context): Promise<AppResponse> {
@@ -47,7 +47,7 @@ export class AuthControllerImpl implements AuthController {
       path: '/',
       sameSite: 'lax',
       secure: process.env.APP_ENV == 'production',
-      maxAge: 60 * 60 * 24 * 7
+      maxAge: 60 * 60 * 24 * 7,
     })
 
     return successResponse(ctx, { accessToken: response.accessToken })
@@ -86,5 +86,17 @@ export class AuthControllerImpl implements AuthController {
 
     const response = await this.userService.showUserProfileByUserId(userId)
     return successResponse(ctx, response)
+  }
+
+  async requestPasswordReset(ctx: Context): Promise<AppResponse> {
+    const { email } = ctx.body as { email: string }
+    await this.authService.requestPasswordReset(email)
+    return noResponse(ctx, `A password reset link has been sent to ${email}`)
+  }
+
+  async resetPassword(ctx: Context): Promise<AppResponse> {
+    const { token, password } = ctx.body as { token: string; password: string }
+    await this.authService.resetPassword(token, password)
+    return noResponse(ctx, "Password has been reset successfully")
   }
 }

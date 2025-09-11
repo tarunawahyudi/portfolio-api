@@ -54,6 +54,17 @@ export const loginAttempts = pgTable('login_attempts', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 })
 
+export const passwordResets = pgTable("password_resets", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id),
+  tokenHash: varchar("token_hash", { length: 255 }).notNull().unique(),
+  isUsed: boolean("is_used").default(false).notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true, mode: 'date' }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+})
+
 export const profiles = pgTable('profiles', {
   id: serial('id').primaryKey(),
   userId: uuid('user_id')
@@ -246,7 +257,8 @@ export const userRelations = relations(users, ({ one, many }) => ({
   workExperiences: many(workExperiences),
   portfolios: many(portfolios),
   awards: many(awards),
-  emailVerifications: many(emailVerification)
+  emailVerifications: many(emailVerification),
+  passwordResets: many(passwordResets),
 }))
 
 export const profileRelations = relations(profiles, ({ one }) => ({

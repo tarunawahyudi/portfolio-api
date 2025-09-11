@@ -4,6 +4,7 @@ import nodemailer from 'nodemailer'
 import { EmailService } from '@core/service/email.service'
 import { injectable } from 'tsyringe'
 import config from '@core/config'
+import { logger } from '@shared/util/logger.util'
 
 @injectable()
 export class EmailServiceImpl implements EmailService {
@@ -39,7 +40,7 @@ export class EmailServiceImpl implements EmailService {
   }
 
   async sendVerificationEmail(to: string, verifyUrl: string): Promise<void> {
-    const html = await this.loadTemplate('email_verification', {
+    const html = await this.loadTemplate('email-verification', {
       VERIFY_URL: verifyUrl,
       YEAR: new Date().getFullYear().toString(),
     })
@@ -48,6 +49,23 @@ export class EmailServiceImpl implements EmailService {
       from: `"${config.app.name}" <${process.env.SMTP_USER}>`,
       to,
       subject: 'Verify your email address',
+      html,
+    })
+  }
+
+
+  async sendPasswordResetEmail(recipientEmail: string, recipientName: string, resetUrl: string): Promise<void> {
+    const html = await this.loadTemplate('reset-password', {
+      RECIPIENT_NAME: recipientName,
+      RESET_URL: resetUrl,
+      YEAR: new Date().getFullYear().toString(),
+    })
+
+    logger.info(`[EmailService] Sending password reset email to: ${recipientEmail}`)
+    await this.transporter.sendMail({
+      from: `"${config.app.name}" <${process.env.SMTP_USER}>`,
+      to: recipientEmail,
+      subject: 'Your Password Reset Link',
       html,
     })
   }

@@ -48,4 +48,11 @@ export class UserRepositoryImpl implements UserRepository {
 
     return row ?? null
   }
+
+  async updatePassword(userId: string, passwordHash: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ passwordHash, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+  }
 }

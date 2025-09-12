@@ -6,7 +6,7 @@ import { inject, injectable } from 'tsyringe'
 import type { PortfolioService } from '@module/portfolio/service/portfolio.service'
 import {
   noResponse,
-  pageResponse,
+  paginateResponse,
   successResponse,
 } from '@shared/util/response.util'
 import {
@@ -23,7 +23,7 @@ export class PortfolioControllerImpl implements PortfolioController {
     const userId = (ctx as any).user?.sub
     const options = parsePaginationOptions(ctx.query)
     const paginatedData = await this.portfolioService.fetch(userId, options)
-    return pageResponse(ctx, paginatedData, 'fetch success')
+    return paginateResponse(ctx, paginatedData, 'fetch success')
   }
 
   async getById(ctx: Context): Promise<AppResponse> {

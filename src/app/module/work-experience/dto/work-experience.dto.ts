@@ -1,5 +1,6 @@
 export interface WorkExperienceResponse {
   id: string;
+  userId: string;
   company: string;
   position: string;
   startDate: string;

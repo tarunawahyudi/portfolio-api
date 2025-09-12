@@ -25,27 +25,7 @@ export function noResponse(ctx: Context, message = 'Success', status = 200) {
   }
 }
 
-export function paginateResponse(
-  ctx: any,
-  data: any,
-  message: string = 'Success',
-  statusCode: number = 200,
-  pagination?: object,
-) {
-  ctx.set.status = statusCode
-  const response: any = {
-    code: statusCode,
-    status: 'success',
-    message: message,
-    data: data,
-  }
-  if (pagination) {
-    response.pagination = pagination
-  }
-  return response
-}
-
-export function pageResponse<T>(
+export function paginateResponse<T>(
   ctx: Context,
   paginatedData: PaginatedResponse<T>,
   message = 'Success',

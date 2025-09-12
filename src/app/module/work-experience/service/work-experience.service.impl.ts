@@ -5,9 +5,10 @@ import { inject, injectable } from 'tsyringe'
 import type { WorkExperienceRepository } from '@module/work-experience/repository/work-experience.repository'
 import {
   CreateWorkExperienceRequest,
-  UpdateWorkExperienceRequest,
+  UpdateWorkExperienceRequest, WorkExperienceResponse,
 } from '@module/work-experience/dto/work-experience.dto'
 import { AppException } from '@core/exception/app.exception'
+import { toWorkExperienceResponse } from '@module/work-experience/mapper/work-experience.mapper'
 
 @injectable()
 export class WorkExperienceServiceImpl implements WorkExperienceService {
@@ -20,8 +21,14 @@ export class WorkExperienceServiceImpl implements WorkExperienceService {
     if (!exists) throw new AppException('WE-001')
   }
 
-  async fetch(options: PaginationOptions, userId: string): Promise<PaginatedResponse<WorkExperience>> {
-    return this.workExperienceRepository.findAll(options, userId)
+  async fetch(options: PaginationOptions, userId: string): Promise<PaginatedResponse<WorkExperienceResponse>> {
+    const paginatedResult = await this.workExperienceRepository.findAll(options, userId)
+    const transformData = paginatedResult.data.map(toWorkExperienceResponse)
+
+    return {
+      data: transformData,
+      pagination: paginatedResult.pagination
+    }
   }
 
   async create(request: CreateWorkExperienceRequest): Promise<WorkExperience> {

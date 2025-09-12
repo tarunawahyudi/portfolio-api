@@ -21,6 +21,12 @@ export const userStatusEnum = pgEnum('user_status', [
   'deleted',
 ])
 
+export const mediaOwnerTypeEnum = pgEnum('media_owner_type', [
+  'portfolio',
+  'user',
+  'article'
+])
+
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 100 }).notNull(),
@@ -76,7 +82,7 @@ export const profiles = pgTable('profiles', {
   displayName: varchar('display_name', { length: 100 }),
   bio: text('bio'),
   address: text('address'),
-  avatar: varchar('avatar'),
+  avatarId: uuid('avatar_id').references(() => media.id, { onDelete: 'set null' }),
   socials: jsonb('socials').$type<Record<string, string>>().default({}),
   website: varchar('website', { length: 100 }),
   hobbies: text('hobbies').array(),
@@ -213,7 +219,7 @@ export const portfolios = pgTable('portfolios', {
     .references(() => users.id, { onDelete: 'cascade' }),
   title: varchar('title').notNull(),
   description: text('description'),
-  thumbnail: text('thumbnail'),
+  thumbnailId: uuid('thumbnail_id').references(() => media.id, { onDelete: 'set null' }),
   techStack: text('tech_stack').array(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
@@ -244,6 +250,17 @@ export const emailVerification = pgTable('email_verifications', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 })
 
+export const media = pgTable('media', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  fileKey: text('file_key').notNull(),
+  fileType: varchar('file_type', { length: 100 }).notNull(),
+  fileSize: integer('file_size').notNull(),
+  altText: text('alt_text'),
+  ownerId: uuid('owner_id').notNull(),
+  ownerType: mediaOwnerTypeEnum('owner_type').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+})
+
 // RELATIONS
 export const userRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles),
@@ -266,6 +283,10 @@ export const profileRelations = relations(profiles, ({ one }) => ({
     fields: [profiles.userId],
     references: [users.id],
   }),
+  avatar: one(media, {
+    fields: [profiles.avatarId],
+    references: [media.id],
+  })
 }))
 
 export const passwordResetRelations = relations(passwordResets, ({ one }) => ({
@@ -338,11 +359,16 @@ export const workExperienceRelations = relations(workExperiences, ({ one }) => (
   }),
 }))
 
-export const portfolioRelations = relations(portfolios, ({ one }) => ({
+export const portfolioRelations = relations(portfolios, ({ one, many }) => ({
   user: one(users, {
     fields: [portfolios.userId],
     references: [users.id],
   }),
+  thumbnail: one(media, {
+    fields: [portfolios.thumbnailId],
+    references: [media.id]
+  }),
+  gallery: many(media),
 }))
 
 export const awardRelations = relations(awards, ({ one }) => ({

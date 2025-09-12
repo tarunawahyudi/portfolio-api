@@ -65,7 +65,11 @@ export class PortfolioServiceImpl implements PortfolioService {
     console.log(portfolio)
     if (!portfolio) throw new AppException('COMMON-001')
 
-    const { key } = await this.storageService.upload(thumbnailFile, 'thumbnail')
+    const { key } = await this.storageService.upload({
+      file: thumbnailFile,
+      module: 'portfolio',
+      category: 'thumbnail',
+    })
     await this.portfolioRepository.updateThumbnail(id, userId, key)
     return { thumbnailUrl: cdnUrl(key) }
   }

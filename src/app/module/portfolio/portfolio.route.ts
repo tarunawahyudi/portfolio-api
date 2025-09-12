@@ -85,5 +85,12 @@ export function registerPortfolioRoutes(app: Elysia) {
           summary: "Upload a thumbnail for a specific portfolio"
         }
       })
+      .post('/:id/media', portfolioController.uploadMedia.bind(portfolioController), { // Asumsi method `uploadMedia` dibuat di PortfolioController yang memanggil MediaService
+        params: t.Object({ id: t.String({ format: 'uuid' }) }),
+        body: t.Object({
+          file: t.File({ type: ['image/jpeg', 'image/png'], maxSize: '5m' })
+        }),
+        detail: { tags: ["Portfolio"], summary: "Upload media to a portfolio gallery" }
+      })
   )
 }

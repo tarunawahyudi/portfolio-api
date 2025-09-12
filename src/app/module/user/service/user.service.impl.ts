@@ -121,7 +121,11 @@ export class UserServiceImpl implements UserService {
   }
 
   async uploadAvatar(userId: string, avatarFile: File): Promise<{ avatarUrl: string }> {
-    const { key } = await this.storageService.upload(avatarFile, 'avatar')
+    const { key } = await this.storageService.upload({
+      file: avatarFile,
+      module: 'user',
+      category: 'avatar',
+    })
     await this.profileRepository.updateAvatar(userId, key)
     const avatarUrl = `${process.env.R2_PUBLIC_URL}/${key}`
 

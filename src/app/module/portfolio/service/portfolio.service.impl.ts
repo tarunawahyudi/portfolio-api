@@ -11,7 +11,7 @@ import type { PortfolioRepository } from '@module/portfolio/repository/portfolio
 import { toPortfolioResponse } from '@module/portfolio/mapper/portfolio.mapper'
 import { AppException } from '@core/exception/app.exception'
 import { StorageService } from '@core/service/storage.service'
-import { generateCdnUrl } from '@shared/util/common.util'
+import { cdnUrl } from '@shared/util/common.util'
 
 @injectable()
 export class PortfolioServiceImpl implements PortfolioService {
@@ -67,6 +67,6 @@ export class PortfolioServiceImpl implements PortfolioService {
 
     const { key } = await this.storageService.upload(thumbnailFile, 'thumbnail')
     await this.portfolioRepository.updateThumbnail(id, userId, key)
-    return { thumbnailUrl: generateCdnUrl(key) }
+    return { thumbnailUrl: cdnUrl(key) }
   }
 }

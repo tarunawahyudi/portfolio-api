@@ -11,7 +11,7 @@ import { ProfileResponse, UpdateProfileRequest } from '@module/user/dto/profile.
 import type { ProfileRepository } from '@module/user/repository/profile.repository'
 import { Transactional } from '@shared/decorator/transactional.decorator'
 import { StorageService } from '@core/service/storage.service'
-import { generateCdnUrl } from '@shared/util/common.util'
+import { cdnUrl } from '@shared/util/common.util'
 
 @injectable()
 export class UserServiceImpl implements UserService {
@@ -106,7 +106,7 @@ export class UserServiceImpl implements UserService {
       address: row.address ?? '',
       bio: row.bio ?? '',
       displayName: row.displayName ?? '',
-      avatarUrl: generateCdnUrl(row.avatar) ?? '',
+      avatarUrl: cdnUrl(row.avatar) ?? '',
       fullName: row.fullName ?? '',
       phoneNumber: row.phoneNumber ?? '',
       socials: row.socials ?? {},

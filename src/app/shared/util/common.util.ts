@@ -334,7 +334,7 @@ export const getReadableLockDuration = (futureTime: Date): string => {
  * @param relativePath The relative path of the asset (e.g., 'avatars/xyz.jpg').
  * @returns The full public URL for the asset, or `null` if the input path is empty or the base URL is not configured.
  */
-export const generateCdnUrl = (relativePath: string | null | undefined): string | null => {
+export const cdnUrl = (relativePath: string | null | undefined): string | null => {
   if (!relativePath) {
     return null
   }

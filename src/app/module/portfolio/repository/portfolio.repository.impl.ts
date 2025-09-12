@@ -31,6 +31,17 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
     return row || null
   }
 
+  async findOne(id: string, userId: string): Promise<Portfolio | null> {
+    const row = await db.query.portfolios.findFirst({
+      where: and(
+        eq(portfolios.id, id),
+        eq(portfolios.userId, userId)
+      )
+    })
+
+    return row || null
+  }
+
   async update(id: string, userId: string, data: NewPortfolio): Promise<Portfolio> {
     const [updated] = await db
       .update(portfolios)
@@ -54,5 +65,15 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
           eq(portfolios.userId, userId)
         )
       )
+  }
+
+  async updateThumbnail(id: string, userId: string, thumbnailKey: string): Promise<Portfolio> {
+    const [updatedPortfolio] = await db
+      .update(portfolios)
+      .set({ thumbnail: thumbnailKey, updatedAt: new Date() })
+      .where(and(eq(portfolios.id, id), eq(portfolios.userId, userId)))
+      .returning()
+
+    return updatedPortfolio
   }
 }

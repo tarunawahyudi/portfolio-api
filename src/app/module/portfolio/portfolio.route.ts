@@ -69,5 +69,21 @@ export function registerPortfolioRoutes(app: Elysia) {
           summary: "Delete a portfolio"
         }
       })
+      .post('/:id/thumbnail', portfolioController.uploadThumbnail.bind(portfolioController), {
+        beforeHandle: authGuard,
+        params: t.Object({
+          id: t.String({ format: 'uuid', error: 'Invalid portfolio ID format' })
+        }),
+        body: t.Object({
+          thumbnail: t.File({
+            type: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+            maxSize: '5m'
+          })
+        }),
+        detail: {
+          tags: ["Portfolio"],
+          summary: "Upload a thumbnail for a specific portfolio"
+        }
+      })
   )
 }

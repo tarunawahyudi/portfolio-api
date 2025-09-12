@@ -10,10 +10,13 @@ import { inject, injectable } from 'tsyringe'
 import type { PortfolioRepository } from '@module/portfolio/repository/portfolio.repository'
 import { toPortfolioResponse } from '@module/portfolio/mapper/portfolio.mapper'
 import { AppException } from '@core/exception/app.exception'
+import { StorageService } from '@core/service/storage.service'
+import { generateCdnUrl } from '@shared/util/common.util'
 
 @injectable()
 export class PortfolioServiceImpl implements PortfolioService {
   constructor(
+    @inject('StorageService') private readonly storageService: StorageService,
     @inject('PortfolioRepository') private readonly portfolioRepository: PortfolioRepository,
   ) {}
   async fetch(
@@ -40,12 +43,30 @@ export class PortfolioServiceImpl implements PortfolioService {
     return toPortfolioResponse(portfolio)
   }
 
-  async modify(id: string, userId: string, data: UpdatePortfolioRequest): Promise<PortfolioResponse> {
+  async modify(
+    id: string,
+    userId: string,
+    data: UpdatePortfolioRequest,
+  ): Promise<PortfolioResponse> {
     const updatedPortfolio = await this.portfolioRepository.update(id, userId, data as NewPortfolio)
     return toPortfolioResponse(updatedPortfolio)
   }
 
   async remove(id: string, userId: string): Promise<void> {
     await this.portfolioRepository.delete(id, userId)
+  }
+
+  async uploadThumbnail(
+    id: string,
+    userId: string,
+    thumbnailFile: File,
+  ): Promise<{ thumbnailUrl: string | null }> {
+    const portfolio = await this.portfolioRepository.findOne(id, userId)
+    console.log(portfolio)
+    if (!portfolio) throw new AppException('COMMON-001')
+
+    const { key } = await this.storageService.upload(thumbnailFile, 'thumbnail')
+    await this.portfolioRepository.updateThumbnail(id, userId, key)
+    return { thumbnailUrl: generateCdnUrl(key) }
   }
 }

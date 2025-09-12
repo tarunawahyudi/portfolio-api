@@ -4,21 +4,18 @@ import { AppResponse, PageResponse } from '@shared/type/global'
 import { parsePaginationOptions } from '@shared/util/pagination.util'
 import { inject, injectable } from 'tsyringe'
 import type { PortfolioService } from '@module/portfolio/service/portfolio.service'
-import {
-  noResponse,
-  paginateResponse,
-  successResponse,
-} from '@shared/util/response.util'
+import { noResponse, paginateResponse, successResponse } from '@shared/util/response.util'
 import {
   CreatePortfolioRequest,
   PortfolioResponse,
   UpdatePortfolioRequest,
 } from '@module/portfolio/dto/portfolio.dto'
+import { AppException } from '@core/exception/app.exception'
 
 @injectable()
 export class PortfolioControllerImpl implements PortfolioController {
-  constructor(@inject('PortfolioService') private readonly portfolioService: PortfolioService) {
-  }
+  constructor(@inject('PortfolioService') private readonly portfolioService: PortfolioService) {}
+
   async get(ctx: Context): Promise<PageResponse<PortfolioResponse>> {
     const userId = (ctx as any).user?.sub
     const options = parsePaginationOptions(ctx.query)
@@ -61,5 +58,19 @@ export class PortfolioControllerImpl implements PortfolioController {
 
     await this.portfolioService.remove(id, userId)
     return noResponse(ctx, 'Portfolio deleted')
+  }
+
+  async uploadThumbnail(ctx: Context): Promise<AppResponse> {
+    const userId = (ctx as any).user?.sub
+
+    const { id } = ctx.params
+    const { thumbnail } = ctx.body as { thumbnail: File }
+
+    if (!thumbnail || thumbnail.size === 0) {
+      throw new AppException('MEDIA-001', 'No file uploaded or file is empty.')
+    }
+
+    const response = await this.portfolioService.uploadThumbnail(id, userId, thumbnail)
+    return successResponse(ctx, response, 'Thumbnail uploaded successfully')
   }
 }

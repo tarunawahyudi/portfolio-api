@@ -44,5 +44,30 @@ export function registerPortfolioRoutes(app: Elysia) {
           summary: "Create a new portfolio"
         }
       })
+      .patch('/:id', portfolioController.patch.bind(portfolioController), {
+        beforeHandle: authGuard,
+        params: t.Object({
+          id: t.String({ format: 'uuid', error: 'Invalid portfolio ID format' })
+        }),
+        body: t.Object({
+          title: t.Optional(t.String({ maxLength: 100 })),
+          description: t.Optional(t.String()),
+          techStack: t.Optional(t.Array(t.String()))
+        }),
+        detail: {
+          tags: ["Portfolio"],
+          summary: "Update an existing portfolio"
+        }
+      })
+      .delete('/:id', portfolioController.delete.bind(portfolioController), {
+        beforeHandle: authGuard,
+        params: t.Object({
+          id: t.String({ format: 'uuid', error: 'Invalid portfolio ID format' })
+        }),
+        detail: {
+          tags: ["Portfolio"],
+          summary: "Delete a portfolio"
+        }
+      })
   )
 }

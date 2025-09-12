@@ -6,6 +6,6 @@ export interface PortfolioController {
   get(ctx: Context): Promise<PageResponse<PortfolioResponse>>
   getById(ctx: Context): Promise<AppResponse>
   post(ctx: Context): Promise<AppResponse>
-  put(ctx: Context): Promise<AppResponse>
+  patch(ctx: Context): Promise<AppResponse>
   delete(ctx: Context): Promise<AppResponse>
 }

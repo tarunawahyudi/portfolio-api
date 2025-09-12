@@ -46,7 +46,7 @@ export class PortfolioControllerImpl implements PortfolioController {
     return successResponse(ctx, response, 'Portfolio saved', 201)
   }
 
-  async put(ctx: Context): Promise<AppResponse> {
+  async patch(ctx: Context): Promise<AppResponse> {
     const id = ctx.params.id
     const userId = (ctx as any).user?.sub
     const request = ctx.body as UpdatePortfolioRequest

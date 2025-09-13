@@ -8,6 +8,13 @@
       "when": 1757760769673,
       "tag": "0000_kind_thunderbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1757784233740,
+      "tag": "0001_plain_red_skull",
+      "breakpoints": true
     }
   ]
 }

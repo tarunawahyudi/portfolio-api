@@ -72,7 +72,6 @@ export class PortfolioServiceImpl implements PortfolioService {
     thumbnailFile: File,
   ): Promise<{ thumbnailUrl: string | null }> {
     const portfolio = await this.portfolioRepository.findOne(id, userId)
-    console.log(portfolio)
     if (!portfolio) throw new AppException('COMMON-001')
 
     const { key } = await this.storageService.upload({

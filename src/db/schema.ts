@@ -130,6 +130,7 @@ export const certificates = pgTable('certificates', {
   organization: varchar('organization', { length: 255 }),
   issueDate: date('issue_date'),
   expirationDate: date('expiration_date'),
+  certificateImage: text('certificate_image'),
   credentialId: varchar('credential_id', { length: 255 }),
   credentialUrl: varchar('credential_url', { length: 500 }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),

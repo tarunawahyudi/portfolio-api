@@ -8,6 +8,7 @@ import { StorageService } from '@core/service/storage.service'
 import { registerPortfolioModule } from '@module/portfolio/portfolio.container'
 import { registerEducationModule } from '@module/education/education.container'
 import { registerCertificateModule } from '@module/certificate/certificate.container'
+import { registerSkillModule } from '@module/skill/skill.container'
 
 export async function setupContainer() {
   container.registerSingleton('EmailService', EmailService)
@@ -19,4 +20,5 @@ export async function setupContainer() {
   await registerPortfolioModule()
   await registerEducationModule()
   await registerCertificateModule()
+  await registerSkillModule()
 }

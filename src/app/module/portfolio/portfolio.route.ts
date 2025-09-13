@@ -85,5 +85,18 @@ export function registerPortfolioRoutes(app: Elysia) {
           summary: "Upload a thumbnail for a specific portfolio"
         }
       })
+      .post('/:id/gallery', portfolioController.uploadGallery.bind(portfolioController), {
+        beforeHandle: authGuard,
+        params: t.Object({
+          id: t.String({ format: 'uuid', error: 'Invalid portfolio ID format' })
+        }),
+        body: t.Object({
+          files: t.Files()
+        }),
+        detail: {
+          tags: ['Portfolio'],
+          summary: "Upload multiple images to a portfolio gallery"
+        }
+      })
   )
 }

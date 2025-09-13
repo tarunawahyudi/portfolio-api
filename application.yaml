@@ -37,7 +37,7 @@ logger:
 swagger:
   path: /docs
   version: 3.0.0
-  provider: swagger-ui
+  provider: scalar
   darkMode: false
   title: Portfolio API Documentation
   description: API documentation for portfolio apps

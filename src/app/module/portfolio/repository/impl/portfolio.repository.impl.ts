@@ -1,6 +1,6 @@
 import { PortfolioRepository } from '@module/portfolio/repository/portfolio.repository'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
-import { NewPortfolio, Portfolio } from '@module/portfolio/entity/portfolio'
+import { NewPortfolio, Portfolio, PortfolioWithGallery } from '@module/portfolio/entity/portfolio'
 import { portfolios } from '@db/schema'
 import { and, eq } from 'drizzle-orm'
 import { paginate } from '@shared/util/pagination.util'
@@ -26,6 +26,17 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
   async findById(id: string): Promise<Portfolio | null> {
     const row = await db.query.portfolios.findFirst({
       where: eq(portfolios.id, id)
+    })
+
+    return row || null
+  }
+
+  async findDetail(id: string): Promise<PortfolioWithGallery | null> {
+    const row = await db.query.portfolios.findFirst({
+      where: eq(portfolios.id, id),
+      with: {
+        gallery: true,
+      }
     })
 
     return row || null

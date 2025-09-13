@@ -244,6 +244,19 @@ export const emailVerification = pgTable('email_verifications', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 })
 
+export const portfolioGallery = pgTable('portfolio_gallery', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  portfolioId: uuid('portfolio_id')
+    .notNull()
+    .references(() => portfolios.id, { onDelete: 'cascade' }),
+  path: text('path'),
+  size: integer('size'),
+  fileType: varchar('file_type', { length: 100 }),
+  order: integer('order'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+})
+
 // RELATIONS
 export const userRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles),
@@ -338,12 +351,23 @@ export const workExperienceRelations = relations(workExperiences, ({ one }) => (
   }),
 }))
 
-export const portfolioRelations = relations(portfolios, ({ one }) => ({
+export const portfolioRelations = relations(portfolios, ({ one, many }) => ({
   user: one(users, {
     fields: [portfolios.userId],
     references: [users.id],
   }),
+  gallery: many(portfolioGallery),
 }))
+
+export const portfolioGalleryRelations = relations(
+  portfolioGallery,
+  ({ one }) => ({
+    portfolio: one(portfolios, {
+      fields: [portfolioGallery.portfolioId],
+      references: [portfolios.id],
+    }),
+  }),
+)
 
 export const awardRelations = relations(awards, ({ one }) => ({
   user: one(users, {

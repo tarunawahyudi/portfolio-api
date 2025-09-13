@@ -2,22 +2,32 @@ import { PortfolioService } from '@module/portfolio/service/portfolio.service'
 import { NewPortfolio } from '@module/portfolio/entity/portfolio'
 import {
   CreatePortfolioRequest,
+  PortfolioDetailResponse,
+  PortfolioGalleryItemResponse,
   PortfolioResponse,
   UpdatePortfolioRequest,
 } from '@module/portfolio/dto/portfolio.dto'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { inject, injectable } from 'tsyringe'
 import type { PortfolioRepository } from '@module/portfolio/repository/portfolio.repository'
-import { toPortfolioResponse } from '@module/portfolio/mapper/portfolio.mapper'
+import {
+  toPortfolioDetailResponse,
+  toPortfolioGalleryItemResponse,
+  toPortfolioResponse,
+} from '@module/portfolio/mapper/portfolio.mapper'
 import { AppException } from '@core/exception/app.exception'
 import { StorageService } from '@core/service/storage.service'
 import { cdnUrl } from '@shared/util/common.util'
+import { logger } from '@shared/util/logger.util'
+import { NewPortfolioGallery } from '@module/portfolio/entity/portfolio-gallery'
+import type { PortfolioGalleryRepository } from '@module/portfolio/repository/portfolio-gallery.repository'
 
 @injectable()
 export class PortfolioServiceImpl implements PortfolioService {
   constructor(
     @inject('StorageService') private readonly storageService: StorageService,
     @inject('PortfolioRepository') private readonly portfolioRepository: PortfolioRepository,
+    @inject('PortfolioGalleryRepository') private readonly portfolioGalleryRepository: PortfolioGalleryRepository,
   ) {}
   async fetch(
     userId: string,
@@ -37,10 +47,10 @@ export class PortfolioServiceImpl implements PortfolioService {
     return toPortfolioResponse(newPortfolio)
   }
 
-  async show(id: string): Promise<PortfolioResponse> {
-    const portfolio = await this.portfolioRepository.findById(id)
+  async show(id: string): Promise<PortfolioDetailResponse> {
+    const portfolio = await this.portfolioRepository.findDetail(id)
     if (!portfolio) throw new AppException('PORTFOLIO-001')
-    return toPortfolioResponse(portfolio)
+    return toPortfolioDetailResponse(portfolio)
   }
 
   async modify(
@@ -65,8 +75,42 @@ export class PortfolioServiceImpl implements PortfolioService {
     console.log(portfolio)
     if (!portfolio) throw new AppException('COMMON-001')
 
-    const { key } = await this.storageService.upload(thumbnailFile, 'thumbnail')
+    const { key } = await this.storageService.upload({
+      file: thumbnailFile,
+      module: 'portfolio',
+      collection: 'thumbnail'
+    })
     await this.portfolioRepository.updateThumbnail(id, userId, key)
     return { thumbnailUrl: cdnUrl(key) }
+  }
+
+  async uploadGallery(portfolioId: string, files: File[]): Promise<PortfolioGalleryItemResponse[]> {
+    const portfolio = await this.portfolioRepository.findById(portfolioId)
+    if (!portfolio) throw new AppException('PORTFOLIO-001')
+
+    logger.info(`uploading ${files.length} files in parallel...`)
+    const uploadPromises = files.map(file =>
+      this.storageService.upload({
+        file,
+        module: 'portfolio',
+        collection: 'gallery'
+      })
+    )
+
+    const uploadResults = await Promise.all(uploadPromises)
+    logger.info('All files uploaded to storage')
+
+    const galleryItemsToSave: NewPortfolioGallery[] = uploadResults.map((result, index) => ({
+      portfolioId: portfolioId,
+      path: result.key,
+      fileType: files[index].type,
+      size: files[index].size,
+      order: index,
+    }))
+
+    const newGalleryItems = await this.portfolioGalleryRepository.saveBulk(galleryItemsToSave)
+    logger.info(`${newGalleryItems.length} gallery items saved to database`)
+
+    return newGalleryItems.map(toPortfolioGalleryItemResponse)
   }
 }

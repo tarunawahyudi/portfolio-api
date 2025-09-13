@@ -20,3 +20,21 @@ export interface UpdatePortfolioRequest {
   thumbnail?: string;
   techStack?: string[];
 }
+
+export interface PortfolioGalleryItemResponse {
+  id: string;
+  url: string | null;
+  fileType: string | null;
+  size: number | null;
+  order: number | null;
+}
+
+export interface PortfolioDetailResponse {
+  id: string;
+  userId: string;
+  title: string;
+  description?: string;
+  thumbnailUrl: string | null;
+  techStack: string[];
+  gallery: PortfolioGalleryItemResponse[];
+}

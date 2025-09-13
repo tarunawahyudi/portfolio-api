@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1757484257089,
-      "tag": "0000_needy_firedrake",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1757575673472,
-      "tag": "0001_rapid_spencer_smythe",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1757585339624,
-      "tag": "0002_thick_william_stryker",
+      "when": 1757760769673,
+      "tag": "0000_kind_thunderbolt",
       "breakpoints": true
     }
   ]

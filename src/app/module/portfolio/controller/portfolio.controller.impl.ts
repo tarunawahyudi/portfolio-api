@@ -73,4 +73,21 @@ export class PortfolioControllerImpl implements PortfolioController {
     const response = await this.portfolioService.uploadThumbnail(id, userId, thumbnail)
     return successResponse(ctx, response, 'Thumbnail uploaded successfully')
   }
+
+  async uploadGallery(ctx: Context): Promise<AppResponse> {
+    const userId = (ctx as any).user?.sub
+    if (!userId) throw new AppException('AUTH-000')
+
+    const { id: portfolioId } = ctx.params
+
+    const { files } = ctx.body as { files: File[] }
+
+    if (!files || files.length === 0) {
+      throw new AppException('MEDIA-001', 'No files were uploaded.')
+    }
+
+    const response = await this.portfolioService.uploadGallery(portfolioId, files)
+    return successResponse(ctx, response, 'Gallery images uploaded successfully')
+
+  }
 }

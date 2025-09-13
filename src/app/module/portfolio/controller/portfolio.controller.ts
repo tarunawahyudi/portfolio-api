@@ -9,4 +9,5 @@ export interface PortfolioController {
   patch(ctx: Context): Promise<AppResponse>
   delete(ctx: Context): Promise<AppResponse>
   uploadThumbnail(ctx: Context): Promise<AppResponse>
+  uploadGallery(ctx: Context): Promise<AppResponse>
 }

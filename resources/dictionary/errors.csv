@@ -26,3 +26,4 @@ PORTFOLIO-001,PORTFOLIO,Portfolio not found or you do not have permission to vie
 EDU-001,EDUCATION,Education not found,warn,404
 CERT-001,CERTIFICATE,Certificate not found,warn,404
 SKILL-001,SKILL,Skill not found,warn,404
+AWARD-001,AWARD,Award not found,warn,404

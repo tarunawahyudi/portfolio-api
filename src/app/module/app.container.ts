@@ -10,6 +10,7 @@ import { registerEducationModule } from '@module/education/education.container'
 import { registerCertificateModule } from '@module/certificate/certificate.container'
 import { registerSkillModule } from '@module/skill/skill.container'
 import { registerAwardModule } from '@module/award/award.container'
+import { registerTestimonialModule } from '@module/testimonial/testimonial.container'
 
 export async function setupContainer() {
   container.registerSingleton('EmailService', EmailService)
@@ -23,4 +24,5 @@ export async function setupContainer() {
   await registerCertificateModule()
   await registerSkillModule()
   await registerAwardModule()
+  await registerTestimonialModule()
 }

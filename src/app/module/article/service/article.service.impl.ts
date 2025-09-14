@@ -27,7 +27,7 @@ export class ArticleServiceImpl implements ArticleService {
     }
   }
 
-  async findById(id: string): Promise<ArticleResponse> {
+  async show(id: string): Promise<ArticleResponse> {
     const row = await this.articleRepository.findById(id)
     if (!row) throw new AppException('ARTICLE-001')
     return toArticleResponse(row)

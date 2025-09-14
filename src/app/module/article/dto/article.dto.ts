@@ -4,6 +4,7 @@ export interface CreateArticleRequest {
   slug: string
   content: string
   tags: string[]
+  status?: string
 }
 
 export interface ArticleResponse {
@@ -13,5 +14,6 @@ export interface ArticleResponse {
   content: string
   thumbnail: string
   tags: string[]
+  status: string;
   publishedAt: string
 }

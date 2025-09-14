@@ -21,6 +21,12 @@ export const userStatusEnum = pgEnum('user_status', [
   'deleted',
 ])
 
+export const articleStatusEnum = pgEnum('article_status', [
+  'draft',
+  'published',
+  'deleted',
+])
+
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 100 }).notNull(),
@@ -116,6 +122,7 @@ export const articles = pgTable('articles', {
   content: text('content'),
   thumbnail: text('thumbnail'),
   tags: text('tags').array(),
+  status: articleStatusEnum('status').default('draft'),
   publishedAt: timestamp('published_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),

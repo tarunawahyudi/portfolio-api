@@ -16,6 +16,7 @@ export function registerArticleRoutes(app: Elysia) {
             limit: t.Optional(t.Number({ default: 10, minimum: 1, maximum: 100 })),
             sort: t.Optional(t.String()),
             search: t.Optional(t.String()),
+            status: t.Optional(t.UnionEnum(['draft', 'published']))
           }),
           detail: {
             tags: ["Article"],
@@ -30,6 +31,7 @@ export function registerArticleRoutes(app: Elysia) {
           slug: t.String({ maxLength: 100 }),
           content: t.String(),
           tags: t.Optional(t.Array(t.String())),
+          status: t.Optional(t.UnionEnum(['draft', 'published']))
         }),
         detail: {
           tags: ["Article"],

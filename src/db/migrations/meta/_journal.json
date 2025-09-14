@@ -15,6 +15,13 @@
       "when": 1757784233740,
       "tag": "0001_plain_red_skull",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1757889216218,
+      "tag": "0002_natural_vulcan",
+      "breakpoints": true
     }
   ]
 }

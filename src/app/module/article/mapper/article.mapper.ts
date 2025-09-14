@@ -8,6 +8,7 @@ export function toArticleResponse(article: Article): ArticleResponse {
     title: article.title,
     slug: article.slug,
     content: article.content,
+    status: article.status,
     thumbnail: cdnUrl(article.thumbnail),
     publishedAt: article.publishedAt
   }

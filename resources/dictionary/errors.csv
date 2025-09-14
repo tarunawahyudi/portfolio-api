@@ -29,3 +29,4 @@ SKILL-001,SKILL,Skill not found,warn,404
 AWARD-001,AWARD,Award not found,warn,404
 TESTIMONIAL-001,TESTIMONIAL,Testimonial not found,warn,404
 COURSE-001,COURSE,Course not found,warn,404
+SETTING-001,SETTING,Setting not found,warn,404

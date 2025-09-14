@@ -9,6 +9,7 @@ import { registerSkillRoutes } from '@module/skill/skill.route'
 import { registerAwardRoutes } from '@module/award/award.route'
 import { registerTestimonialRoutes } from '@module/testimonial/testimonial.route'
 import { registerCourseRoutes } from '@module/course/course.route'
+import { registerSettingRoutes } from '@module/setting/setting.route'
 
 export function ApplicationRoutes(app: Elysia) {
   return app
@@ -22,4 +23,5 @@ export function ApplicationRoutes(app: Elysia) {
     .use(registerAwardRoutes)
     .use(registerTestimonialRoutes)
     .use(registerCourseRoutes)
+    .use(registerSettingRoutes)
 }

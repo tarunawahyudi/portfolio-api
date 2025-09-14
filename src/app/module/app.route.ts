@@ -10,6 +10,7 @@ import { registerAwardRoutes } from '@module/award/award.route'
 import { registerTestimonialRoutes } from '@module/testimonial/testimonial.route'
 import { registerCourseRoutes } from '@module/course/course.route'
 import { registerSettingRoutes } from '@module/setting/setting.route'
+import { registerArticleRoutes } from '@module/article/article.route'
 
 export function ApplicationRoutes(app: Elysia) {
   return app
@@ -24,4 +25,5 @@ export function ApplicationRoutes(app: Elysia) {
     .use(registerTestimonialRoutes)
     .use(registerCourseRoutes)
     .use(registerSettingRoutes)
+    .use(registerArticleRoutes)
 }

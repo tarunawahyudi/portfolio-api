@@ -6,4 +6,5 @@ export interface ArticleController {
   get(ctx: Context): Promise<PaginatedResponse<ArticleResponse>>
   getById(ctx: Context): Promise<AppResponse>
   post(ctx: Context): Promise<AppResponse>
+  postThumbnail(ctx: Context): Promise<AppResponse>
 }

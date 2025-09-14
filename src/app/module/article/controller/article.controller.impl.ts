@@ -35,4 +35,17 @@ export class ArticleControllerImpl implements ArticleController {
     return successResponse(ctx, response, 'create success', 201)
   }
 
+  async postThumbnail(ctx: Context): Promise<AppResponse> {
+    const userId = (ctx as any).user?.sub
+
+    const { id } = ctx.params
+    const { thumbnail } = ctx.body as { thumbnail: File }
+
+    if (!thumbnail || thumbnail.size === 0) {
+      throw new AppException('MEDIA-001', 'No file uploaded or file is empty.')
+    }
+
+    const response = await this.articleService.uploadThumbnail(id, userId, thumbnail)
+    return successResponse(ctx, response, 'Thumbnail uploaded successfully')
+  }
 }

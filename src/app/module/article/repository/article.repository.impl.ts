@@ -1,7 +1,7 @@
 import { ArticleRepository } from '@module/article/repository/article.repository'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { Article, NewArticle } from '@module/article/entity/article'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { articles } from '@db/schema'
 import { paginate } from '@shared/util/pagination.util'
 import { db } from '@db/index'
@@ -16,18 +16,28 @@ export class ArticleRepositoryImpl implements ArticleRepository {
 
   async findById(id: string): Promise<Article | null> {
     const row = await db.query.articles.findFirst({
-      where: eq(articles.id, id)
+      where: eq(articles.id, id),
     })
 
     return row ?? null
   }
 
   async save(data: NewArticle): Promise<Article> {
-    const [inserted] = await db
-      .insert(articles)
-      .values(data)
-      .returning()
+    const [inserted] = await db.insert(articles).values(data).returning()
 
     return inserted
+  }
+
+  async setThumbnailUrl(id: string, userId: string, thumbnailKey: string): Promise<Article> {
+    const [updatedArticle] = await db
+      .update(articles)
+      .set({ thumbnail: thumbnailKey, updatedAt: new Date() })
+      .where(
+        and(
+          eq(articles.id, id), eq(articles.userId, userId)
+        )
+      ).returning()
+
+    return updatedArticle
   }
 }

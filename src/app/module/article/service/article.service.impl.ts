@@ -1,16 +1,23 @@
 import { ArticleService } from '@module/article/service/article.service'
-import { ArticleResponse, CreateArticleRequest } from '@module/article/dto/article.dto'
+import {
+  ArticleResponse,
+  ArticleThumbnailResponse,
+  CreateArticleRequest,
+} from '@module/article/dto/article.dto'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { Article, NewArticle } from '@module/article/entity/article'
 import { inject, injectable } from 'tsyringe'
 import type { ArticleRepository } from '@module/article/repository/article.repository'
 import { toArticleResponse } from '@module/article/mapper/article.mapper'
 import { AppException } from '@core/exception/app.exception'
+import { StorageService } from '@core/service/storage.service'
+import { cdnUrl } from '@shared/util/common.util'
 
 @injectable()
 export class ArticleServiceImpl implements ArticleService {
   constructor(
-    @inject('ArticleRepository') private readonly articleRepository: ArticleRepository
+    @inject('ArticleRepository') private readonly articleRepository: ArticleRepository,
+    @inject('StorageService') private readonly storageService: StorageService
   ) {}
   async create(request: CreateArticleRequest): Promise<ArticleResponse> {
     const response = await this.articleRepository.save(request as NewArticle)
@@ -23,7 +30,7 @@ export class ArticleServiceImpl implements ArticleService {
 
     return {
       data: transformData,
-      pagination: paginatedResult.pagination
+      pagination: paginatedResult.pagination,
     }
   }
 
@@ -33,4 +40,19 @@ export class ArticleServiceImpl implements ArticleService {
     return toArticleResponse(row)
   }
 
+  async uploadThumbnail(id: string, userId: string, thumbnailFile: File): Promise<ArticleThumbnailResponse> {
+    const article = await this.articleRepository.findById(id)
+    if (!article) throw new AppException('ARTICLE-001')
+
+    const { key } = await this.storageService.upload({
+      file: thumbnailFile,
+      module: 'article',
+      collection: 'thumbnail',
+    })
+
+    await this.articleRepository.setThumbnailUrl(id, userId, key)
+    return {
+      id, thumbnailUrl: cdnUrl(key)
+    }
+  }
 }

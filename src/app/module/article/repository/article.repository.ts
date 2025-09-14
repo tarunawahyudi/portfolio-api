@@ -5,4 +5,5 @@ export interface ArticleRepository {
   save(article: NewArticle): Promise<Article>;
   findAll(userId: string, options: PaginationOptions): Promise<PaginatedResponse<Article>>
   findById(id: string): Promise<Article | null>
+  setThumbnailUrl(id: string, userId: string, thumbnailKey: string): Promise<Article>
 }

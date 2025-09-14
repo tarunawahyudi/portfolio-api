@@ -46,5 +46,21 @@ export function registerArticleRoutes(app: Elysia) {
           summary: "Get a specific artcile"
         }
       })
+      .post('/:id/thumbnail', articleController.postThumbnail.bind(articleController), {
+        beforeHandle: authGuard,
+        params: t.Object({
+          id: t.String({ format: 'uuid', error: 'Invalid portfolio ID format' })
+        }),
+        body: t.Object({
+          thumbnail: t.File({
+            type: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+            maxSize: '5m'
+          })
+        }),
+        detail: {
+          tags: ["Article"],
+          summary: "Upload a thumbnail for a specific article"
+        }
+      })
   )
 }

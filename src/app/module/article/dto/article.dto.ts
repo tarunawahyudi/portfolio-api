@@ -17,3 +17,8 @@ export interface ArticleResponse {
   status: string;
   publishedAt: string
 }
+
+export interface ArticleThumbnailResponse {
+  id: string;
+  thumbnailUrl: string;
+}

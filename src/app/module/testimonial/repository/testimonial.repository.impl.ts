@@ -19,7 +19,7 @@ export class TestimonialRepositoryImpl implements TestimonialRepository {
       where: eq(testimonials.id, id)
     })
 
-    return row || null
+    return row ?? null
   }
 
   async save(data: NewTestimonial): Promise<Testimonial> {

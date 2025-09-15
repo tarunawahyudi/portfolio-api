@@ -47,7 +47,7 @@ export class AuthServiceImpl implements AuthService {
     const user = await this.authRepository.findByEmailOrUsername(data.usernameOrEmail)
 
     if (!user) {
-      throw new AppException('AUTH-001', "User not found")
+      throw new AppException('AUTH-001')
     }
 
     if (!user.isVerified) {

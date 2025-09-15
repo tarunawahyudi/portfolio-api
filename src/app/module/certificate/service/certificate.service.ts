@@ -8,5 +8,5 @@ export interface CertificateService {
   create(request: CreateCertificateRequest): Promise<CertificateResponse>
   fetch(userId: string, options: PaginationOptions): Promise<PaginatedResponse<CertificateResponse>>
   show(id: string): Promise<CertificateResponse>
-  uploadCertificateImage(id: string, image: File): Promise<{ imageUrl: string | null }>
+  uploadCertificateImage(id: string, userId: string, image: File): Promise<{ imageUrl: string | null }>
 }

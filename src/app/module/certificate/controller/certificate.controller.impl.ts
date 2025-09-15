@@ -48,7 +48,7 @@ export class CertificateControllerImpl implements CertificateController {
       throw new AppException('MEDIA-001', 'No file uploaded or file is empty.')
     }
 
-    const response = await this.certificateService.uploadCertificateImage(id, image)
+    const response = await this.certificateService.uploadCertificateImage(id, userId, image)
     return successResponse(ctx, response, 'upload success')
   }
 }

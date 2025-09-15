@@ -2,7 +2,7 @@ import { CertificateRepository } from '@module/certificate/repository/certificat
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { Certificate, NewCertificate } from '@module/certificate/entity/certificate'
 import { injectable } from 'tsyringe'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { certificates } from '@db/schema'
 import { paginate } from '@shared/util/pagination.util'
 import { db } from '@db/index'
@@ -17,6 +17,17 @@ export class CertificateRepositoryImpl implements CertificateRepository {
   async findById(id: string): Promise<Certificate | null> {
     const row = await db.query.certificates.findFirst({
       where: eq(certificates.id, id)
+    })
+
+    return row ?? null
+  }
+
+  async findOne(id: string, userId: string): Promise<Certificate | null> {
+    const row = await db.query.certificates.findFirst({
+      where: and(
+        eq(certificates.id, id),
+        eq(certificates.userId, userId)
+      )
     })
 
     return row ?? null

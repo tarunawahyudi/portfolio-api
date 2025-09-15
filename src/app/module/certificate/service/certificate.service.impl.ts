@@ -8,6 +8,7 @@ import { toCertificateResponse } from '@module/certificate/mapper/certificate.ma
 import { AppException } from '@core/exception/app.exception'
 import { StorageService } from '@core/service/storage.service'
 import { cdnUrl } from '@shared/util/common.util'
+import { logger } from '@sentry/bun'
 
 @injectable()
 export class CertificateServiceImpl implements CertificateService {
@@ -37,17 +38,36 @@ export class CertificateServiceImpl implements CertificateService {
     return toCertificateResponse(row)
   }
 
-  async uploadCertificateImage(id: string, image: File): Promise<{ imageUrl: string | null }> {
-    const certificate = await this.certificateRepository.findById(id)
+  async uploadCertificateImage(id: string, userId: string, image: File): Promise<{ imageUrl: string | null }> {
+    const certificate = await this.certificateRepository.findOne(id, userId)
     if (!certificate) throw new AppException('CERT-001')
 
-    const { key} = await this.storageService.upload({
+    const oldImageKey = certificate.certificateImage
+
+    const { key: newImageKey } = await this.storageService.upload({
       file: image,
       module: 'certificate',
       collection: 'image'
     })
 
-    await this.certificateRepository.setImage(id, key)
-    return { imageUrl: cdnUrl(key) }
+    try {
+      await this.certificateRepository.setImage(id, newImageKey)
+      if (oldImageKey) {
+        logger.info(`Deleting old certificate image: ${oldImageKey}`)
+        this.storageService.delete(oldImageKey).catch(err =>
+          logger.error(`Failed to delete old image ${oldImageKey}`, err)
+        )
+      }
+      return { imageUrl: cdnUrl(newImageKey) }
+    } catch (dbError) {
+      console.error(dbError)
+      logger.error(`Database update failed. Rolling back storage upload for key: ${newImageKey}`)
+
+      await this.storageService.delete(newImageKey).catch(err =>
+        logger.error(`Failed to rollback (delete) new image ${newImageKey}`, err)
+      )
+
+      throw dbError
+    }
   }
 }

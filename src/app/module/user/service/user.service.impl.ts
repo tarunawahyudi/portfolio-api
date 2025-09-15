@@ -12,6 +12,7 @@ import type { ProfileRepository } from '@module/user/repository/profile.reposito
 import { Transactional } from '@shared/decorator/transactional.decorator'
 import { StorageService } from '@core/service/storage.service'
 import { cdnUrl } from '@shared/util/common.util'
+import { logger } from '@sentry/bun'
 
 @injectable()
 export class UserServiceImpl implements UserService {
@@ -121,14 +122,34 @@ export class UserServiceImpl implements UserService {
   }
 
   async uploadAvatar(userId: string, avatarFile: File): Promise<{ avatarUrl: string }> {
-    const { key } = await this.storageService.upload({
+    const profile = await this.profileRepository.findByUserId(userId)
+    if (!profile) throw new AppException('USER-002')
+    const oldAvatar = profile.avatar
+
+    const { key: newImageKey } = await this.storageService.upload({
       file: avatarFile,
       module: 'user',
       collection: 'avatar'
     })
-    await this.profileRepository.updateAvatar(userId, key)
-    const avatarUrl = `${process.env.R2_PUBLIC_URL}/${key}`
 
-    return { avatarUrl }
+    try {
+      await this.profileRepository.updateAvatar(userId, newImageKey)
+      if (oldAvatar) {
+        logger.info(`Deleting old avatar image: ${oldAvatar}`)
+        this.storageService.delete(oldAvatar).catch(err =>
+          logger.error(`Failed to delete old image ${oldAvatar}`, err)
+        )
+      }
+
+      return { avatarUrl: cdnUrl(newImageKey) ?? '' }
+    } catch (dbError) {
+      logger.error(`Database update failed. Rolling back storage upload for key: ${newImageKey}`)
+      console.error(dbError)
+      await this.storageService.delete(newImageKey).catch(err =>
+        logger.error(`Failed to rollback (delete) new image ${newImageKey}`, err)
+      )
+
+      throw dbError
+    }
   }
 }

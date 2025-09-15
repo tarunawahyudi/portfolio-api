@@ -46,7 +46,7 @@ export function registerCertificateRoutes(app: Elysia) {
           summary: "Get detail certificate of user"
         }
       })
-      .post('/:id', certificateController.upload.bind(certificateController), {
+      .post('/:id/upload', certificateController.upload.bind(certificateController), {
         beforeHandle: authGuard,
         params: t.Object({
           id: t.String({ format: 'uuid' })

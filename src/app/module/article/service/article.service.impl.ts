@@ -55,4 +55,8 @@ export class ArticleServiceImpl implements ArticleService {
       id, thumbnailUrl: cdnUrl(key)
     }
   }
+
+  async updateStatus(id: string, userId: string, status: string): Promise<void> {
+    await this.articleRepository.setStatus(id, userId, status)
+  }
 }

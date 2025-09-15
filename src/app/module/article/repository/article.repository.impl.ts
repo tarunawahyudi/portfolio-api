@@ -32,12 +32,20 @@ export class ArticleRepositoryImpl implements ArticleRepository {
     const [updatedArticle] = await db
       .update(articles)
       .set({ thumbnail: thumbnailKey, updatedAt: new Date() })
+      .where(and(eq(articles.id, id), eq(articles.userId, userId)))
+      .returning()
+
+    return updatedArticle
+  }
+
+  async setStatus(id: string, userId: string, status: string): Promise<void> {
+    await db
+      .update(articles)
+      .set({ status })
       .where(
         and(
           eq(articles.id, id), eq(articles.userId, userId)
         )
-      ).returning()
-
-    return updatedArticle
+      )
   }
 }

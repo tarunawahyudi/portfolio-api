@@ -49,7 +49,7 @@ export function registerArticleRoutes(app: Elysia) {
       .post('/:id/thumbnail', articleController.postThumbnail.bind(articleController), {
         beforeHandle: authGuard,
         params: t.Object({
-          id: t.String({ format: 'uuid', error: 'Invalid portfolio ID format' })
+          id: t.String({ format: 'uuid', error: 'Invalid article ID format' })
         }),
         body: t.Object({
           thumbnail: t.File({
@@ -60,6 +60,19 @@ export function registerArticleRoutes(app: Elysia) {
         detail: {
           tags: ["Article"],
           summary: "Upload a thumbnail for a specific article"
+        }
+      })
+      .patch('/:id/status', articleController.patchStatus.bind(articleController), {
+        beforeHandle: authGuard,
+        params: t.Object({
+          id: t.String({ format: 'uuid', error: 'Invalid article ID format' })
+        }),
+        body: t.Object({
+          status: t.UnionEnum(['draft', 'published'])
+        }),
+        detail: {
+          tags: ["Article"],
+          summary: "Set article status update"
         }
       })
   )

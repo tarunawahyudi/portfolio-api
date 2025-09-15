@@ -4,7 +4,7 @@ import { AppResponse, PaginatedResponse } from '@shared/type/global'
 import { ArticleResponse, CreateArticleRequest } from '@module/article/dto/article.dto'
 import { inject, injectable } from 'tsyringe'
 import { parsePaginationOptions } from '@shared/util/pagination.util'
-import { paginateResponse, successResponse } from '@shared/util/response.util'
+import { noResponse, paginateResponse, successResponse } from '@shared/util/response.util'
 import { AppException } from '@core/exception/app.exception'
 import type { ArticleService } from '@module/article/service/article.service'
 
@@ -47,5 +47,14 @@ export class ArticleControllerImpl implements ArticleController {
 
     const response = await this.articleService.uploadThumbnail(id, userId, thumbnail)
     return successResponse(ctx, response, 'Thumbnail uploaded successfully')
+  }
+
+  async patchStatus(ctx: Context): Promise<AppResponse> {
+    const userId = (ctx as any).user?.sub
+    const { id } = ctx.params
+    const { status } = ctx.body as { status: string }
+
+    await this.articleService.updateStatus(id, userId, status)
+    return noResponse(ctx, 'status successfully updated')
   }
 }

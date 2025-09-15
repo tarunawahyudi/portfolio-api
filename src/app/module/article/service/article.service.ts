@@ -11,4 +11,5 @@ export interface ArticleService {
   fetch(userId: string, options: PaginationOptions): Promise<PaginatedResponse<Article>>
   show(id: string): Promise<ArticleResponse>
   uploadThumbnail(id: string, userId: string, thumbnailFile: File): Promise<ArticleThumbnailResponse>
+  updateStatus(id: string, userId: string, status: string): Promise<void>
 }

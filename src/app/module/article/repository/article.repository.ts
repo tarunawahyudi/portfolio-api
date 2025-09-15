@@ -6,4 +6,5 @@ export interface ArticleRepository {
   findAll(userId: string, options: PaginationOptions): Promise<PaginatedResponse<Article>>
   findById(id: string): Promise<Article | null>
   setThumbnailUrl(id: string, userId: string, thumbnailKey: string): Promise<Article>
+  setStatus(id: string, userId: string, status: string): Promise<void>
 }

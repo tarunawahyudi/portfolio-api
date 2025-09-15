@@ -7,4 +7,5 @@ export interface ArticleController {
   getById(ctx: Context): Promise<AppResponse>
   post(ctx: Context): Promise<AppResponse>
   postThumbnail(ctx: Context): Promise<AppResponse>
+  patchStatus(ctx: Context): Promise<AppResponse>
 }

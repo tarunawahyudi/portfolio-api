@@ -71,7 +71,7 @@ export class UserServiceImpl implements UserService {
     await this.profileRepository.save({
       userId: row.id,
       fullName: row.name,
-      displayName: row.name
+      displayName: row.name,
     })
 
     const rawToken = randomBytes(32).toString('hex')
@@ -129,27 +129,39 @@ export class UserServiceImpl implements UserService {
     const { key: newImageKey } = await this.storageService.upload({
       file: avatarFile,
       module: 'user',
-      collection: 'avatar'
+      collection: 'avatar',
     })
 
     try {
       await this.profileRepository.updateAvatar(userId, newImageKey)
       if (oldAvatar) {
         logger.info(`Deleting old avatar image: ${oldAvatar}`)
-        this.storageService.delete(oldAvatar).catch(err =>
-          logger.error(`Failed to delete old image ${oldAvatar}`, err)
-        )
+        this.storageService
+          .delete(oldAvatar)
+          .catch((err) => logger.error(`Failed to delete old image ${oldAvatar}`, err))
       }
 
       return { avatarUrl: cdnUrl(newImageKey) ?? '' }
     } catch (dbError) {
       logger.error(`Database update failed. Rolling back storage upload for key: ${newImageKey}`)
       console.error(dbError)
-      await this.storageService.delete(newImageKey).catch(err =>
-        logger.error(`Failed to rollback (delete) new image ${newImageKey}`, err)
-      )
+      await this.storageService
+        .delete(newImageKey)
+        .catch((err) => logger.error(`Failed to rollback (delete) new image ${newImageKey}`, err))
 
       throw dbError
     }
+  }
+
+  async changePassword(userId: string, oldPass: string, newPass: string): Promise<void> {
+    const user = await this.userRepository.findById(userId)
+    if (!user || !user.passwordHash)
+      throw new AppException('AUTH-002')
+
+    const isMatch = await Bun.password.verify(oldPass, user.passwordHash)
+    if (!isMatch) throw new AppException('AUTH-011')
+
+    const newPasswordHash = await Bun.password.hash(newPass)
+    await this.userRepository.updatePassword(userId, newPasswordHash)
   }
 }

@@ -11,6 +11,7 @@ AUTH-007,AUTH,Account is not active,warn,401
 AUTH-008,RESET-PASSWORD,Invalid or expired reset token,warn,400
 AUTH-009,RESET-PASSWORD,Reset token has expired,warn,400
 AUTH-010,RESET-PASSWORD,This reset token has already been used,warn,400
+AUTH-011,AUTH,Incorrect current password,warn,400
 EMAIL-VERIFY-001,AUTH,Invalid or expired verification link, warn, 403
 EMAIL-VERIFY-002,AUTH,Invalid token, warn, 403
 USER-000,USER,User not authenticated, warn, 403

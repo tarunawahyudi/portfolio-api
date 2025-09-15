@@ -40,6 +40,15 @@ export class UserRepositoryImpl implements UserRepository {
     return row ?? null
   }
 
+  async findById(id: string): Promise<User | null> {
+    const row = await db.query.users
+      .findFirst({
+        where: eq(users.id, id),
+      })
+
+    return row ?? null
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     const row = await db.query.users
       .findFirst({

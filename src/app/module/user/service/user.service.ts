@@ -7,4 +7,5 @@ export interface UserService {
   showUserProfileByUserId(userId: string): Promise<ProfileResponse>
   updateProfile(userId: string, request: UpdateProfileRequest): Promise<void>
   uploadAvatar(userId: string, avatarFile: File): Promise<{ avatarUrl: string }>
+  changePassword(userId: string, oldPass: string, newPass: string): Promise<void>
 }

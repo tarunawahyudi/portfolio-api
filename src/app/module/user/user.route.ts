@@ -45,5 +45,13 @@ export function registerUserRoutes(app: Elysia) {
           summary: "Upload or update the current user's avatar"
         }
       })
+      .patch('/password', userController.changePassword.bind(userController), {
+        beforeHandle: authGuard,
+        body: t.Object({
+          oldPassword: t.String(),
+          newPassword: t.String({ minLength: 8 }),
+        }),
+        detail: { tags: ["User"], summary: "Change current user's password" }
+      })
   )
 }

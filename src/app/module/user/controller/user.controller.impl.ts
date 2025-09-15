@@ -9,9 +9,7 @@ import { UpdateProfileRequest } from '@module/user/dto/profile.dto'
 
 @injectable()
 export class UserControllerImpl implements UserController {
-  constructor(
-    @inject('UserService') private readonly userService: UserService
-  ) {}
+  constructor(@inject('UserService') private readonly userService: UserService) {}
 
   async getByUsername(ctx: Context): Promise<AppResponse> {
     const { username } = ctx.params
@@ -42,13 +40,17 @@ export class UserControllerImpl implements UserController {
 
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
     if (!allowedTypes.includes(avatar.type)) {
-      throw new AppException(
-        'MEDIA-002',
-        'Please upload a JPG, PNG, or WebP image.',
-      )
+      throw new AppException('MEDIA-002', 'Please upload a JPG, PNG, or WebP image.')
     }
 
     const response = await this.userService.uploadAvatar(userId, avatar)
     return successResponse(ctx, response, 'Avatar updated successfully')
+  }
+
+  async changePassword(ctx: Context): Promise<AppResponse> {
+    const userId = (ctx as any).user.sub
+    const { oldPassword, newPassword } = ctx.body as any
+    await this.userService.changePassword(userId, oldPassword, newPassword)
+    return noResponse(ctx, 'update password success')
   }
 }

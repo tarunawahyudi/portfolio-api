@@ -14,8 +14,18 @@ export interface EducationResponse {
   institution: string;
   degree: string;
   fieldOfStudy: string;
-  grade: string;
+  grade?: string;
   startDate: string;
-  endDate: string;
-  description: string;
+  endDate?: string;
+  description?: string;
+}
+
+export interface UpdateEducationRequest {
+  institution?: string;
+  degree?: string;
+  fieldOfStudy?: string;
+  grade?: string;
+  startDate?: string;
+  endDate?: string;
+  description?: string;
 }

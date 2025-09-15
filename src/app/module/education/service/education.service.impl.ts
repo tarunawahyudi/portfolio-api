@@ -1,5 +1,9 @@
 import { EducationService } from '@module/education/service/education.service'
-import { CreateEducationRequest, EducationResponse } from '@module/education/dto/education.dto'
+import {
+  CreateEducationRequest,
+  EducationResponse,
+  UpdateEducationRequest,
+} from '@module/education/dto/education.dto'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { NewEducation } from '@module/education/entity/education'
 import { inject, injectable } from 'tsyringe'
@@ -31,5 +35,14 @@ export class EducationServiceImpl implements EducationService {
     const row = await this.educationRepository.findById(id)
     if (!row) throw new AppException('EDU-001')
     return toEducationResponse(row)
+  }
+
+  async modify(id: string, userId: string, data: UpdateEducationRequest): Promise<EducationResponse> {
+    const updatedEducation = await this.educationRepository.update(id, userId, data)
+    return toEducationResponse(updatedEducation)
+  }
+
+  async remove(id: string, userId: string): Promise<void> {
+    await this.educationRepository.delete(id, userId)
   }
 }

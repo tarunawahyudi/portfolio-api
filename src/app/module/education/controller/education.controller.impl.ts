@@ -1,11 +1,15 @@
 import { EducationController } from '@module/education/controller/education.controller'
 import { Context } from 'elysia'
 import { AppResponse, PageResponse } from '@shared/type/global'
-import { CreateEducationRequest, EducationResponse } from '@module/education/dto/education.dto'
+import {
+  CreateEducationRequest,
+  EducationResponse,
+  UpdateEducationRequest,
+} from '@module/education/dto/education.dto'
 import { parsePaginationOptions } from '@shared/util/pagination.util'
 import { inject, injectable } from 'tsyringe'
 import type { EducationService } from '@module/education/service/education.service'
-import { paginateResponse, successResponse } from '@shared/util/response.util'
+import { noResponse, paginateResponse, successResponse } from '@shared/util/response.util'
 import { AppException } from '@core/exception/app.exception'
 
 @injectable()
@@ -34,5 +38,22 @@ export class EducationControllerImpl implements EducationController {
     request.userId = userId
     const response = await this.educationService.create(request)
     return successResponse(ctx, response, 'Education created success', 201)
+  }
+
+  async update(ctx: Context): Promise<AppResponse> {
+    const userId = (ctx as any).user?.sub
+    const { id } = ctx.params
+    const data = ctx.body as UpdateEducationRequest
+
+    const updatedEducation = await this.educationService.modify(id, userId, data)
+    return successResponse(ctx, updatedEducation, 'Education updated successfully')
+  }
+
+  async delete(ctx: Context): Promise<AppResponse> {
+    const userId = (ctx as any).user?.sub
+    const { id } = ctx.params
+
+    await this.educationService.remove(id, userId)
+    return noResponse(ctx, 'Education deleted successfully')
   }
 }

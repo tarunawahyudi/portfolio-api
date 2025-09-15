@@ -47,5 +47,34 @@ export function registerEducationRoutes(app: Elysia) {
           summary: "Get detail of user"
         }
       })
+      .patch('/:id', educationController.update.bind(educationController), {
+        beforeHandle: authGuard,
+        params: t.Object({
+          id: t.String({ format: 'uuid', error: "Invalid ID format" })
+        }),
+        body: t.Object({
+          institution: t.Optional(t.String({ maxLength: 100 })),
+          degree: t.Optional(t.String({ maxLength: 50 })),
+          fieldOfStudy: t.Optional(t.String()),
+          grade: t.Optional(t.String()),
+          startDate: t.Optional(t.String({ format: 'date' })),
+          endDate: t.Optional(t.String({ format: 'date' })),
+          description: t.Optional(t.String())
+        }),
+        detail: {
+          tags: ["Education"],
+          summary: "Update an education record"
+        }
+      })
+      .delete('/:id', educationController.delete.bind(educationController), {
+        beforeHandle: authGuard,
+        params: t.Object({
+          id: t.String({ format: 'uuid', error: "Invalid ID format" })
+        }),
+        detail: {
+          tags: ["Education"],
+          summary: "Delete an education record"
+        }
+      })
   )
 }

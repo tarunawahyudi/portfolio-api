@@ -3,9 +3,11 @@ import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { Education, NewEducation } from '@module/education/entity/education'
 import { db } from '@db/index'
 import { educations } from '@db/schema'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { paginate } from '@shared/util/pagination.util'
 import { injectable } from 'tsyringe'
+import { UpdateEducationRequest } from '@module/education/dto/education.dto'
+import { AppException } from '@core/exception/app.exception'
 
 @injectable()
 export class EducationRepositoryImpl implements EducationRepository {
@@ -31,4 +33,30 @@ export class EducationRepositoryImpl implements EducationRepository {
     return inserted
   }
 
+  async update(id: string, userId: string, data: UpdateEducationRequest): Promise<Education> {
+    const [updated] = await db
+      .update(educations)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(eq(educations.id, id), eq(educations.userId, userId)))
+      .returning()
+
+    if (!updated) {
+      throw new AppException('EDU-001', 'Education record not found or permission denied.')
+    }
+
+    return updated
+  }
+
+  async delete(id: string, userId: string): Promise<Education> {
+    const [deleted] = await db
+      .delete(educations)
+      .where(and(eq(educations.id, id), eq(educations.userId, userId)))
+      .returning()
+
+    if (!deleted) {
+      throw new AppException('EDU-001', 'Education record not found or permission denied.')
+    }
+
+    return deleted
+  }
 }

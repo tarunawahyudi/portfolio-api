@@ -57,4 +57,14 @@ export class ArticleControllerImpl implements ArticleController {
     await this.articleService.updateStatus(id, userId, status)
     return noResponse(ctx, 'status successfully updated')
   }
+
+  async delete(ctx: Context): Promise<AppResponse> {
+    const userId = (ctx as any).user?.sub
+    if (!userId) throw new AppException('AUTH-000')
+
+    const { id } = ctx.params
+
+    await this.articleService.deleteStatus(id, userId)
+    return noResponse(ctx, 'status successfully deleted')
+  }
 }

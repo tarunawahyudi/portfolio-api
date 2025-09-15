@@ -5,7 +5,7 @@ import {
   CreateArticleRequest,
 } from '@module/article/dto/article.dto'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
-import { Article, NewArticle } from '@module/article/entity/article'
+import { NewArticle } from '@module/article/entity/article'
 import { inject, injectable } from 'tsyringe'
 import type { ArticleRepository } from '@module/article/repository/article.repository'
 import { toArticleResponse } from '@module/article/mapper/article.mapper'
@@ -24,7 +24,7 @@ export class ArticleServiceImpl implements ArticleService {
     return toArticleResponse(response)
   }
 
-  async fetch(userId: string, options: PaginationOptions): Promise<PaginatedResponse<Article>> {
+  async fetch(userId: string, options: PaginationOptions): Promise<PaginatedResponse<ArticleResponse>> {
     const paginatedResult = await this.articleRepository.findAll(userId, options)
     const transformData = paginatedResult.data.map(toArticleResponse)
 
@@ -52,11 +52,15 @@ export class ArticleServiceImpl implements ArticleService {
 
     await this.articleRepository.setThumbnailUrl(id, userId, key)
     return {
-      id, thumbnailUrl: cdnUrl(key)
+      id, thumbnailUrl: cdnUrl(key) ?? ''
     }
   }
 
   async updateStatus(id: string, userId: string, status: string): Promise<void> {
     await this.articleRepository.setStatus(id, userId, status)
+  }
+
+  async deleteStatus(id: string, userId: string): Promise<void> {
+    await this.articleRepository.softDelete(id, userId)
   }
 }

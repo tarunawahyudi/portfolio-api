@@ -75,5 +75,15 @@ export function registerArticleRoutes(app: Elysia) {
           summary: "Set article status update"
         }
       })
+      .delete('/:id', articleController.delete.bind(articleController), {
+        beforeHandle: authGuard,
+        params: t.Object({
+          id: t.String({ format: 'uuid', error: 'Invalid article ID format' })
+        }),
+        detail: {
+          tags: ["Article"],
+          summary: "Delete article by id"
+        }
+      }),
   )
 }

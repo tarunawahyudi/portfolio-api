@@ -41,7 +41,18 @@ export class ArticleRepositoryImpl implements ArticleRepository {
   async setStatus(id: string, userId: string, status: string): Promise<void> {
     await db
       .update(articles)
-      .set({ status })
+      .set({ status: status as 'draft' | 'published', updatedAt: new Date() })
+      .where(
+        and(
+          eq(articles.id, id), eq(articles.userId, userId)
+        )
+      )
+  }
+
+  async softDelete(id: string, userId: string): Promise<void> {
+    await db
+      .update(articles)
+      .set({ status: 'deleted' })
       .where(
         and(
           eq(articles.id, id), eq(articles.userId, userId)

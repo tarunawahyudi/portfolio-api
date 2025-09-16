@@ -5,10 +5,11 @@ import {
   PortfolioDetailResponse,
   PortfolioGalleryItemResponse,
   PortfolioResponse,
-  UpdatePortfolioRequest,
+  UpdatePortfolioRequest, VisitorInfo,
 } from '@module/portfolio/dto/portfolio.dto'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { inject, injectable } from 'tsyringe'
+import geoip from 'geoip-lite'
 import type { PortfolioRepository } from '@module/portfolio/repository/portfolio.repository'
 import {
   toPortfolioDetailResponse,
@@ -47,9 +48,17 @@ export class PortfolioServiceImpl implements PortfolioService {
     return toPortfolioResponse(newPortfolio)
   }
 
-  async show(id: string): Promise<PortfolioDetailResponse> {
+  async show(id: string, visitorInfo: VisitorInfo): Promise<PortfolioDetailResponse> {
     const portfolio = await this.portfolioRepository.findDetail(id)
     if (!portfolio) throw new AppException('PORTFOLIO-001')
+
+    if (visitorInfo.ipAddress) {
+      this.logVisitor(id, visitorInfo).catch(err => {
+        console.error(err)
+        logger.error('Failed to log portfolio view')
+      })
+    }
+
     return toPortfolioDetailResponse(portfolio)
   }
 
@@ -111,5 +120,23 @@ export class PortfolioServiceImpl implements PortfolioService {
     logger.info(`${newGalleryItems.length} gallery items saved to database`)
 
     return newGalleryItems.map(toPortfolioGalleryItemResponse)
+  }
+
+  private async logVisitor(portfolioId: string, visitorInfo: VisitorInfo): Promise<void> {
+    const geo = geoip.lookup(visitorInfo.ipAddress!)
+
+    await this.portfolioRepository.logView({
+      portfolioId: portfolioId,
+      userId: visitorInfo.userId,
+      ipAddress: visitorInfo.ipAddress,
+      userAgent: visitorInfo.userAgent,
+      country: geo?.country,
+      region: geo?.region,
+      city: geo?.city,
+      latitude: geo?.ll[0],
+      longitude: geo?.ll[1],
+    })
+
+    logger.info(`View logged for portfolio ${portfolioId} from IP ${visitorInfo.ipAddress}`)
   }
 }

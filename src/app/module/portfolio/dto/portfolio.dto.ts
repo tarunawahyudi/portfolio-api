@@ -1,40 +1,58 @@
 export interface PortfolioResponse {
   id: string;
-  userId: string;
   title: string;
-  description?: string;
-  thumbnailUrl?: string;
-  techStack?: string[];
+  category: string;
+  summary?: string;
+  thumbnailUrl: string | null;
+  isFeatured: boolean;
+  status: 'draft' | 'published' | 'archived';
 }
 
 export interface CreatePortfolioRequest {
   userId: string;
   title: string;
+  category: string;
+  status?: 'draft' | 'published' | 'archived';
+  summary?: string;
   description?: string;
   techStack?: string[];
+  projectUrl?: string;
+  repoUrl?: string;
 }
 
 export interface UpdatePortfolioRequest {
   title?: string;
+  category?: string;
+  status?: 'draft' | 'published';
+  visibility?: 'public' | 'private';
+  isFeatured?: boolean;
+  summary?: string;
   description?: string;
-  thumbnail?: string;
   techStack?: string[];
+  projectUrl?: string;
+  repoUrl?: string;
 }
 
 export interface PortfolioGalleryItemResponse {
   id: string;
   url: string | null;
-  fileType: string | null;
-  size: number | null;
   order: number | null;
 }
 
-export interface PortfolioDetailResponse {
-  id: string;
+export interface PortfolioDetailResponse extends PortfolioResponse {
   userId: string;
-  title: string;
   description?: string;
-  thumbnailUrl: string | null;
+  projectUrl?: string;
+  repoUrl?: string;
+  demoUrl?: string;
   techStack: string[];
+  publishedAt?: Date | null;
+  viewCount: number;
   gallery: PortfolioGalleryItemResponse[];
+}
+
+export interface VisitorInfo {
+  ipAddress?: string;
+  userAgent?: string;
+  userId?: string;
 }

@@ -1,11 +1,16 @@
 import { PortfolioRepository } from '@module/portfolio/repository/portfolio.repository'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
-import { NewPortfolio, Portfolio, PortfolioWithGallery } from '@module/portfolio/entity/portfolio'
-import { portfolios } from '@db/schema'
-import { and, eq } from 'drizzle-orm'
+import {
+  NewPortfolio,
+  Portfolio,
+  PortfolioWithRelations,
+} from '@module/portfolio/entity/portfolio'
+import { portfolios, portfolioViews } from '@db/schema'
+import { and, count, eq } from 'drizzle-orm'
 import { paginate } from '@shared/util/pagination.util'
 import { db } from '@db/index'
 import { injectable } from 'tsyringe'
+import { NewPortfolioView } from '@module/portfolio/entity/portfolio-view'
 
 @injectable()
 export class PortfolioRepositoryImpl implements PortfolioRepository {
@@ -31,15 +36,26 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
     return row || null
   }
 
-  async findDetail(id: string): Promise<PortfolioWithGallery | null> {
+  async findDetail(id: string): Promise<PortfolioWithRelations | null> {
     const row = await db.query.portfolios.findFirst({
       where: eq(portfolios.id, id),
       with: {
         gallery: true,
+        user: true,
       }
     })
 
-    return row || null
+    if (!row) return null
+
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(portfolioViews)
+      .where(eq(portfolioViews.portfolioId, id))
+
+    return {
+      ...row,
+      viewCount: total ?? 0,
+    }
   }
 
   async findOne(id: string, userId: string): Promise<Portfolio | null> {
@@ -86,5 +102,9 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
       .returning()
 
     return updatedPortfolio
+  }
+
+  async logView(data: NewPortfolioView): Promise<void> {
+    await db.insert(portfolioViews).values(data)
   }
 }

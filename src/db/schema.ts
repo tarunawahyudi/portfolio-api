@@ -1,6 +1,6 @@
 import {
   boolean,
-  date,
+  date, doublePrecision,
   integer,
   jsonb,
   pgEnum,
@@ -25,6 +25,17 @@ export const articleStatusEnum = pgEnum('article_status', [
   'draft',
   'published',
   'deleted',
+])
+
+export const visibilityEnum = pgEnum('visibility', [
+  'public',
+  'private'
+])
+
+export const portfolioStatusEnum = pgEnum('portfolio_status', [
+  'draft',
+  'published',
+  'archived'
 ])
 
 export const users = pgTable('users', {
@@ -220,11 +231,38 @@ export const portfolios = pgTable('portfolios', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   title: varchar('title').notNull(),
+  category: varchar('category').notNull(),
+  status: portfolioStatusEnum('status').default('draft').notNull(),
+  visibility: visibilityEnum('visibility').default('public').notNull(),
+  isFeatured: boolean("is_featured").default(false),
+  projectUrl: varchar('project_url'),
+  repoUrl: varchar('repo_url'),
+  demoUrl: text("demo_url"),
+  summary: varchar("summary", { length: 500 }),
   description: text('description'),
   thumbnail: text('thumbnail'),
+  externalVideoUrl: text('external_video_url'),
+  selfHostedVideoUrl: text('self_hosted_video_url'),
   techStack: text('tech_stack').array(),
+  publishedAt: timestamp("published_at", { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+})
+
+export const portfolioViews = pgTable('portfolio_views', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  portfolioId: uuid('portfolio_id')
+    .notNull()
+    .references(() => portfolios.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').references(() => users.id),
+  ipAddress: varchar('ip_address', { length: 45 }),
+  country: varchar('country'),
+  region: varchar('region'),
+  city: varchar('city'),
+  latitude: doublePrecision('latitude'),
+  longitude: doublePrecision('longitude'),
+  userAgent: text('user_agent'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 })
 
 export const awards = pgTable('awards', {
@@ -365,6 +403,7 @@ export const portfolioRelations = relations(portfolios, ({ one, many }) => ({
     references: [users.id],
   }),
   gallery: many(portfolioGallery),
+  viewCount: many(portfolioViews),
 }))
 
 export const portfolioGalleryRelations = relations(
@@ -375,6 +414,16 @@ export const portfolioGalleryRelations = relations(
       references: [portfolios.id],
     }),
   }),
+)
+
+export const portfolioViewRelations = relations(
+  portfolioViews,
+  ({ one }) => ({
+    portfolio: one(portfolios, {
+      fields: [portfolioViews.portfolioId],
+      references: [portfolios.id],
+    })
+  })
 )
 
 export const awardRelations = relations(awards, ({ one }) => ({

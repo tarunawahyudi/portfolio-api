@@ -25,19 +25,21 @@ export class PortfolioControllerImpl implements PortfolioController {
 
   async getById(ctx: Context): Promise<AppResponse> {
     const id = ctx.params.id
-    const response = await this.portfolioService.show(id)
+
+    const visitorInfo = {
+      ipAddress: ctx.request.headers.get('x-forwarded-for') ?? undefined,
+      userAgent: ctx.request.headers.get('user-agent') ?? undefined,
+      userId: (ctx as any).user?.sub,
+    }
+
+    const response = await this.portfolioService.show(id, visitorInfo)
     return successResponse(ctx, response)
   }
 
   async post(ctx: Context): Promise<AppResponse> {
     const userId = (ctx as any).user?.sub
-    const { title, description, techStack } = ctx.body as any
-    const request: CreatePortfolioRequest = {
-      userId: userId,
-      title: title,
-      description: description,
-      techStack: techStack ?? [],
-    }
+    const request = ctx.body as CreatePortfolioRequest
+    request.userId = userId
 
     const response = await this.portfolioService.create(request)
     return successResponse(ctx, response, 'Portfolio saved', 201)

@@ -1,4 +1,4 @@
-import { Portfolio, PortfolioWithGallery } from '@module/portfolio/entity/portfolio'
+import { Portfolio, PortfolioWithRelations } from '@module/portfolio/entity/portfolio'
 import {
   PortfolioDetailResponse,
   PortfolioGalleryItemResponse,
@@ -10,22 +10,32 @@ import { PortfolioGallery } from '@module/portfolio/entity/portfolio-gallery'
 export function toPortfolioResponse(portfolio: Portfolio): PortfolioResponse {
   return {
     id: portfolio.id,
-    userId: portfolio.userId,
     title: portfolio.title,
-    description: portfolio.description ?? undefined,
-    thumbnailUrl: cdnUrl(portfolio.thumbnail) ?? '',
-    techStack: portfolio.techStack ?? [],
+    category: portfolio.category,
+    summary: portfolio.summary ?? undefined,
+    thumbnailUrl: cdnUrl(portfolio.thumbnail),
+    status: portfolio.status,
+    isFeatured: portfolio.isFeatured ?? false,
   }
 }
 
-export function toPortfolioDetailResponse(portfolio: PortfolioWithGallery): PortfolioDetailResponse {
+export function toPortfolioDetailResponse(portfolio: PortfolioWithRelations): PortfolioDetailResponse {
   return {
     id: portfolio.id,
-    userId: portfolio.userId,
     title: portfolio.title,
-    description: portfolio.description ?? undefined,
+    category: portfolio.category,
+    summary: portfolio.summary ?? undefined,
     thumbnailUrl: cdnUrl(portfolio.thumbnail),
+    status: portfolio.status,
+    isFeatured: portfolio.isFeatured ?? false,
+    userId: portfolio.userId,
+    description: portfolio.description ?? undefined,
+    projectUrl: portfolio.projectUrl ?? undefined,
+    repoUrl: portfolio.repoUrl ?? undefined,
+    demoUrl: portfolio.demoUrl ?? undefined,
     techStack: portfolio.techStack ?? [],
+    publishedAt: portfolio.publishedAt,
+    viewCount: portfolio.viewCount ?? 0,
     gallery: portfolio.gallery ? portfolio.gallery.map(toPortfolioGalleryItemResponse) : [],
   }
 }
@@ -34,8 +44,6 @@ export function toPortfolioGalleryItemResponse(item: PortfolioGallery): Portfoli
   return {
     id: item.id,
     url: cdnUrl(item.path),
-    fileType: item.fileType ?? '',
-    size: item.size,
     order: item.order,
   }
 }

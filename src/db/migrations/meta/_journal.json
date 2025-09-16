@@ -22,6 +22,13 @@
       "when": 1757889216218,
       "tag": "0002_natural_vulcan",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1758005134623,
+      "tag": "0003_silky_omega_sentinel",
+      "breakpoints": true
     }
   ]
 }

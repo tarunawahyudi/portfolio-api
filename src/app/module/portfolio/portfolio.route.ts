@@ -3,6 +3,7 @@ import { container } from 'tsyringe'
 import { ROOT } from '@shared/constant/commons.constant'
 import { authGuard } from '@core/middleware/auth.middleware'
 import { PortfolioControllerImpl } from '@module/portfolio/controller/portfolio.controller.impl'
+import { portfolioStatusEnum, visibilityEnum } from '@db/schema'
 
 export function registerPortfolioRoutes(app: Elysia) {
   const portfolioController = container.resolve(PortfolioControllerImpl)
@@ -35,9 +36,15 @@ export function registerPortfolioRoutes(app: Elysia) {
       .post(ROOT, portfolioController.post.bind(portfolioController), {
         beforeHandle: authGuard,
         body: t.Object({
-          title: t.String({ maxLength: 100 }),
+          title: t.String(),
+          category: t.String(),
+          status: t.Optional(t.UnionEnum(portfolioStatusEnum.enumValues)),
+          visibility: t.Optional(t.UnionEnum(visibilityEnum.enumValues)),
+          summary: t.Optional(t.String()),
           description: t.Optional(t.String()),
-          techStack: t.Array(t.String())
+          techStack: t.Optional(t.Array(t.String())),
+          projectUrl: t.Optional(t.String()),
+          repoUrl: t.Optional(t.String()),
         }),
         detail: {
           tags: ["Portfolio"],

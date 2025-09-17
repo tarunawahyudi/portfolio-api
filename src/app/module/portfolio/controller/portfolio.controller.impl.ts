@@ -50,8 +50,8 @@ export class PortfolioControllerImpl implements PortfolioController {
     const userId = (ctx as any).user?.sub
     const request = ctx.body as UpdatePortfolioRequest
 
-    await this.portfolioService.modify(id, userId, request)
-    return noResponse(ctx, 'Portfolio updated successfully')
+    const updatedPortfolio = await this.portfolioService.modify(id, userId, request)
+    return successResponse(ctx, updatedPortfolio, 'Portfolio updated successfully')
   }
 
   async delete(ctx: Context): Promise<AppResponse> {
@@ -88,8 +88,15 @@ export class PortfolioControllerImpl implements PortfolioController {
       throw new AppException('MEDIA-001', 'No files were uploaded.')
     }
 
-    const response = await this.portfolioService.uploadGallery(portfolioId, files)
+    const response = await this.portfolioService.uploadGallery(portfolioId, userId, files)
     return successResponse(ctx, response, 'Gallery images uploaded successfully')
+  }
 
+  async deleteGalleryImage(ctx: Context): Promise<AppResponse> {
+    const { id, imageId } = ctx.params
+    const userId = (ctx as any).user?.sub
+
+    await this.portfolioService.removeGalleryImage(id, imageId, userId)
+    return noResponse(ctx, 'Gallery image deleted successfully')
   }
 }

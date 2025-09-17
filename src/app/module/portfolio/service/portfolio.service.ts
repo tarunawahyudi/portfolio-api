@@ -14,5 +14,6 @@ export interface PortfolioService {
   modify(id: string, userId: string, data: UpdatePortfolioRequest): Promise<PortfolioResponse>
   remove(id: string, userId: string): Promise<void>
   uploadThumbnail(id: string, userId: string, thumbnailFile: File): Promise<{ thumbnailUrl: string | null }>
-  uploadGallery(portfolioId: string, files: File[]): Promise<PortfolioGalleryItemResponse[]>
+  uploadGallery(portfolioId: string, userId: string, files: File[]): Promise<PortfolioGalleryItemResponse[]>
+  removeGalleryImage(portfolioId: string, imageId: string, userId: string): Promise<void>
 }

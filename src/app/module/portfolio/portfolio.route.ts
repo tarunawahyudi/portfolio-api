@@ -60,15 +60,17 @@ export function registerPortfolioRoutes(app: Elysia) {
           id: t.String({ format: 'uuid', error: 'Invalid portfolio ID format' })
         }),
         body: t.Object({
-          title: t.Optional(t.String({ maxLength: 100 })),
-          category: t.Optional(t.String()),
-          summary: t.Optional(t.String()),
+          title: t.Optional(t.String({ minLength: 3, maxLength: 100 })),
+          category: t.Optional(t.String({ minLength: 3 })),
+          status: t.Optional(t.UnionEnum(portfolioStatusEnum.enumValues)),
           visibility: t.Optional(t.UnionEnum(visibilityEnum.enumValues)),
           isFeatured: t.Optional(t.Boolean()),
+          summary: t.Optional(t.String({ maxLength: 500 })),
           description: t.Optional(t.String()),
           techStack: t.Optional(t.Array(t.String())),
-          projectUrl: t.Optional(t.String()),
-          repoUrl: t.Optional(t.String()),
+          projectUrl: t.Optional(t.String({ format: 'uri' })),
+          repoUrl: t.Optional(t.String({ format: 'uri' })),
+          demoUrl: t.Optional(t.String({ format: 'uri' })),
         }),
         detail: {
           tags: ["Portfolio"],
@@ -112,6 +114,17 @@ export function registerPortfolioRoutes(app: Elysia) {
         detail: {
           tags: ['Portfolio'],
           summary: "Upload multiple images to a portfolio gallery"
+        }
+      })
+      .delete('/:id/gallery/:imageId', portfolioController.deleteGalleryImage.bind(portfolioController), {
+        beforeHandle: authGuard,
+        params: t.Object({
+          id: t.String({ format: 'uuid' }),
+          imageId: t.String({ format: 'uuid' })
+        }),
+        detail: {
+          tags: ["Portfolio"],
+          summary: "Delete Image Gallery"
         }
       })
   )

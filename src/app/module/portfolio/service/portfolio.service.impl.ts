@@ -5,7 +5,8 @@ import {
   PortfolioDetailResponse,
   PortfolioGalleryItemResponse,
   PortfolioResponse,
-  UpdatePortfolioRequest, VisitorInfo,
+  UpdatePortfolioRequest,
+  VisitorInfo,
 } from '@module/portfolio/dto/portfolio.dto'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { inject, injectable } from 'tsyringe'
@@ -28,7 +29,8 @@ export class PortfolioServiceImpl implements PortfolioService {
   constructor(
     @inject('StorageService') private readonly storageService: StorageService,
     @inject('PortfolioRepository') private readonly portfolioRepository: PortfolioRepository,
-    @inject('PortfolioGalleryRepository') private readonly portfolioGalleryRepository: PortfolioGalleryRepository,
+    @inject('PortfolioGalleryRepository')
+    private readonly portfolioGalleryRepository: PortfolioGalleryRepository,
   ) {}
   async fetch(
     userId: string,
@@ -53,7 +55,7 @@ export class PortfolioServiceImpl implements PortfolioService {
     if (!portfolio) throw new AppException('PORTFOLIO-001')
 
     if (visitorInfo.ipAddress) {
-      this.logVisitor(id, visitorInfo).catch(err => {
+      this.logVisitor(id, visitorInfo).catch((err) => {
         console.error(err)
         logger.error('Failed to log portfolio view')
       })
@@ -67,7 +69,12 @@ export class PortfolioServiceImpl implements PortfolioService {
     userId: string,
     data: UpdatePortfolioRequest,
   ): Promise<PortfolioResponse> {
-    const updatedPortfolio = await this.portfolioRepository.update(id, userId, data as NewPortfolio)
+    const existingPortfolio = await this.portfolioRepository.findById(id, userId)
+    if (!existingPortfolio) {
+      throw new AppException('PORTFOLIO-001')
+    }
+
+    const updatedPortfolio = await this.portfolioRepository.update(id, userId, data)
     return toPortfolioResponse(updatedPortfolio)
   }
 
@@ -88,12 +95,16 @@ export class PortfolioServiceImpl implements PortfolioService {
     }
 
     if (portfolioToDelete.gallery && portfolioToDelete.gallery.length > 0) {
-      const galleryKeys = portfolioToDelete.gallery.map(item => item.path).filter((path): path is string => !!path)
+      const galleryKeys = portfolioToDelete.gallery
+        .map((item) => item.path)
+        .filter((path): path is string => !!path)
       keysToDelete.push(...galleryKeys)
     }
 
     if (keysToDelete.length > 0) {
-      logger.info(`Deleting ${keysToDelete.length} associated files from R2 for portfolio ID: ${id}`)
+      logger.info(
+        `Deleting ${keysToDelete.length} associated files from R2 for portfolio ID: ${id}`,
+      )
       await this.storageService.deleteMany(keysToDelete)
       logger.info(`Files deleted successfully from R2.`)
     } else {
@@ -105,33 +116,60 @@ export class PortfolioServiceImpl implements PortfolioService {
   }
 
   async uploadThumbnail(
-    id: string,
+    portfolioId: string,
     userId: string,
-    thumbnailFile: File,
+    file: File,
   ): Promise<{ thumbnailUrl: string | null }> {
-    const portfolio = await this.portfolioRepository.findOne(id, userId)
-    if (!portfolio) throw new AppException('COMMON-001')
+    const portfolio = await this.portfolioRepository.findById(portfolioId, userId)
+    if (!portfolio) {
+      throw new AppException('PORTFOLIO-001')
+    }
 
-    const { key } = await this.storageService.upload({
-      file: thumbnailFile,
+    const oldThumbnailKey = portfolio.thumbnail
+    const { key: newThumbnailKey } = await this.storageService.upload({
+      file,
       module: 'portfolio',
-      collection: 'thumbnail'
+      collection: 'thumbnail',
     })
-    await this.portfolioRepository.updateThumbnail(id, userId, key)
-    return { thumbnailUrl: cdnUrl(key) }
+
+    await this.portfolioRepository.update(portfolioId, userId, { thumbnail: newThumbnailKey })
+    if (oldThumbnailKey) {
+      logger.info(`[PortfolioService] Deleting old thumbnail: ${oldThumbnailKey}`)
+      await this.storageService.delete(oldThumbnailKey)
+    }
+
+    return { thumbnailUrl: cdnUrl(newThumbnailKey) }
   }
 
-  async uploadGallery(portfolioId: string, files: File[]): Promise<PortfolioGalleryItemResponse[]> {
-    const portfolio = await this.portfolioRepository.findById(portfolioId)
+  async removeGalleryImage(portfolioId: string, imageId: string, userId: string): Promise<void> {
+    const image = await this.portfolioRepository.findGalleryImageById(imageId)
+
+    if (!image || image.portfolioId !== portfolioId) {
+      throw new AppException('GALLERY-001')
+    }
+    const portfolio = await this.portfolioRepository.findById(portfolioId, userId)
+    if (!portfolio) {
+      throw new AppException('PORTFOLIO-001')
+    }
+
+    if (image.path) {
+      await this.storageService.delete(image.path)
+    }
+
+    await this.portfolioRepository.deleteGalleryImage(imageId)
+  }
+
+  async uploadGallery(portfolioId: string, userId: string, files: File[]): Promise<PortfolioGalleryItemResponse[]> {
+    const portfolio = await this.portfolioRepository.findById(portfolioId, userId)
     if (!portfolio) throw new AppException('PORTFOLIO-001')
 
     logger.info(`uploading ${files.length} files in parallel...`)
-    const uploadPromises = files.map(file =>
+    const uploadPromises = files.map((file) =>
       this.storageService.upload({
         file,
         module: 'portfolio',
-        collection: 'gallery'
-      })
+        collection: 'gallery',
+      }),
     )
 
     const uploadResults = await Promise.all(uploadPromises)

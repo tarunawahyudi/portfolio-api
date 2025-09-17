@@ -32,3 +32,4 @@ TESTIMONIAL-001,TESTIMONIAL,Testimonial not found,warn,404
 COURSE-001,COURSE,Course not found,warn,404
 SETTING-001,SETTING,Setting not found,warn,404
 ARTICLE-001,ARTICLE,Article not found,warn,404
+GALLERY-001,PORTFOLIO,Gallery image not found,warn,404

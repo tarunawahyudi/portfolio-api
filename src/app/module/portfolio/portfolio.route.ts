@@ -45,6 +45,9 @@ export function registerPortfolioRoutes(app: Elysia) {
           techStack: t.Optional(t.Array(t.String())),
           projectUrl: t.Optional(t.String()),
           repoUrl: t.Optional(t.String()),
+          demoUrl: t.Optional(t.String()),
+          isFeatured: t.Optional(t.Boolean()),
+          externalVideoUrl: t.Optional(t.String())
         }),
         detail: {
           tags: ["Portfolio"],
@@ -58,8 +61,14 @@ export function registerPortfolioRoutes(app: Elysia) {
         }),
         body: t.Object({
           title: t.Optional(t.String({ maxLength: 100 })),
+          category: t.Optional(t.String()),
+          summary: t.Optional(t.String()),
+          visibility: t.Optional(t.UnionEnum(visibilityEnum.enumValues)),
+          isFeatured: t.Optional(t.Boolean()),
           description: t.Optional(t.String()),
-          techStack: t.Optional(t.Array(t.String()))
+          techStack: t.Optional(t.Array(t.String())),
+          projectUrl: t.Optional(t.String()),
+          repoUrl: t.Optional(t.String()),
         }),
         detail: {
           tags: ["Portfolio"],

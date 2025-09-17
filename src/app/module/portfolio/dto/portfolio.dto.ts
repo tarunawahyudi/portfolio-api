@@ -18,6 +18,10 @@ export interface CreatePortfolioRequest {
   techStack?: string[];
   projectUrl?: string;
   repoUrl?: string;
+  demoUrl?: string;
+  visibility: 'public' | 'private';
+  isFeatured: boolean;
+  externalVideoUrl?: string;
 }
 
 export interface UpdatePortfolioRequest {
@@ -47,7 +51,10 @@ export interface PortfolioDetailResponse extends PortfolioResponse {
   demoUrl?: string;
   techStack: string[];
   publishedAt?: Date | null;
+  visibility: 'public' | 'private';
   viewCount: number;
+  externalVideoUrl?: string;
+  selfHostedVideoUrl?: string;
   gallery: PortfolioGalleryItemResponse[];
 }
 

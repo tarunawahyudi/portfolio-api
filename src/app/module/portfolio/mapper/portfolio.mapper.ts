@@ -36,6 +36,9 @@ export function toPortfolioDetailResponse(portfolio: PortfolioWithRelations): Po
     techStack: portfolio.techStack ?? [],
     publishedAt: portfolio.publishedAt,
     viewCount: portfolio.viewCount ?? 0,
+    visibility: portfolio.visibility ?? 'public',
+    selfHostedVideoUrl: portfolio.selfHostedVideoUrl ?? undefined,
+    externalVideoUrl: portfolio.externalVideoUrl ?? undefined,
     gallery: portfolio.gallery ? portfolio.gallery.map(toPortfolioGalleryItemResponse) : [],
   }
 }

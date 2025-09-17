@@ -3,6 +3,7 @@ import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import {
   NewPortfolio,
   Portfolio,
+  PortfolioWithGallery,
   PortfolioWithRelations,
 } from '@module/portfolio/entity/portfolio'
 import { portfolios, portfolioViews } from '@db/schema'
@@ -102,6 +103,15 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
       .returning()
 
     return updatedPortfolio
+  }
+
+  async findByIdWithGallery(id: string, userId: string): Promise<PortfolioWithGallery | undefined> {
+    return db.query.portfolios.findFirst({
+      where: and(eq(portfolios.id, id), eq(portfolios.userId, userId)),
+      with: {
+        gallery: true,
+      },
+    })
   }
 
   async logView(data: NewPortfolioView): Promise<void> {

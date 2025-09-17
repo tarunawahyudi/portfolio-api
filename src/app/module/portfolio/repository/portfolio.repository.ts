@@ -17,4 +17,5 @@ export interface PortfolioRepository {
   delete(id: string, userId: string): Promise<void>
   updateThumbnail(id: string, userId: string, thumbnailKey: string): Promise<Portfolio>
   logView(data: NewPortfolioView): Promise<void>
+  findByIdWithGallery(id: string, userId: string): Promise<PortfolioWithGallery | undefined>
 }

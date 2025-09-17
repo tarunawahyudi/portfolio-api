@@ -72,7 +72,36 @@ export class PortfolioServiceImpl implements PortfolioService {
   }
 
   async remove(id: string, userId: string): Promise<void> {
+    logger.info(`Attempting to delete portfolio ID: ${id} for user ID: ${userId}`)
+
+    const portfolioToDelete = await this.portfolioRepository.findByIdWithGallery(id, userId)
+
+    if (!portfolioToDelete) {
+      logger.warn(`Portfolio not found or user not authorized. ID: ${id}`)
+      throw new AppException('PORTFOLIO-001')
+    }
+
+    const keysToDelete: string[] = []
+
+    if (portfolioToDelete.thumbnail) {
+      keysToDelete.push(portfolioToDelete.thumbnail)
+    }
+
+    if (portfolioToDelete.gallery && portfolioToDelete.gallery.length > 0) {
+      const galleryKeys = portfolioToDelete.gallery.map(item => item.path).filter((path): path is string => !!path)
+      keysToDelete.push(...galleryKeys)
+    }
+
+    if (keysToDelete.length > 0) {
+      logger.info(`Deleting ${keysToDelete.length} associated files from R2 for portfolio ID: ${id}`)
+      await this.storageService.deleteMany(keysToDelete)
+      logger.info(`Files deleted successfully from R2.`)
+    } else {
+      logger.info(`No associated files to delete for portfolio ID: ${id}`)
+    }
+
     await this.portfolioRepository.delete(id, userId)
+    logger.info(`Portfolio record deleted successfully from database. ID: ${id}`)
   }
 
   async uploadThumbnail(

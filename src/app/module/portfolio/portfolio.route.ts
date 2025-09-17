@@ -109,7 +109,10 @@ export function registerPortfolioRoutes(app: Elysia) {
           id: t.String({ format: 'uuid', error: 'Invalid portfolio ID format' })
         }),
         body: t.Object({
-          files: t.Files({ type: 'image/jpeg' })
+          files: t.Files({
+            type: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+            maxSize: '5m'
+          })
         }),
         detail: {
           tags: ['Portfolio'],

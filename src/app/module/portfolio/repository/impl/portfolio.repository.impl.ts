@@ -16,7 +16,7 @@ import { NewPortfolioView } from '@module/portfolio/entity/portfolio-view'
 export class PortfolioRepositoryImpl implements PortfolioRepository {
   async findAll(userId: string, options: PaginationOptions): Promise<PaginatedResponse<Portfolio>> {
     const whereCondition = eq(portfolios.userId, userId)
-    return paginate(db, portfolios, options, [], whereCondition)
+    return paginate(db, portfolios, options, [portfolios.title, portfolios.category], whereCondition)
   }
 
   async save(data: NewPortfolio): Promise<Portfolio> {

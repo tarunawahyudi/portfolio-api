@@ -8,6 +8,6 @@ import {
 export interface WorkExperienceService {
   fetch(options: PaginationOptions, userId: string): Promise<PaginatedResponse<WorkExperienceResponse>>
   create(request: CreateWorkExperienceRequest): Promise<WorkExperience>
-  modify(id: string, userId: string, request: UpdateWorkExperienceRequest): Promise<void>
+  modify(id: string, userId: string, request: UpdateWorkExperienceRequest): Promise<WorkExperienceResponse>
   remove(id: string, userId: string): Promise<void>
 }

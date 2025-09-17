@@ -45,6 +45,13 @@ export class WorkExperienceRepositoryImpl implements WorkExperienceRepository {
     return updated
   }
 
+  async findByIdAndUser(id: string, userId: string): Promise<WorkExperience | null> {
+    const row = await db.query.workExperiences.findFirst({
+      where: and(eq(workExperiences.id, id), eq(workExperiences.userId, userId)),
+    })
+    return row || null
+  }
+
   async delete(id: string, userId: string): Promise<void> {
     await db
       .delete(workExperiences)

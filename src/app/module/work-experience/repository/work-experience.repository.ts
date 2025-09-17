@@ -6,5 +6,6 @@ export interface WorkExperienceRepository {
   findById(id: string): Promise<WorkExperience | null>
   save(data: NewWorkExperience): Promise<WorkExperience>;
   update(id: string, userId: string, data: Partial<NewWorkExperience>): Promise<WorkExperience>
+  findByIdAndUser(id: string, userId: string): Promise<WorkExperience | null>
   delete(id: string, userId: string): Promise<void>
 }

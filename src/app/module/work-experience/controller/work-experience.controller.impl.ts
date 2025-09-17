@@ -7,7 +7,8 @@ import { parsePaginationOptions } from '@shared/util/pagination.util'
 import { noResponse, paginateResponse, successResponse } from '@shared/util/response.util'
 import {
   CreateWorkExperienceRequest,
-  UpdateWorkExperienceRequest, WorkExperienceResponse,
+  UpdateWorkExperienceRequest,
+  WorkExperienceResponse,
 } from '@module/work-experience/dto/work-experience.dto'
 
 @injectable()
@@ -44,5 +45,14 @@ export class WorkExperienceControllerImpl implements WorkExperienceController {
 
     await this.workExperienceService.remove(id, userId)
     return noResponse(ctx, 'Work experience deleted successfully')
+  }
+
+  async patch(ctx: Context): Promise<AppResponse> {
+    const { id } = ctx.params
+    const userId = (ctx as any).user?.sub
+    const request = ctx.body as UpdateWorkExperienceRequest
+
+    const updatedExperience = await this.workExperienceService.modify(id, userId, request)
+    return successResponse(ctx, updatedExperience, 'Work experience updated successfully')
   }
 }

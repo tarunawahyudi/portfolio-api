@@ -38,14 +38,14 @@ export function registerWorkerExperienceRoutes(app: Elysia) {
           summary: "Create a new work experience"
         }
       })
-      .put('/:id', workExperienceController.put.bind(workExperienceController), {
+      .patch('/:id', workExperienceController.patch.bind(workExperienceController), {
         beforeHandle: authGuard,
-        params: t.Object({ id: t.String() }),
+        params: t.Object({ id: t.String({ format: 'uuid' }) }),
         body: t.Object({
           company: t.Optional(t.String()),
           position: t.Optional(t.String()),
-          startDate: t.Optional(t.String()),
-          endDate: t.Optional(t.String()),
+          startDate: t.Optional(t.String({ format: 'date' })),
+          endDate: t.Optional(t.Nullable(t.String({ format: 'date' }))),
           isCurrent: t.Optional(t.Boolean()),
           jobDescription: t.Optional(t.String())
         }),

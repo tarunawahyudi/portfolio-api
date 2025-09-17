@@ -35,9 +35,18 @@ export class WorkExperienceServiceImpl implements WorkExperienceService {
     return await this.workExperienceRepository.save(request)
   }
 
-  async modify(id: string, userId: string, request: UpdateWorkExperienceRequest): Promise<void> {
-    await this.validate(id)
-    await this.workExperienceRepository.update(id, userId, request)
+  async modify(id: string, userId: string, request: UpdateWorkExperienceRequest): Promise<WorkExperienceResponse> {
+    const existingExperience = await this.workExperienceRepository.findByIdAndUser(id, userId)
+    if (!existingExperience) {
+      throw new AppException('WE-001')
+    }
+
+    if (request.isCurrent === true) {
+      request.endDate = null
+    }
+
+    const updatedExperience = await this.workExperienceRepository.update(id, userId, request)
+    return toWorkExperienceResponse(updatedExperience)
   }
 
   async remove(id: string, userId: string): Promise<void> {

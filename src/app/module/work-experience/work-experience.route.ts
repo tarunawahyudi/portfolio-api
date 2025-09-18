@@ -29,7 +29,7 @@ export function registerWorkerExperienceRoutes(app: Elysia) {
           company: t.String(),
           position: t.String(),
           startDate: t.String({ format: 'date' }),
-          endDate: t.Optional(t.String({ format: 'date' })),
+          endDate: t.Optional(t.Nullable(t.String({ format: 'date' }))),
           isCurrent: t.Optional(t.Boolean()),
           jobDescription: t.Optional(t.String()),
         }),

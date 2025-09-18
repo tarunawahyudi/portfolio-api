@@ -31,18 +31,23 @@ export class EducationServiceImpl implements EducationService {
     }
   }
 
-  async show(id: string): Promise<EducationResponse> {
-    const row = await this.educationRepository.findById(id)
+  async show(id: string, userId: string): Promise<EducationResponse> {
+    const row = await this.educationRepository.findByIdAndUser(id, userId)
     if (!row) throw new AppException('EDU-001')
     return toEducationResponse(row)
   }
 
   async modify(id: string, userId: string, data: UpdateEducationRequest): Promise<EducationResponse> {
+    const existingRecord = await this.educationRepository.findByIdAndUser(id, userId)
+    if (!existingRecord) throw new AppException('EDU-001')
+
     const updatedEducation = await this.educationRepository.update(id, userId, data)
     return toEducationResponse(updatedEducation)
   }
 
   async remove(id: string, userId: string): Promise<void> {
+    const existingRecord = await this.educationRepository.findByIdAndUser(id, userId)
+    if (!existingRecord) throw new AppException('EDU-001')
     await this.educationRepository.delete(id, userId)
   }
 }

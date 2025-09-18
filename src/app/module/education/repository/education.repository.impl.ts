@@ -59,4 +59,11 @@ export class EducationRepositoryImpl implements EducationRepository {
 
     return deleted
   }
+
+  async findByIdAndUser(id: string, userId: string): Promise<Education | null> {
+    const row = await db.query.educations.findFirst({
+      where: and(eq(educations.id, id), eq(educations.userId, userId)),
+    })
+    return row ?? null
+  }
 }

@@ -26,7 +26,8 @@ export class EducationControllerImpl implements EducationController {
 
   async getById(ctx: Context): Promise<AppResponse> {
     const id = ctx.params.id
-    const response = await this.educationService.show(id)
+    const userId = (ctx as any).user?.sub
+    const response = await this.educationService.show(id, userId)
     return successResponse(ctx, response)
   }
 

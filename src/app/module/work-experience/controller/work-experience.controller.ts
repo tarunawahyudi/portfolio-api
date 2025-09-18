@@ -7,4 +7,5 @@ export interface WorkExperienceController {
   post(ctx: Context): Promise<AppResponse>
   put(ctx: Context): Promise<AppResponse>
   delete(ctx: Context): Promise<AppResponse>
+  patch(ctx: Context): Promise<AppResponse>
 }

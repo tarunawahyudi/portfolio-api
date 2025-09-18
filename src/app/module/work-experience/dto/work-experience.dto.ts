@@ -23,7 +23,7 @@ export type UpdateWorkExperienceRequest = {
   company?: string;
   position?: string;
   startDate?: string;
-  endDate?: string;
+  endDate?: string | null;
   isCurrent?: boolean;
   jobDescription?: string;
-}
+};

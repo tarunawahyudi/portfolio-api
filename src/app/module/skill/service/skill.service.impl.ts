@@ -1,37 +1,44 @@
 import { SkillService } from '@module/skill/service/skill.service'
-import { CreateSkillRequest, SkillResponse } from '@module/skill/dto/skill.dto'
+import { CreateSkillRequest, SkillResponse, UpdateSkillRequest } from '@module/skill/dto/skill.dto'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
+import { NewSkill } from '@module/skill/entity/skill'
 import { inject, injectable } from 'tsyringe'
 import type { SkillRepository } from '@module/skill/repository/skill.repository'
-import { NewSkill } from '@module/skill/entity/skill'
 import { toSkillResponse } from '@module/skill/mapper/skill.mapper'
 import { AppException } from '@core/exception/app.exception'
 
 @injectable()
 export class SkillServiceImpl implements SkillService {
-  constructor(
-    @inject('SkillRepository') private readonly skillRepository: SkillRepository
-  ) {
-  }
+  constructor(@inject('SkillRepository') private readonly skillRepository: SkillRepository) {}
+
   async create(request: CreateSkillRequest): Promise<SkillResponse> {
     const result = await this.skillRepository.save(request as NewSkill)
     return toSkillResponse(result)
   }
 
-  async fetch(userId: string, options: PaginationOptions): Promise<PaginatedResponse<SkillResponse>> {
+  async fetch(
+    userId: string,
+    options: PaginationOptions,
+  ): Promise<PaginatedResponse<SkillResponse>> {
     const paginatedResult = await this.skillRepository.findAll(userId, options)
     const transformData = paginatedResult.data.map(toSkillResponse)
-
-    return {
-      data: transformData,
-      pagination: paginatedResult.pagination,
-    }
+    return { data: transformData, pagination: paginatedResult.pagination }
   }
 
-  async show(id: string): Promise<SkillResponse> {
-    const row = await this.skillRepository.findById(id)
+  async show(id: string, userId: string): Promise<SkillResponse> {
+    const row = await this.skillRepository.findByIdAndUser(id, userId)
     if (!row) throw new AppException('SKILL-001')
     return toSkillResponse(row)
   }
 
+  async modify(id: string, userId: string, data: UpdateSkillRequest): Promise<SkillResponse> {
+    await this.show(id, userId)
+    const updated = await this.skillRepository.update(id, userId, data)
+    return toSkillResponse(updated)
+  }
+
+  async remove(id: string, userId: string): Promise<void> {
+    await this.show(id, userId)
+    await this.skillRepository.delete(id, userId)
+  }
 }

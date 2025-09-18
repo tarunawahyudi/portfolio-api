@@ -5,7 +5,7 @@ export function toSkillResponse(skill: Skill): SkillResponse {
   return {
     id: skill.id,
     name: skill.name,
-    category: skill.category,
+    category: skill.category ?? '',
     proficiency: skill.proficiency,
   }
 }

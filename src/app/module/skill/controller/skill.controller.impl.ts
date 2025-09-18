@@ -1,18 +1,17 @@
 import { SkillController } from '@module/skill/controller/skill.controller'
 import { Context } from 'elysia'
 import { AppResponse, PaginatedResponse } from '@shared/type/global'
-import { CreateSkillRequest, SkillResponse } from '@module/skill/dto/skill.dto'
+import { parsePaginationOptions } from '@shared/util/pagination.util'
 import { inject, injectable } from 'tsyringe'
 import type { SkillService } from '@module/skill/service/skill.service'
-import { paginateResponse, successResponse } from '@shared/util/response.util'
+import { noResponse, paginateResponse, successResponse } from '@shared/util/response.util'
+import { CreateSkillRequest, SkillResponse, UpdateSkillRequest } from '@module/skill/dto/skill.dto'
 import { AppException } from '@core/exception/app.exception'
-import { parsePaginationOptions } from '@shared/util/pagination.util'
 
 @injectable()
 export class SkillControllerImpl implements SkillController {
-  constructor(
-    @inject('SkillService') private readonly skillService: SkillService
-  ) {}
+  constructor(@inject('SkillService') private readonly skillService: SkillService) {}
+
   async get(ctx: Context): Promise<PaginatedResponse<SkillResponse>> {
     const userId = (ctx as any).user?.sub
     const options = parsePaginationOptions(ctx.query)
@@ -21,19 +20,33 @@ export class SkillControllerImpl implements SkillController {
   }
 
   async getById(ctx: Context): Promise<AppResponse> {
-    const id = ctx.params.id
-    const response = await this.skillService.show(id)
+    const { id } = ctx.params
+    const userId = (ctx as any).user?.sub
+    const response = await this.skillService.show(id, userId)
     return successResponse(ctx, response)
   }
 
   async post(ctx: Context): Promise<AppResponse> {
     const userId = (ctx as any).user?.sub
     if (!userId) throw new AppException('AUTH-000')
-
-    const request = (ctx.body as any) as CreateSkillRequest
+    const request = ctx.body as any as CreateSkillRequest
     request.userId = userId
     const response = await this.skillService.create(request)
-    return successResponse(ctx, response, 'create success', 201)
+    return successResponse(ctx, response, 'Skill created successfully', 201)
   }
 
+  async patch(ctx: Context): Promise<AppResponse> {
+    const { id } = ctx.params
+    const userId = (ctx as any).user?.sub
+    const data = ctx.body as UpdateSkillRequest
+    const updated = await this.skillService.modify(id, userId, data)
+    return successResponse(ctx, updated, 'Skill updated successfully')
+  }
+
+  async delete(ctx: Context): Promise<AppResponse> {
+    const { id } = ctx.params
+    const userId = (ctx as any).user?.sub
+    await this.skillService.remove(id, userId)
+    return noResponse(ctx, 'Skill deleted successfully')
+  }
 }

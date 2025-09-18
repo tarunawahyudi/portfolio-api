@@ -1,13 +1,19 @@
 export interface CreateSkillRequest {
-  userId: string;
-  name: string;
-  proficiency: number;
-  category?: string;
+  userId: string
+  name: string
+  proficiency: number
+  category: string
+}
+
+export interface UpdateSkillRequest {
+  name?: string
+  proficiency?: number
+  category?: string
 }
 
 export interface SkillResponse {
-  id: string;
-  name: string;
-  proficiency: number;
-  category: string;
+  id: string
+  name: string
+  proficiency: number
+  category: string
 }

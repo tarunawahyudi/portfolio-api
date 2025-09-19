@@ -1,73 +1,120 @@
+import { injectable, inject } from 'tsyringe'
 import { CertificateService } from '@module/certificate/service/certificate.service'
-import { CertificateResponse, CreateCertificateRequest } from '@module/certificate/dto/certificate.dto'
-import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
-import { inject, injectable } from 'tsyringe'
 import type { CertificateRepository } from '@module/certificate/repository/certificate.repository'
+import { StorageService } from '@core/service/storage.service'
+import {
+  CreateCertificateRequest,
+  UpdateCertificateRequest,
+  CertificateResponse,
+} from '@module/certificate/dto/certificate.dto'
+import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { NewCertificate } from '@module/certificate/entity/certificate'
 import { toCertificateResponse } from '@module/certificate/mapper/certificate.mapper'
 import { AppException } from '@core/exception/app.exception'
-import { StorageService } from '@core/service/storage.service'
 import { cdnUrl } from '@shared/util/common.util'
-import { logger } from '@sentry/bun'
+import { logger } from '@shared/util/logger.util'
 
 @injectable()
 export class CertificateServiceImpl implements CertificateService {
   constructor(
     @inject('StorageService') private readonly storageService: StorageService,
-    @inject('CertificateRepository') private readonly certificateRepository: CertificateRepository
+    @inject('CertificateRepository') private readonly certificateRepository: CertificateRepository,
   ) {}
+
+  private async findAndValidate(id: string, userId: string) {
+    const record = await this.certificateRepository.findByIdAndUser(id, userId)
+    if (!record) {
+      throw new AppException('CERT-001')
+    }
+    return record
+  }
+
+  async fetch(
+    userId: string,
+    options: PaginationOptions,
+  ): Promise<PaginatedResponse<CertificateResponse>> {
+    const result = await this.certificateRepository.findAll(userId, options)
+    return { data: result.data.map(toCertificateResponse), pagination: result.pagination }
+  }
+
+  async show(id: string, userId: string): Promise<CertificateResponse> {
+    const record = await this.findAndValidate(id, userId)
+    return toCertificateResponse(record)
+  }
+
   async create(request: CreateCertificateRequest): Promise<CertificateResponse> {
     const result = await this.certificateRepository.save(request as NewCertificate)
     return toCertificateResponse(result)
   }
 
-  async fetch(userId: string, options: PaginationOptions): Promise<PaginatedResponse<CertificateResponse>> {
-    const paginatedResult = await this.certificateRepository.findAll(userId, options)
-    const transformData = paginatedResult.data.map(toCertificateResponse)
+  async modify(
+    id: string,
+    userId: string,
+    data: UpdateCertificateRequest,
+  ): Promise<CertificateResponse> {
+    await this.findAndValidate(id, userId)
+    const updated = await this.certificateRepository.update(id, userId, data)
+    return toCertificateResponse(updated)
+  }
 
-    return {
-      data: transformData,
-      pagination: paginatedResult.pagination,
+  async remove(id: string, userId: string): Promise<void> {
+    const record = await this.findAndValidate(id, userId)
+    const keysToDelete: string[] = []
+    if (record.certificateImage) {
+      keysToDelete.push(record.certificateImage)
     }
+    if (record.display.type === 'upload' && record.display.value) {
+      keysToDelete.push(record.display.value)
+    }
+
+    if (keysToDelete.length > 0) {
+      await this.storageService.deleteMany(keysToDelete)
+    }
+
+    await this.certificateRepository.delete(id, userId)
   }
 
-  async show(id: string): Promise<CertificateResponse> {
-    const row = await this.certificateRepository.findById(id)
-    if (!row) throw new AppException('CERT-001')
-
-    return toCertificateResponse(row)
-  }
-
-  async uploadCertificateImage(id: string, userId: string, image: File): Promise<{ imageUrl: string | null }> {
-    const certificate = await this.certificateRepository.findOne(id, userId)
-    if (!certificate) throw new AppException('CERT-001')
-
-    const oldImageKey = certificate.certificateImage
+  async uploadCertificateImage(
+    id: string,
+    userId: string,
+    image: File,
+  ): Promise<{ imageUrl: string | null }> {
+    const record = await this.findAndValidate(id, userId)
+    const oldImageKey = record.certificateImage
 
     const { key: newImageKey } = await this.storageService.upload({
       file: image,
       module: 'certificate',
-      collection: 'image'
+      collection: 'image',
     })
 
-    try {
-      await this.certificateRepository.setImage(id, newImageKey)
-      if (oldImageKey) {
-        logger.info(`Deleting old certificate image: ${oldImageKey}`)
-        this.storageService.delete(oldImageKey).catch(err =>
-          logger.error(`Failed to delete old image ${oldImageKey}`, err)
-        )
-      }
-      return { imageUrl: cdnUrl(newImageKey) }
-    } catch (dbError) {
-      console.error(dbError)
-      logger.error(`Database update failed. Rolling back storage upload for key: ${newImageKey}`)
-
-      await this.storageService.delete(newImageKey).catch(err =>
-        logger.error(`Failed to rollback (delete) new image ${newImageKey}`, err)
-      )
-
-      throw dbError
+    await this.certificateRepository.update(id, userId, { certificateImage: newImageKey })
+    if (oldImageKey) {
+      this.storageService
+        .delete(oldImageKey)
+        .catch((err) => logger.error(`Failed to delete old certificate image: ${err}`))
     }
+
+    return { imageUrl: cdnUrl(newImageKey) }
+  }
+
+  async uploadDisplayImage(id: string, userId: string, image: File): Promise<{ display: any }> {
+    const record = await this.findAndValidate(id, userId)
+    if (record.display.type === 'upload' && record.display.value) {
+      this.storageService
+        .delete(record.display.value)
+        .catch((err) => logger.error(`Failed to delete old display image: ${err}`))
+    }
+
+    const { key: newImageKey } = await this.storageService.upload({
+      file: image,
+      module: 'certificate',
+      collection: 'display',
+    })
+
+    const newDisplay = { type: 'upload' as const, value: newImageKey }
+    const updated = await this.certificateRepository.update(id, userId, { display: newDisplay })
+
+    return { display: updated.display }
   }
 }

@@ -12,6 +12,7 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
+import { CertificateDisplay } from '@module/certificate/dto/certificate.dto'
 
 export const userStatusEnum = pgEnum('user_status', [
   'pending',
@@ -151,6 +152,8 @@ export const certificates = pgTable('certificates', {
   certificateImage: text('certificate_image'),
   credentialId: varchar('credential_id', { length: 255 }),
   credentialUrl: varchar('credential_url', { length: 500 }),
+  description: text('description'),
+  display: jsonb('display').$type<CertificateDisplay>().default({ type: 'default', value: 'award' }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 })

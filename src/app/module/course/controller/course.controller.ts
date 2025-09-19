@@ -6,4 +6,6 @@ export interface CourseController {
   get(ctx: Context): Promise<PaginatedResponse<CourseResponse>>
   getById(ctx: Context): Promise<AppResponse>
   post(ctx: Context): Promise<AppResponse>
+  patch(ctx: Context): Promise<AppResponse>
+  delete(ctx: Context): Promise<AppResponse>
 }

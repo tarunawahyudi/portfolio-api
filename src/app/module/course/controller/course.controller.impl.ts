@@ -1,39 +1,54 @@
-import { CourseController } from '@module/course/controller/course.controller'
+import { injectable, inject } from 'tsyringe'
 import { Context } from 'elysia'
-import { AppResponse, PaginatedResponse } from '@shared/type/global'
-import { CourseResponse, CreateCourseRequest } from '@module/course/dto/course.dto'
-import { AppException } from '@core/exception/app.exception'
-import { inject, injectable } from 'tsyringe'
+import { CourseController } from '@module/course/controller/course.controller'
 import type { CourseService } from '@module/course/service/course.service'
-import { paginateResponse, successResponse } from '@shared/util/response.util'
+import {
+  CreateCourseRequest,
+  UpdateCourseRequest,
+  CourseResponse,
+} from '@module/course/dto/course.dto'
+import { AppResponse, PageResponse } from '@shared/type/global'
 import { parsePaginationOptions } from '@shared/util/pagination.util'
+import { noResponse, paginateResponse, successResponse } from '@shared/util/response.util'
 
 @injectable()
 export class CourseControllerImpl implements CourseController {
-  constructor(
-    @inject('CourseService') private readonly courseService: CourseService,
-  ) {}
-  async post(ctx: Context): Promise<AppResponse> {
-    const userId = (ctx as any).user?.sub
-    if (!userId) throw new AppException('AUTH-000')
+  constructor(@inject('CourseService') private readonly courseService: CourseService) {}
 
-    const request = (ctx.body as any) as CreateCourseRequest
-    request.userId = userId
-    const response = await this.courseService.create(request)
-    return successResponse(ctx, response, 'create success', 201)
-  }
-
-  async get(ctx: Context): Promise<PaginatedResponse<CourseResponse>> {
+  async get(ctx: Context): Promise<PageResponse<CourseResponse>> {
     const userId = (ctx as any).user?.sub
     const options = parsePaginationOptions(ctx.query)
-    const paginatedData = await this.courseService.fetch(userId, options)
-    return paginateResponse(ctx, paginatedData)
+    const data = await this.courseService.fetch(userId, options)
+    return paginateResponse(ctx, data)
   }
 
   async getById(ctx: Context): Promise<AppResponse> {
-    const id = ctx.params.id
-    const response = await this.courseService.show(id)
-    return successResponse(ctx, response)
+    const { id } = ctx.params
+    const userId = (ctx as any).user?.sub
+    const data = await this.courseService.show(id, userId)
+    return successResponse(ctx, data)
   }
 
+  async post(ctx: Context): Promise<AppResponse> {
+    const userId = (ctx as any).user?.sub
+    const request = ctx.body as CreateCourseRequest
+    request.userId = userId
+    const data = await this.courseService.create(request)
+    return successResponse(ctx, data, 'Course created successfully', 201)
+  }
+
+  async patch(ctx: Context): Promise<AppResponse> {
+    const { id } = ctx.params
+    const userId = (ctx as any).user?.sub
+    const request = ctx.body as UpdateCourseRequest
+    const data = await this.courseService.modify(id, userId, request)
+    return successResponse(ctx, data, 'Course updated successfully')
+  }
+
+  async delete(ctx: Context): Promise<AppResponse> {
+    const { id } = ctx.params
+    const userId = (ctx as any).user?.sub
+    await this.courseService.remove(id, userId)
+    return noResponse(ctx, 'Course deleted successfully')
+  }
 }

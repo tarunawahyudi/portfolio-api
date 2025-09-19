@@ -7,43 +7,44 @@ import { CourseControllerImpl } from '@module/course/controller/course.controlle
 export function registerCourseRoutes(app: Elysia) {
   const courseController = container.resolve(CourseControllerImpl)
 
-  return app.group("/courses", (group) =>
+  const courseBody = t.Object({
+    institution: t.String(),
+    courseName: t.String(),
+    startDate: t.String({ format: 'date' }),
+    endDate: t.Optional(t.Nullable(t.String({ format: 'date' }))),
+    description: t.Optional(t.String()),
+  })
+
+  return app.group('/courses', (group) =>
     group
       .get(ROOT, courseController.get.bind(courseController), {
-          beforeHandle: authGuard as any,
-          query: t.Object({
-            page: t.Optional(t.Number({ default: 1, minimum: 1 })),
-            limit: t.Optional(t.Number({ default: 10, minimum: 1, maximum: 100 })),
-            sort: t.Optional(t.String()),
-            search: t.Optional(t.String()),
-          }),
-          detail: {
-            tags: ["Course"],
-            summary: "Get list courses of users"
-          }
-        }
-      )
+        beforeHandle: authGuard as any,
+        query: t.Object({
+          page: t.Optional(t.Number({ min: 1 })),
+          limit: t.Optional(t.Number({ min: 1, max: 100 })),
+        }),
+        detail: { tags: ['Course'], summary: 'Get list courses of user' },
+      })
       .post(ROOT, courseController.post.bind(courseController), {
         beforeHandle: authGuard,
-        body: t.Object({
-          institution: t.String(),
-          courseName: t.String(),
-          startDate: t.String({ format: 'date' }),
-          endDate: t.Optional(t.String({ format: 'date' })),
-          description: t.Optional(t.String())
-        }),
-        detail: {
-          tags: ["Course"],
-          summary: "Create a new course"
-        }
+        body: courseBody,
+        detail: { tags: ['Course'], summary: 'Create a new course' },
       })
       .get('/:id', courseController.getById.bind(courseController), {
         beforeHandle: authGuard,
-        params: t.Object({ id: t.String() }),
-        detail: {
-          tags: ["Course"],
-          summary: "Get a specific course"
-        }
+        params: t.Object({ id: t.String({ format: 'uuid' }) }),
+        detail: { tags: ['Course'], summary: 'Get a specific course' },
       })
+      .patch('/:id', courseController.patch.bind(courseController), {
+        beforeHandle: authGuard,
+        params: t.Object({ id: t.String({ format: 'uuid' }) }),
+        body: t.Partial(courseBody),
+        detail: { tags: ['Course'], summary: 'Update a course' },
+      })
+      .delete('/:id', courseController.delete.bind(courseController), {
+        beforeHandle: authGuard,
+        params: t.Object({ id: t.String({ format: 'uuid' }) }),
+        detail: { tags: ['Course'], summary: 'Delete a course' },
+      }),
   )
 }

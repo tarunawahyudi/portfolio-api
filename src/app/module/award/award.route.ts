@@ -6,8 +6,9 @@ import { AwardControllerImpl } from '@module/award/controller/award.controller.i
 
 export function registerAwardRoutes(app: Elysia) {
   const awardController = container.resolve(AwardControllerImpl)
+  const awardBody = t.Object({ title: t.String(), description: t.Optional(t.String()) })
 
-  return app.group("/award", (group) =>
+  return app.group("/awards", (group) =>
     group
       .get(ROOT, awardController.get.bind(awardController), {
           beforeHandle: authGuard as any,
@@ -25,14 +26,8 @@ export function registerAwardRoutes(app: Elysia) {
       )
       .post(ROOT, awardController.post.bind(awardController), {
         beforeHandle: authGuard,
-        body: t.Object({
-          title: t.String(),
-          description: t.Optional(t.String())
-        }),
-        detail: {
-          tags: ["Award"],
-          summary: "Create a new award"
-        }
+        body: awardBody,
+        detail: { tags: ["Award"], summary: "Create a new award" }
       })
       .get('/:id', awardController.getById.bind(awardController), {
         beforeHandle: authGuard,
@@ -41,6 +36,29 @@ export function registerAwardRoutes(app: Elysia) {
           tags: ["Award"],
           summary: "Get a specific award"
         }
+      })
+      .patch('/:id', awardController.patch.bind(awardController), {
+        beforeHandle: authGuard,
+        params: t.Object({ id: t.String({ format: 'uuid' }) }),
+        body: t.Partial(awardBody),
+        detail: { tags: ["Award"], summary: "Update an award" }
+      })
+      .delete('/:id', awardController.delete.bind(awardController), {
+        beforeHandle: authGuard,
+        params: t.Object({ id: t.String({ format: 'uuid' }) }),
+        detail: { tags: ["Award"], summary: "Delete an award" }
+      })
+      .post('/:id/images', awardController.uploadImages.bind(awardController), {
+        beforeHandle: authGuard,
+        params: t.Object({ id: t.String({ format: 'uuid' }) }),
+        body: t.Object({ images: t.Files({ type: 'image', maxSize: '5m' }) }),
+        detail: { tags: ["Award"], summary: "Upload images to an award" }
+      })
+      .delete('/:id/images', awardController.removeImage.bind(awardController), {
+        beforeHandle: authGuard,
+        params: t.Object({ id: t.String({ format: 'uuid' }) }),
+        body: t.Object({ imageKey: t.String() }),
+        detail: { tags: ["Award"], summary: "Remove an image from an award" }
       })
   )
 }

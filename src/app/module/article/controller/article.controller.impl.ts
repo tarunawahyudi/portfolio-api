@@ -1,70 +1,81 @@
-import { ArticleController } from '@module/article/controller/article.controller'
+import { injectable, inject } from 'tsyringe'
 import { Context } from 'elysia'
+import { ArticleController } from '@module/article/controller/article.controller'
+import type { ArticleService } from '@module/article/service/article.service'
+import {
+  ArticleResponse,
+  CreateArticleRequest,
+  UpdateArticleRequest,
+  ArticleStatus,
+} from '@module/article/dto/article.dto'
 import { AppResponse, PaginatedResponse } from '@shared/type/global'
-import { ArticleResponse, CreateArticleRequest } from '@module/article/dto/article.dto'
-import { inject, injectable } from 'tsyringe'
 import { parsePaginationOptions } from '@shared/util/pagination.util'
 import { noResponse, paginateResponse, successResponse } from '@shared/util/response.util'
 import { AppException } from '@core/exception/app.exception'
-import type { ArticleService } from '@module/article/service/article.service'
 
 @injectable()
 export class ArticleControllerImpl implements ArticleController {
   constructor(@inject('ArticleService') private readonly articleService: ArticleService) {}
+
   async get(ctx: Context): Promise<PaginatedResponse<ArticleResponse>> {
     const userId = (ctx as any).user?.sub
     const options = parsePaginationOptions(ctx.query)
-    const paginatedData = await this.articleService.fetch(userId, options)
-
-    return paginateResponse(ctx, paginatedData)
+    const status = ctx.query.status as ArticleStatus
+    const data = await this.articleService.fetch(userId, options, status)
+    return paginateResponse(ctx, data)
   }
 
   async getById(ctx: Context): Promise<AppResponse> {
-    const id = ctx.params.id
-    const response = await this.articleService.show(id)
-    return successResponse(ctx, response)
+    const { id } = ctx.params
+    const userId = (ctx as any).user?.sub
+    const data = await this.articleService.show(id, userId)
+    return successResponse(ctx, data)
   }
 
   async post(ctx: Context): Promise<AppResponse> {
     const userId = (ctx as any).user?.sub
-    if (!userId) throw new AppException('AUTH-000')
-
-    const request = (ctx.body as any) as CreateArticleRequest
+    const request = ctx.body as CreateArticleRequest
     request.userId = userId
-    const response = await this.articleService.create(request)
-    return successResponse(ctx, response, 'create success', 201)
+    const data = await this.articleService.create(request)
+    return successResponse(ctx, data, 'Article created successfully', 201)
+  }
+
+  async patch(ctx: Context): Promise<AppResponse> {
+    const { id } = ctx.params
+    const userId = (ctx as any).user?.sub
+    const request = ctx.body as UpdateArticleRequest
+    const data = await this.articleService.modify(id, userId, request)
+    return successResponse(ctx, data, 'Article updated successfully')
   }
 
   async postThumbnail(ctx: Context): Promise<AppResponse> {
-    const userId = (ctx as any).user?.sub
-
     const { id } = ctx.params
+    const userId = (ctx as any).user?.sub
     const { thumbnail } = ctx.body as { thumbnail: File }
-
-    if (!thumbnail || thumbnail.size === 0) {
-      throw new AppException('MEDIA-001', 'No file uploaded or file is empty.')
-    }
-
-    const response = await this.articleService.uploadThumbnail(id, userId, thumbnail)
-    return successResponse(ctx, response, 'Thumbnail uploaded successfully')
+    if (!thumbnail) throw new AppException('MEDIA-001')
+    const data = await this.articleService.uploadThumbnail(id, userId, thumbnail)
+    return successResponse(ctx, data, 'Thumbnail uploaded successfully')
   }
 
   async patchStatus(ctx: Context): Promise<AppResponse> {
-    const userId = (ctx as any).user?.sub
     const { id } = ctx.params
-    const { status } = ctx.body as { status: string }
-
-    await this.articleService.updateStatus(id, userId, status)
-    return noResponse(ctx, 'status successfully updated')
+    const userId = (ctx as any).user?.sub
+    const { status } = ctx.body as { status: ArticleStatus }
+    const data = await this.articleService.updateStatus(id, userId, status)
+    return successResponse(ctx, data, `Article status updated to ${status}`)
   }
 
   async delete(ctx: Context): Promise<AppResponse> {
-    const userId = (ctx as any).user?.sub
-    if (!userId) throw new AppException('AUTH-000')
-
     const { id } = ctx.params
+    const userId = (ctx as any).user?.sub
+    await this.articleService.remove(id, userId)
+    return noResponse(ctx, 'Article moved to trash')
+  }
 
-    await this.articleService.deleteStatus(id, userId)
-    return noResponse(ctx, 'status successfully deleted')
+  async restore(ctx: Context): Promise<AppResponse> {
+    const { id } = ctx.params
+    const userId = (ctx as any).user?.sub
+    await this.articleService.restore(id, userId)
+    return noResponse(ctx, 'Article restored successfully')
   }
 }

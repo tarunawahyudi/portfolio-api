@@ -6,10 +6,13 @@ export function toArticleResponse(article: Article): ArticleResponse {
   return {
     id: article.id,
     title: article.title,
-    slug: article.slug,
-    content: article.content,
-    status: article.status,
+    slug: article.slug ?? '',
+    content: article.content ?? '',
     thumbnail: cdnUrl(article.thumbnail),
-    publishedAt: article.publishedAt
+    tags: article.tags ?? [],
+    status: article.status ?? 'draft',
+    publishedAt: article.publishedAt,
+    createdAt: article.createdAt!,
+    updatedAt: article.updatedAt!,
   }
 }

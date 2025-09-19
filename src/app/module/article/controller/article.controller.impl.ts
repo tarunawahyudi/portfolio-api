@@ -20,7 +20,12 @@ export class ArticleControllerImpl implements ArticleController {
   async get(ctx: Context): Promise<PaginatedResponse<ArticleResponse>> {
     const userId = (ctx as any).user?.sub
     const options = parsePaginationOptions(ctx.query)
-    const status = ctx.query.status as ArticleStatus
+    const statusQuery = ctx.query.status
+    const validStatuses: ArticleStatus[] = ['draft', 'published', 'deleted']
+    const status = validStatuses.includes(statusQuery as ArticleStatus)
+      ? (statusQuery as ArticleStatus)
+      : undefined
+
     const data = await this.articleService.fetch(userId, options, status)
     return paginateResponse(ctx, data)
   }

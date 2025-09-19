@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe'
-import { and, eq, not} from 'drizzle-orm'
+import { and, eq, not, SQL } from 'drizzle-orm'
 import { articles } from '@db/schema'
 import { ArticleRepository } from '@module/article/repository/article.repository'
 import { UpdateArticleRequest, ArticleStatus } from '@module/article/dto/article.dto'
@@ -16,10 +16,17 @@ export class ArticleRepositoryImpl implements ArticleRepository {
     options: PaginationOptions,
     status?: ArticleStatus,
   ): Promise<PaginatedResponse<Article>> {
-    const conditions = [
-      eq(articles.userId, userId),
-      status ? eq(articles.status, status) : not(eq(articles.status, 'deleted')),
-    ]
+    // --- PENYEMPURNAAN LOGIKA KONDISI ---
+    const conditions: (SQL | undefined)[] = [eq(articles.userId, userId)]
+
+    if (status) {
+      // Jika ada status spesifik (draft, published, deleted), gunakan itu.
+      conditions.push(eq(articles.status, status))
+    } else {
+      // Jika TIDAK ada status (untuk tab "Semua"), tampilkan semua KECUALI yang di 'deleted'.
+      conditions.push(not(eq(articles.status, 'deleted')))
+    }
+    // --- AKHIR PENYEMPURNAAN ---
 
     const searchColumns = [articles.title, articles.content]
 
@@ -28,7 +35,7 @@ export class ArticleRepositoryImpl implements ArticleRepository {
       articles,
       options,
       searchColumns,
-      and(...conditions),
+      and(...conditions.filter((c): c is SQL => !!c)), // Pastikan tidak ada `undefined`
     )
   }
 

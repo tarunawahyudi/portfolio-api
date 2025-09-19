@@ -19,8 +19,8 @@ export interface UpdateArticleRequest {
 export interface ArticleResponse {
   id: string;
   title: string;
-  slug: string;
-  content: string;
+  slug: string | null;
+  content: string | null;
   thumbnail: string | null;
   tags: string[];
   status: ArticleStatus;

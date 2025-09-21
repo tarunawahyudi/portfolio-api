@@ -155,8 +155,7 @@ export class UserServiceImpl implements UserService {
 
   async changePassword(userId: string, oldPass: string, newPass: string): Promise<void> {
     const user = await this.userRepository.findById(userId)
-    if (!user || !user.passwordHash)
-      throw new AppException('AUTH-002')
+    if (!user || !user.passwordHash) throw new AppException('AUTH-002')
 
     const isMatch = await Bun.password.verify(oldPass, user.passwordHash)
     if (!isMatch) throw new AppException('AUTH-011')

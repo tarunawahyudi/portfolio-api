@@ -1,0 +1,19 @@
+import { Elysia, t } from 'elysia'
+import { container } from 'tsyringe'
+import { PublicControllerImpl } from '@module/public/controller/public.controller.impl'
+
+export function registerPublicRoutes(app: Elysia) {
+  const publicController = container.resolve(PublicControllerImpl)
+
+  return app.group('/public', (group) =>
+    group.get('/:username', publicController.getByUsername.bind(publicController), {
+      params: t.Object({
+        username: t.String({ minLength: 3 }),
+      }),
+      detail: {
+        tags: ['Public'],
+        summary: "Get a user's complete public profile by username",
+      },
+    }),
+  )
+}

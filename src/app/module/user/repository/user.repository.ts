@@ -1,4 +1,4 @@
-import { NewUser, User } from '@module/user/entity/user'
+import { NewUser, User, UserWithRelations } from '@module/user/entity/user'
 
 export interface UserRepository {
   save(data: NewUser): Promise<User>
@@ -7,4 +7,5 @@ export interface UserRepository {
   findByEmail(email: string): Promise<User | null>
   markVerified(userId: string): Promise<void>
   updatePassword(userId: string, passwordHash: string): Promise<void>
+  findPublicProfileByUsername(username: string): Promise<UserWithRelations | null>
 }

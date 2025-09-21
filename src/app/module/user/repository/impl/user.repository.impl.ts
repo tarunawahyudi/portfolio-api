@@ -1,20 +1,16 @@
-import { NewUser, User } from '@module/user/entity/user'
-import {injectable} from "tsyringe"
-import type {UserRepository} from "@module/user/repository/user.repository"
+import { NewUser, User, UserWithRelations } from '@module/user/entity/user'
+import { injectable } from 'tsyringe'
+import type { UserRepository } from '@module/user/repository/user.repository'
 import { db } from '@db/index'
-import { users } from '@db/schema'
-import { eq } from 'drizzle-orm'
+import { articles, users } from '@db/schema'
+import { and, eq } from 'drizzle-orm'
 import { getDbOrTx } from '@shared/decorator/transactional.decorator'
 
 @injectable()
 export class UserRepositoryImpl implements UserRepository {
-
   async save(data: NewUser): Promise<User> {
     const dbOrTx = getDbOrTx()
-    const [inserted] = await dbOrTx
-      .insert(users)
-      .values(data)
-      .returning()
+    const [inserted] = await dbOrTx.insert(users).values(data).returning()
 
     return inserted
   }
@@ -32,36 +28,50 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    const row = await db.query.users
-      .findFirst({
-        where: eq(users.username, username),
-      })
+    const row = await db.query.users.findFirst({
+      where: eq(users.username, username),
+    })
 
     return row ?? null
   }
 
   async findById(id: string): Promise<User | null> {
-    const row = await db.query.users
-      .findFirst({
-        where: eq(users.id, id),
-      })
+    const row = await db.query.users.findFirst({
+      where: eq(users.id, id),
+    })
 
     return row ?? null
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const row = await db.query.users
-      .findFirst({
-        where: eq(users.email, email)
-      })
+    const row = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    })
 
     return row ?? null
   }
 
   async updatePassword(userId: string, passwordHash: string): Promise<void> {
-    await db
-      .update(users)
-      .set({ passwordHash, updatedAt: new Date() })
-      .where(eq(users.id, userId))
+    await db.update(users).set({ passwordHash, updatedAt: new Date() }).where(eq(users.id, userId))
+  }
+
+  async findPublicProfileByUsername(username: string): Promise<UserWithRelations | null> {
+    const user = await db.query.users.findFirst({
+      where: and(eq(users.username, username), eq(users.status, 'active')),
+      with: {
+        profile: true,
+        skills: true,
+        workExperiences: { orderBy: (exp, { desc }) => [desc(exp.startDate)] },
+        educations: { orderBy: (edu, { desc }) => [desc(edu.startDate)] },
+        portfolios: true,
+        courses: { orderBy: (crs, { desc }) => [desc(crs.startDate)] },
+        awards: { orderBy: (awd, { desc }) => [desc(awd.createdAt)] },
+        articles: {
+          where: eq(articles.status, 'published'),
+          orderBy: (art, { desc }) => [desc(art.publishedAt)],
+        },
+      },
+    })
+    return user ?? null
   }
 }

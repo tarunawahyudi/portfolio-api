@@ -1,33 +1,57 @@
 import {
-  ArticleResponse,
-  AwardResponse,
-  CourseResponse,
-  EducationResponse,
-  PortfolioResponse,
+  CertificateDisplay,
   SkillResponse,
   WorkExperienceResponse,
+  EducationResponse,
+  CourseResponse,
+  AwardResponse,
 } from '@module/output/dto'
 
 export interface PublicProfileDto {
-  id: string;
-  fullName: string;
-  displayName: string;
-  avatarUrl: string | null;
-  bio: string;
-  socials: Record<string, any>;
-  website: string | null;
+  id: string
+  fullName: string
+  displayName: string
+  avatarUrl: string | null
+  bio: string
+  theme: string
+  socials: Record<string, string>
+  website: string
   hobbies: string[]
-  phoneNumber: string;
-  address: string;
+  phoneNumber: string
+  address: string
+}
+
+export interface PublicArticleItemDto {
+  title: string
+  thumbnail: string | null
+  tags: string[]
+  slug: string | null
+}
+
+export interface PublicPortfolioItemDto {
+  title: string
+  category: string
+  thumbnail: string | null
+  summary: string | null
+  repoUrl: string | null
+  projectUrl: string | null
+}
+
+export interface PublicCertificateItemDto {
+  id: string
+  title: string
+  organization: string
+  display: CertificateDisplay
 }
 
 export interface PublicProfileResponse {
-  profile: PublicProfileDto;
-  skills: SkillResponse[];
-  experiences: WorkExperienceResponse[];
-  educations: EducationResponse[];
-  portfolios: PortfolioResponse[];
-  courses: CourseResponse[];
-  awards: AwardResponse[];
-  articles: ArticleResponse[];
+  profile: PublicProfileDto
+  articles: PublicArticleItemDto[]
+  portfolios: PublicPortfolioItemDto[]
+  certificates: PublicCertificateItemDto[]
+  skills: SkillResponse[]
+  experiences: WorkExperienceResponse[]
+  educations: EducationResponse[]
+  courses: CourseResponse[]
+  awards: AwardResponse[]
 }

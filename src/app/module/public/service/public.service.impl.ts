@@ -5,10 +5,8 @@ import {
   toSkillResponse,
   toWorkExperienceResponse,
   toEducationResponse,
-  toPortfolioResponse,
   toCourseResponse,
   toAwardResponse,
-  toArticleResponse,
 } from '@module/output/mapper'
 import { AppException } from '@core/exception/app.exception'
 import { cdnUrl } from '@shared/util/common.util'
@@ -33,6 +31,7 @@ export class PublicServiceImpl implements PublicService {
       portfolios,
       courses,
       awards,
+      certificates,
       articles,
       ...userData
     } = userWithRelations
@@ -44,19 +43,44 @@ export class PublicServiceImpl implements PublicService {
         displayName: profile?.displayName ?? '',
         avatarUrl: cdnUrl(profile?.avatar),
         bio: profile?.bio ?? '',
+        theme: 'modern',
         socials: profile?.socials ?? {},
         website: profile?.website ?? '',
         hobbies: profile?.hobbies ?? [],
         phoneNumber: profile?.phoneNumber ?? '',
         address: profile?.address ?? '',
       },
+      articles: articles.map((article) => ({
+        title: article.title,
+        thumbnail: cdnUrl(article.thumbnail),
+        tags: article.tags ?? [],
+        slug: article.slug ?? null,
+      })),
+      portfolios: portfolios.map((portfolio) => ({
+        title: portfolio.title,
+        category: portfolio.category,
+        thumbnail: cdnUrl(portfolio.thumbnail),
+        summary: portfolio.summary ?? null,
+        repoUrl: portfolio.repoUrl ?? null,
+        projectUrl: portfolio.projectUrl ?? null,
+      })),
+      certificates: certificates.map((cert) => {
+        const display = { ...cert.display }
+        if (display.type === 'upload' && display.value) {
+          display.value = cdnUrl(display.value) ?? ''
+        }
+        return {
+          id: cert.id,
+          title: cert.title,
+          organization: cert.organization ?? '',
+          display: display,
+        }
+      }),
       skills: skills?.map(toSkillResponse) ?? [],
       experiences: workExperiences?.map(toWorkExperienceResponse) ?? [],
       educations: educations?.map(toEducationResponse) ?? [],
-      portfolios: portfolios?.map(toPortfolioResponse) ?? [],
       courses: courses?.map(toCourseResponse) ?? [],
       awards: awards?.map(toAwardResponse) ?? [],
-      articles: articles?.map(toArticleResponse) ?? [],
     }
   }
 }

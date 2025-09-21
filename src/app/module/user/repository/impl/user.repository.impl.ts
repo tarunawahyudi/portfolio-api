@@ -2,7 +2,7 @@ import { NewUser, User, UserWithRelations } from '@module/user/entity/user'
 import { injectable } from 'tsyringe'
 import type { UserRepository } from '@module/user/repository/user.repository'
 import { db } from '@db/index'
-import { articles, users } from '@db/schema'
+import { articles, portfolios, users } from '@db/schema'
 import { and, eq } from 'drizzle-orm'
 import { getDbOrTx } from '@shared/decorator/transactional.decorator'
 
@@ -63,12 +63,44 @@ export class UserRepositoryImpl implements UserRepository {
         skills: true,
         workExperiences: { orderBy: (exp, { desc }) => [desc(exp.startDate)] },
         educations: { orderBy: (edu, { desc }) => [desc(edu.startDate)] },
-        portfolios: true,
         courses: { orderBy: (crs, { desc }) => [desc(crs.startDate)] },
         awards: { orderBy: (awd, { desc }) => [desc(awd.createdAt)] },
+
         articles: {
+          columns: {
+            title: true,
+            thumbnail: true,
+            tags: true,
+            slug: true,
+          },
           where: eq(articles.status, 'published'),
           orderBy: (art, { desc }) => [desc(art.publishedAt)],
+          limit: 6,
+        },
+
+        portfolios: {
+          columns: {
+            title: true,
+            category: true,
+            thumbnail: true,
+            summary: true,
+            repoUrl: true,
+            projectUrl: true,
+          },
+          where: and(eq(portfolios.visibility, 'public'), eq(portfolios.status, 'published')),
+          orderBy: (p, { desc }) => [desc(p.createdAt)],
+          limit: 6,
+        },
+
+        certificates: {
+          columns: {
+            id: true,
+            title: true,
+            organization: true,
+            display: true,
+          },
+          orderBy: (cert, { desc }) => [desc(cert.issueDate)],
+          limit: 6,
         },
       },
     })

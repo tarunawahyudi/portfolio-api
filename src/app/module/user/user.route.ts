@@ -19,6 +19,7 @@ export function registerUserRoutes(app: Elysia) {
         beforeHandle: authGuard,
         body: t.Object({
           fullName: t.Optional(t.String({ maxLength: 100 })),
+          jobTitle: t.Optional(t.String({ maxLength: 100 })),
           displayName: t.Optional(t.String({ maxLength: 50 })),
           phoneNumber: t.Optional(t.String({ maxLength: 20, minLength: 5 })),
           bio: t.Optional(t.String()),

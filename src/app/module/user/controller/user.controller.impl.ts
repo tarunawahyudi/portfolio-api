@@ -22,8 +22,8 @@ export class UserControllerImpl implements UserController {
     if (!userId) throw new AppException('AUTH-000')
 
     const request = ctx.body as UpdateProfileRequest
-    await this.userService.updateProfile(userId, request)
-    return noResponse(ctx, 'Profile updated successfully')
+    const response = await this.userService.updateProfile(userId, request)
+    return successResponse(ctx, response, 'Profile updated successfully')
   }
 
   async uploadAvatar(ctx: Context): Promise<AppResponse> {

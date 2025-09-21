@@ -13,6 +13,7 @@ import { Transactional } from '@shared/decorator/transactional.decorator'
 import { StorageService } from '@core/service/storage.service'
 import { cdnUrl } from '@shared/util/common.util'
 import { logger } from '@sentry/bun'
+import { toProfileResponse } from '@module/user/mapper/profile.mapper'
 
 @injectable()
 export class UserServiceImpl implements UserService {
@@ -113,12 +114,14 @@ export class UserServiceImpl implements UserService {
       socials: row.socials ?? {},
       hobbies: row.hobbies ?? [],
       website: row.website ?? '',
+      jobTitle: row.jobTitle ?? '',
     }
   }
 
-  async updateProfile(userId: string, request: UpdateProfileRequest): Promise<void> {
-    const row = this.profileRepository.update(userId, request)
+  async updateProfile(userId: string, request: UpdateProfileRequest): Promise<ProfileResponse> {
+    const row = await this.profileRepository.update(userId, request)
     if (!row) throw new AppException('DB-002')
+    return toProfileResponse(row)
   }
 
   async uploadAvatar(userId: string, avatarFile: File): Promise<{ avatarUrl: string }> {

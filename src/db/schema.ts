@@ -91,6 +91,7 @@ export const profiles = pgTable('profiles', {
     .unique(),
   phoneNumber: varchar('phone_number', { length: 20 }),
   fullName: varchar('full_name'),
+  jobTitle: varchar('job_title', { length: 100 }),
   displayName: varchar('display_name', { length: 100 }),
   bio: text('bio'),
   address: text('address'),

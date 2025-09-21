@@ -43,6 +43,13 @@
       "when": 1758218520528,
       "tag": "0005_organic_meltdown",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1758433634407,
+      "tag": "0006_narrow_synch",
+      "breakpoints": true
     }
   ]
 }

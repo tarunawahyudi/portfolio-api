@@ -9,6 +9,7 @@ export interface ProfileResponse {
   avatarUrl: string;
   socials: Record<string, string>;
   website: string;
+  jobTitle: string;
   hobbies: string[];
 }
 

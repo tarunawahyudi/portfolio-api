@@ -34,14 +34,31 @@ export class ProfileRepositoryImpl implements ProfileRepository {
       .values(data)
   }
 
-  async update(userId: string, data: Partial<NewProfile>): Promise<Profile> {
-    const [updatedProfile] = await db
+  async update(userId: string, data: Partial<NewProfile>): Promise<ProfileWithEmail | null> {
+    await db
       .update(profiles)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(profiles.userId, userId))
+      .where(
+        eq(profiles.userId, userId))
       .returning()
 
-    return updatedProfile
+    const row = await db.query.profiles.findFirst({
+      where: eq(profiles.userId, userId),
+      with: {
+        user: {
+          columns: {
+            email: true
+          },
+        },
+      },
+    })
+
+    if (!row) return null
+
+    return {
+      ...row,
+      email: row.user.email,
+    }
   }
 
   async updateAvatar(userId: string, avatarKey: string): Promise<void> {

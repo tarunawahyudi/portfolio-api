@@ -57,12 +57,14 @@ export class PublicServiceImpl implements PublicService {
         slug: article.slug ?? null,
       })),
       portfolios: portfolios.map((portfolio) => ({
+        id: portfolio.id,
         title: portfolio.title,
         category: portfolio.category,
         thumbnail: cdnUrl(portfolio.thumbnail),
         summary: portfolio.summary ?? null,
         repoUrl: portfolio.repoUrl ?? null,
         projectUrl: portfolio.projectUrl ?? null,
+        techStack: portfolio.techStack ?? [],
       })),
       certificates: certificates.map((cert) => {
         const display = { ...cert.display }

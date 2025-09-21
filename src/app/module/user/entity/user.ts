@@ -28,12 +28,14 @@ const _userWithRelations = db.query.users.findFirst({
     },
     portfolios: {
       columns: {
+        id: true,
         title: true,
         category: true,
         thumbnail: true,
         summary: true,
         repoUrl: true,
         projectUrl: true,
+        techStack: true,
       },
       where: eq(portfolios.status, 'published'),
       orderBy: (p, { desc }) => [desc(p.createdAt)],

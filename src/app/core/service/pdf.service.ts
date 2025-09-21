@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe'
-import puppeteer from 'puppeteer-core'
+import puppeteer, { Browser } from 'puppeteer-core'
 import chromium from '@sparticuz/chromium'
 import handlebars from 'handlebars'
 import fs from 'fs/promises'
@@ -15,36 +15,52 @@ export class PdfService {
     const template = handlebars.compile(templateHtml)
     const finalHtml = template(data)
 
-    let browser = null
+    let browser: Browser | null = null
     try {
-      let executablePath = ''
+      let executablePath: string | null
 
       if (process.env.NODE_ENV === 'production') {
-        logger.info('Mode Produksi: Menggunakan @sparticuz/chromium')
+        logger.info('Mode PRODUKSI: menggunakan Chromium dari @sparticuz/chromium')
+        executablePath = await chromium.executablePath()
       } else {
-        logger.info('Mode Development: Menggunakan Google Chrome lokal')
-        executablePath = process.env.CHROME_PATH!
-        try {
-          await fs.access(executablePath)
-        } catch (e) {
-          console.error(e)
-          logger.error(`Google Chrome tidak ditemukan di path: ${executablePath}`)
-          logger.error('Pastikan path di pdf.service.ts sudah benar atau Google Chrome sudah terinstal.')
-          throw new Error('Google Chrome executable not found.')
+        logger.info('Mode DEVELOPMENT: mencoba pakai Chrome/Chromium lokal')
+
+        if (process.platform === 'win32') {
+          // Windows
+          executablePath =
+            process.env.CHROME_PATH ||
+            'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+        } else if (process.platform === 'darwin') {
+          // MacOS
+          executablePath =
+            process.env.CHROME_PATH ||
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        } else {
+          // Linux
+          executablePath =
+            // eslint-disable-next-line no-constant-binary-expression
+            process.env.CHROME_PATH ||
+            '/usr/bin/google-chrome' ||
+            '/usr/bin/chromium-browser'
         }
       }
 
-      logger.info(`Mencoba menjalankan browser dari: ${executablePath}`)
+      if (!executablePath) {
+        throw new Error('Tidak menemukan path Chrome/Chromium di environment ini.')
+      }
+
+      logger.info(`Menjalankan browser dari: ${executablePath}`)
 
       browser = await puppeteer.launch({
         args: chromium.args,
-        executablePath: executablePath,
+        executablePath,
         headless: true,
       })
 
       logger.info('Browser berhasil dijalankan.')
-      const page = await browser.newPage()
 
+      const page = await browser.newPage()
+      await page.setViewport({ width: 1280, height: 800 })
       await page.setContent(finalHtml, { waitUntil: 'networkidle0' })
 
       const pdfUint8Array = await page.pdf({

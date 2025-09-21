@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV - {{profile.fullName}}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-print-color-adjust: exact; }
+    .bg-sidebar { background-color: #1f2937; } /* gray-800 */
+    .text-main { color: #111827; } /* gray-900 */
+    .text-light { color: #d1d5db; } /* gray-300 */
+    .text-accent { color: #2dd4bf; } /* teal-400 */
+  </style>
+</head>
+<body class="bg-white">
+<div class="flex" style="min-height: 28.5cm;">
+  <aside class="w-1/3 bg-sidebar p-8 text-light">
+    <div class="text-center">
+      {{#if profile.avatarUrl}}
+      <img src="{{profile.avatarUrl}}" class="w-32 h-32 rounded-full mx-auto border-4 border-gray-700 object-cover">
+      {{/if}}
+      <h1 class="text-3xl font-bold text-white mt-4">{{profile.fullName}}</h1>
+      <h2 class="text-lg text-accent">{{profile.jobTitle}}</h2>
+    </div>
+    <div class="mt-8">
+      <h3 class="text-lg font-semibold uppercase tracking-wider text-white border-b-2 border-accent pb-1 mb-4">Kontak</h3>
+      <div class="space-y-2 text-sm">
+        <p><strong>Email:</strong> {{profile.email}}</p>
+        <p><strong>Telepon:</strong> {{profile.phoneNumber}}</p>
+        <p><strong>Website:</strong> {{profile.website}}</p>
+        <p><strong>Alamat:</strong> {{profile.address}}</p>
+      </div>
+    </div>
+    <div class="mt-8">
+      <h3 class="text-lg font-semibold uppercase tracking-wider text-white border-b-2 border-accent pb-1 mb-4">Keahlian</h3>
+      <div class="flex flex-wrap gap-2 mt-2">
+        {{#each skills}}
+        <span class="bg-gray-700 text-xs px-2 py-1 rounded-md">{{this.name}}</span>
+        {{/each}}
+      </div>
+    </div>
+  </aside>
+
+  <main class="w-2/3 p-8 text-main">
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold uppercase tracking-wider border-b-2 border-gray-300 pb-2 mb-4">Profil</h2>
+      <div class="text-sm prose max-w-none">{{{profile.bio}}}</div>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold uppercase tracking-wider border-b-2 border-gray-300 pb-2 mb-4">Pengalaman Kerja</h2>
+      <div class="space-y-4">
+        {{#each experiences}}
+        <div>
+          <h3 class="font-bold text-md">{{this.position}}</h3>
+          <p class="font-semibold text-sm text-gray-700">{{this.company}}</p>
+          <p class="text-xs text-gray-500">{{this.startDate}} - {{#if this.isCurrent}}Sekarang{{else}}{{this.endDate}}{{/if}}</p>
+          <p class="text-sm mt-1">{{this.jobDescription}}</p>
+        </div>
+        {{/each}}
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-2xl font-bold uppercase tracking-wider border-b-2 border-gray-300 pb-2 mb-4">Pendidikan</h2>
+      <div class="space-y-4">
+        {{#each educations}}
+        <div>
+          <h3 class="font-bold text-md">{{this.institution}}</h3>
+          <p class="font-semibold text-sm text-gray-700">{{this.degree}} - {{this.fieldOfStudy}}</p>
+          <p class="text-xs text-gray-500">{{this.startDate}} - {{this.endDate}}</p>
+        </div>
+        {{/each}}
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

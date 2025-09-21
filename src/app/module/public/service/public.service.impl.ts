@@ -11,10 +11,14 @@ import {
 import { AppException } from '@core/exception/app.exception'
 import { cdnUrl } from '@shared/util/common.util'
 import { PublicService } from '@module/public/service/public.service'
+import { PdfService } from '@core/service/pdf.service'
 
 @injectable()
 export class PublicServiceImpl implements PublicService {
-  constructor(@inject('UserRepository') private readonly userRepository: UserRepository) {}
+  constructor(
+    @inject('UserRepository') private readonly userRepository: UserRepository,
+    @inject('PdfService') private readonly pdfService: PdfService,
+  ) {}
 
   async getPublicProfile(username: string): Promise<PublicProfileResponse> {
     const userWithRelations = await this.userRepository.findPublicProfileByUsername(username)
@@ -86,5 +90,10 @@ export class PublicServiceImpl implements PublicService {
       courses: courses?.map(toCourseResponse) ?? [],
       awards: awards?.map(toAwardResponse) ?? [],
     }
+  }
+
+  async generateCvAsPdf(username: string): Promise<Buffer> {
+    const publicData = await this.getPublicProfile(username)
+    return this.pdfService.generateCv(publicData)
   }
 }

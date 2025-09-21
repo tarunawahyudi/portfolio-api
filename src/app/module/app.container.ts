@@ -15,10 +15,12 @@ import { registerCourseModule } from '@module/course/course.container'
 import { registerSettingModule } from '@module/setting/setting.container'
 import { registerArticleModule } from '@module/article/article.container'
 import { registerPublicModule } from '@module/public/service/public.container'
+import { PdfService } from '@core/service/pdf.service'
 
 export async function setupContainer() {
   container.registerSingleton('EmailService', EmailService)
   container.registerSingleton('StorageService', StorageService)
+  container.registerSingleton('PdfService', PdfService)
 
   await registerUserModule()
   await registerAuthModule()

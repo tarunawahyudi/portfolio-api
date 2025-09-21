@@ -14,6 +14,12 @@ export function registerPublicRoutes(app: Elysia) {
         tags: ['Public'],
         summary: "Get a user's complete public profile by username",
       },
-    }),
+    })
+    .get('/:username/download-cv', publicController.downloadCv.bind(publicController), {
+      detail: {
+        tags: ["Public"],
+        summary: "Download a user's CV as PDF"
+      }
+    })
   )
 }

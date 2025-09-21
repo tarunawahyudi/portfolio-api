@@ -14,4 +14,14 @@ export class PublicControllerImpl implements PublicController {
     const data = await this.publicService.getPublicProfile(username)
     return successResponse(ctx, data)
   }
+
+  async downloadCv(ctx: Context): Promise<Buffer> {
+    const { username } = ctx.params
+    const pdfBuffer = await this.publicService.generateCvAsPdf(username)
+
+    ctx.set.headers['Content-Type'] = 'application/pdf'
+    ctx.set.headers['Content-Disposition'] = `attachment; filename="cv-${username}.pdf"`
+
+    return pdfBuffer
+  }
 }

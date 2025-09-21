@@ -10,6 +10,7 @@ import {
 export interface PublicProfileDto {
   id: string
   fullName: string
+  jobTitle: string;
   displayName: string
   avatarUrl: string | null
   bio: string

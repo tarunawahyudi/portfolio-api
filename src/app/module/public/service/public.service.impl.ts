@@ -40,6 +40,7 @@ export class PublicServiceImpl implements PublicService {
       profile: {
         id: userData.id,
         fullName: profile?.fullName ?? userData.name,
+        jobTitle: profile?.jobTitle ?? '',
         displayName: profile?.displayName ?? '',
         avatarUrl: cdnUrl(profile?.avatar),
         bio: profile?.bio ?? '',

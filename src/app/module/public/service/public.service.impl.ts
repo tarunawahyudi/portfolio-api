@@ -39,6 +39,7 @@ export class PublicServiceImpl implements PublicService {
     return {
       profile: {
         id: userData.id,
+        email: userData.email,
         fullName: profile?.fullName ?? userData.name,
         jobTitle: profile?.jobTitle ?? '',
         displayName: profile?.displayName ?? '',

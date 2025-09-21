@@ -9,6 +9,7 @@ import {
 
 export interface PublicProfileDto {
   id: string
+  email: string;
   fullName: string
   jobTitle: string;
   displayName: string

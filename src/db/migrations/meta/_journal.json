@@ -50,6 +50,13 @@
       "when": 1758433634407,
       "tag": "0006_narrow_synch",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1758565296162,
+      "tag": "0007_lying_shape",
+      "breakpoints": true
     }
   ]
 }

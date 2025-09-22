@@ -1,3 +1,5 @@
+import { AppearanceSettings } from '@module/user/dto/appearance.dto'
+
 export interface ProfileResponse {
   userId: string;
   username: string;
@@ -12,6 +14,7 @@ export interface ProfileResponse {
   website: string;
   jobTitle: string;
   hobbies: string[];
+  appearance: AppearanceSettings | null;
 }
 
 export interface CreateProfileDto {
@@ -29,4 +32,5 @@ export interface UpdateProfileRequest {
   website?: string;
   socials?: Record<string, string>;
   hobbies?: string[];
+  appearance?: Partial<AppearanceSettings>;
 }

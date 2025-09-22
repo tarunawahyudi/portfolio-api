@@ -6,6 +6,7 @@ import {
   CourseResponse,
   AwardResponse,
 } from '@module/output/dto'
+import { AppearanceSettings } from '@module/user/dto/appearance.dto'
 
 export interface PublicProfileDto {
   id: string
@@ -21,6 +22,7 @@ export interface PublicProfileDto {
   hobbies: string[]
   phoneNumber: string
   address: string
+  appearance: AppearanceSettings | null
 }
 
 export interface PublicArticleItemDto {

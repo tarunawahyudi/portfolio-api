@@ -68,6 +68,7 @@ export class PublicServiceImpl implements PublicService {
         hobbies: profile?.hobbies ?? [],
         phoneNumber: profile?.phoneNumber ?? '',
         address: profile?.address ?? '',
+        appearance: profile?.appearance ?? null,
       },
       articles: articles.map((article) => ({
         title: article.title,

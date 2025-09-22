@@ -15,6 +15,8 @@ import { cdnUrl } from '@shared/util/common.util'
 import { logger } from '@sentry/bun'
 import { toProfileResponse } from '@module/user/mapper/profile.mapper'
 import { verifyCaptcha } from '@lib/captcha'
+import { NewProfile } from '@module/user/entity/profileWithEmail'
+import { defaultAppearanceSettings } from '@shared/constant/appearance.constant'
 
 @injectable()
 export class UserServiceImpl implements UserService {
@@ -22,8 +24,9 @@ export class UserServiceImpl implements UserService {
     @inject('StorageService') private readonly storageService: StorageService,
     @inject('EmailService') private readonly emailService: EmailService,
     @inject('UserRepository') private readonly userRepository: UserRepository,
-    @inject('EmailVerificationRepository') private readonly emailVerificationRepository: EmailVerificationRepository,
-    @inject('ProfileRepository') private readonly profileRepository: ProfileRepository
+    @inject('EmailVerificationRepository')
+    private readonly emailVerificationRepository: EmailVerificationRepository,
+    @inject('ProfileRepository') private readonly profileRepository: ProfileRepository,
   ) {}
 
   async showByUsername(username: string): Promise<ShowUserResponse> {
@@ -118,13 +121,33 @@ export class UserServiceImpl implements UserService {
       hobbies: row.hobbies ?? [],
       website: row.website ?? '',
       jobTitle: row.jobTitle ?? '',
+      appearance: row.appearance ?? null,
     }
   }
 
   async updateProfile(userId: string, request: UpdateProfileRequest): Promise<ProfileResponse> {
-    const row = await this.profileRepository.update(userId, request)
-    if (!row) throw new AppException('DB-002')
-    return toProfileResponse(row)
+    const currentProfile = await this.profileRepository.findByUserId(userId)
+    if (!currentProfile) {
+      throw new AppException('USER-002', 'User profile not found.')
+    }
+
+    const { appearance: appearanceChanges, ...otherProfileChanges } = request
+    const payloadForRepo: Partial<NewProfile> = { ...otherProfileChanges }
+
+    if (appearanceChanges && Object.keys(appearanceChanges).length > 0) {
+      payloadForRepo.appearance = {
+        ...defaultAppearanceSettings,
+        ...(currentProfile.appearance || {}),
+        ...appearanceChanges,
+      }
+    }
+
+    const updatedProfile = await this.profileRepository.update(userId, payloadForRepo)
+    if (!updatedProfile) {
+      throw new AppException('DB-002', 'Failed to update profile.')
+    }
+
+    return toProfileResponse(updatedProfile)
   }
 
   async uploadAvatar(userId: string, avatarFile: File): Promise<{ avatarUrl: string }> {

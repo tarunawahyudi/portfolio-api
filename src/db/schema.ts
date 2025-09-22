@@ -13,6 +13,7 @@ import {
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 import { CertificateDisplay } from '@module/certificate/dto/certificate.dto'
+import { AppearanceSettings } from '@module/user/dto/appearance.dto'
 
 export const userStatusEnum = pgEnum('user_status', [
   'pending',
@@ -99,6 +100,7 @@ export const profiles = pgTable('profiles', {
   socials: jsonb('socials').$type<Record<string, string>>().default({}),
   website: varchar('website', { length: 100 }),
   hobbies: text('hobbies').array(),
+  appearance: jsonb('appearance').$type<AppearanceSettings>(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 })

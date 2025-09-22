@@ -17,5 +17,6 @@ export function toProfileResponse(profile: ProfileWithEmail): ProfileResponse {
     avatarUrl: cdnUrl(profile.avatar) ?? '',
     hobbies: profile.hobbies ?? [],
     jobTitle: profile.jobTitle ?? '',
+    appearance: profile.appearance ?? null,
   }
 }

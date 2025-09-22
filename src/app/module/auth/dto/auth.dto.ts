@@ -1,6 +1,7 @@
 export interface LoginRequest {
   usernameOrEmail: string;
   password: string;
+  captchaToken: string;
   ipAddress?: string;
   userAgent?: string;
   browser?: string;
@@ -12,4 +13,9 @@ export interface LoginRequest {
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+  captchaToken: string;
 }

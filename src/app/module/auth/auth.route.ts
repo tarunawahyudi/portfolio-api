@@ -33,6 +33,7 @@ export function registerAuthRoutes(app: Elysia) {
           body: t.Object({
             usernameOrEmail: t.String(),
             password: t.String({ minLength: 6 }),
+            captchaToken: t.String(),
           }),
           detail: {
             tags: ["Authentication"],
@@ -73,6 +74,7 @@ export function registerAuthRoutes(app: Elysia) {
             format: 'email',
             error: 'Invalid email format'
           }),
+          captchaToken: t.String(),
         }),
         detail: {
           tags: ["Authentication"],

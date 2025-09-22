@@ -4,7 +4,7 @@ import { inject, injectable } from 'tsyringe'
 import type { AuthService } from '@module/auth/service/auth.service'
 import { Context } from 'elysia'
 import { noResponse, successResponse } from '@shared/util/response.util'
-import { LoginRequest } from '@module/auth/dto/auth.dto'
+import { ForgotPasswordRequest, LoginRequest } from '@module/auth/dto/auth.dto'
 import { AppException } from '@core/exception/app.exception'
 import { UAParser } from 'ua-parser-js'
 import { CreateUserRequest } from '@module/user/dto/user.dto'
@@ -90,9 +90,11 @@ export class AuthControllerImpl implements AuthController {
   }
 
   async requestPasswordReset(ctx: Context): Promise<AppResponse> {
-    const { email } = ctx.body as { email: string }
-    await this.authService.requestPasswordReset(email)
-    return noResponse(ctx, `A password reset link has been sent to ${email}`)
+    const request = ctx.body as ForgotPasswordRequest
+    const clientIp = ctx.request.headers.get('CF-Connecting-IP') ?? ctx.request.headers.get('x-forwarded-for') ?? undefined
+
+    await this.authService.requestPasswordReset(request, clientIp)
+    return noResponse(ctx, `A password reset link has been sent to ${request.email}`)
   }
 
   async resetPassword(ctx: Context): Promise<AppResponse> {

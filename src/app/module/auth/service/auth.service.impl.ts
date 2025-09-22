@@ -4,7 +4,7 @@ import type { EmailVerificationRepository } from '@module/auth/repository/email-
 import { AppException } from '@core/exception/app.exception'
 import type { UserRepository } from '@module/user/repository/user.repository'
 import { Transactional } from '@shared/decorator/transactional.decorator'
-import { LoginRequest, LoginResponse } from '@module/auth/dto/auth.dto'
+import { ForgotPasswordRequest, LoginRequest, LoginResponse } from '@module/auth/dto/auth.dto'
 import type { AuthRepository } from '@module/auth/repository/auth.repository'
 import { generateTokens, verifyRefreshToken } from '@shared/util/jwt.util'
 import {
@@ -14,6 +14,7 @@ import {
   hashData,
 } from '@shared/util/common.util'
 import type { EmailService } from '@core/service/email.service'
+import { verifyCaptcha } from '@lib/captcha'
 
 @injectable()
 export class AuthServiceImpl implements AuthService {
@@ -44,6 +45,7 @@ export class AuthServiceImpl implements AuthService {
   }
 
   async signIn(data: LoginRequest): Promise<LoginResponse> {
+    await verifyCaptcha(data.captchaToken, data.ipAddress)
     const user = await this.authRepository.findByEmailOrUsername(data.usernameOrEmail)
 
     if (!user) {
@@ -139,8 +141,9 @@ export class AuthServiceImpl implements AuthService {
     return { message: 'Successfully signed out' }
   }
 
-  async requestPasswordReset(email: string): Promise<void> {
-    const user = await this.authRepository.findByEmailOrUsername(email)
+  async requestPasswordReset(request:ForgotPasswordRequest, clientIp?: string): Promise<void> {
+    await verifyCaptcha(request.captchaToken, clientIp)
+    const user = await this.authRepository.findByEmailOrUsername(request.email)
 
     if (user) {
       const token = generateRandomToken(32)

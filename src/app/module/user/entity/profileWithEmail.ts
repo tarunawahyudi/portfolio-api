@@ -3,6 +3,7 @@ import { profiles } from '@db/schema'
 
 export type ProfileWithEmail = typeof profiles.$inferSelect & {
   email: string;
+  username: string;
 };
 
 export type Profile = InferSelectModel<typeof profiles>

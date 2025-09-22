@@ -106,6 +106,7 @@ export class UserServiceImpl implements UserService {
     if (!row) throw new AppException('USER-002')
     return {
       userId: row.userId,
+      username: row.username,
       email: row.email,
       address: row.address ?? '',
       bio: row.bio ?? '',

@@ -7,6 +7,7 @@ export function toProfileResponse(profile: ProfileWithEmail): ProfileResponse {
     fullName: profile.fullName ?? '',
     bio: profile.bio ?? '',
     userId: profile.userId,
+    username: profile.username,
     email: profile.email,
     phoneNumber: profile.phoneNumber ?? '',
     displayName: profile.displayName ?? '',

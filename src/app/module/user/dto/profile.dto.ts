@@ -1,5 +1,6 @@
 export interface ProfileResponse {
   userId: string;
+  username: string;
   phoneNumber: string;
   email: string;
   fullName: string;

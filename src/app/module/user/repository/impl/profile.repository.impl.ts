@@ -1,6 +1,6 @@
 import { injectable } from 'tsyringe'
 import { ProfileRepository } from '@module/user/repository/profile.repository'
-import { NewProfile, Profile, ProfileWithEmail } from '@module/user/entity/profileWithEmail'
+import { NewProfile, ProfileWithEmail } from '@module/user/entity/profileWithEmail'
 import { db } from '@db/index'
 import { eq } from 'drizzle-orm'
 import { profiles } from '@db/schema'
@@ -14,7 +14,8 @@ export class ProfileRepositoryImpl implements ProfileRepository {
       with: {
         user: {
           columns: {
-            email: true
+            email: true,
+            username: true,
           },
         },
       },
@@ -24,6 +25,7 @@ export class ProfileRepositoryImpl implements ProfileRepository {
     return {
       ...row,
       email: row.user.email,
+      username: row.user.username
     }
   }
 
@@ -47,6 +49,7 @@ export class ProfileRepositoryImpl implements ProfileRepository {
       with: {
         user: {
           columns: {
+            username: true,
             email: true
           },
         },
@@ -58,6 +61,7 @@ export class ProfileRepositoryImpl implements ProfileRepository {
     return {
       ...row,
       email: row.user.email,
+      username: row.user.username,
     }
   }
 

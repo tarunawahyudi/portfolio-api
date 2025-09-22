@@ -25,6 +25,10 @@ export function registerPublicRoutes(app: Elysia) {
       .get('/portfolio/:id', publicController.getPortfolioById.bind(publicController), {
         params: t.Object({ id: t.String({ format: 'uuid' }) }),
         detail: { tags: ['Public'], summary: 'Get a single public portfolio detail' },
-      }),
+      })
+      .get('/article/:slug', publicController.getArticleBySlug.bind(publicController), {
+        params: t.Object({ slug: t.String() }),
+        detail: { tags: ["Public"], summary: "Get a single published article by slug" }
+      })
   )
 }

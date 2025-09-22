@@ -7,7 +7,11 @@ import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { paginate } from '@shared/util/pagination.util'
 import { db } from '@db/index'
 import { AppException } from '@core/exception/app.exception'
-import { Article, NewArticle } from '@module/article/entity/article'
+import {
+  Article,
+  ArticleWithAuthor,
+  NewArticle,
+} from '@module/article/entity/article'
 
 @injectable()
 export class ArticleRepositoryImpl implements ArticleRepository {
@@ -16,17 +20,13 @@ export class ArticleRepositoryImpl implements ArticleRepository {
     options: PaginationOptions,
     status?: ArticleStatus,
   ): Promise<PaginatedResponse<Article>> {
-    // --- PENYEMPURNAAN LOGIKA KONDISI ---
     const conditions: (SQL | undefined)[] = [eq(articles.userId, userId)]
 
     if (status) {
-      // Jika ada status spesifik (draft, published, deleted), gunakan itu.
       conditions.push(eq(articles.status, status))
     } else {
-      // Jika TIDAK ada status (untuk tab "Semua"), tampilkan semua KECUALI yang di 'deleted'.
       conditions.push(not(eq(articles.status, 'deleted')))
     }
-    // --- AKHIR PENYEMPURNAAN ---
 
     const searchColumns = [articles.title, articles.content]
 
@@ -35,7 +35,7 @@ export class ArticleRepositoryImpl implements ArticleRepository {
       articles,
       options,
       searchColumns,
-      and(...conditions.filter((c): c is SQL => !!c)), // Pastikan tidak ada `undefined`
+      and(...conditions.filter((c): c is SQL => !!c)),
     )
   }
 
@@ -80,5 +80,15 @@ export class ArticleRepositoryImpl implements ArticleRepository {
       .returning()
     if (!updated) throw new AppException('ARTICLE-001')
     return updated
+  }
+
+  async findPublicBySlug(slug: string): Promise<ArticleWithAuthor | null> {
+    const row = await db.query.articles.findFirst({
+      where: and(eq(articles.slug, slug), eq(articles.status, 'published')),
+      with: {
+        user: { with: { profile: true } },
+      },
+    })
+    return row ?? null
   }
 }

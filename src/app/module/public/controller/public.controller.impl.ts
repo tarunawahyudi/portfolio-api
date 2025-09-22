@@ -30,4 +30,10 @@ export class PublicControllerImpl implements PublicController {
     const data = await this.publicService.getPublicPortfolioDetail(id)
     return successResponse(ctx, data)
   }
+
+  async getArticleBySlug(ctx: Context): Promise<AppResponse> {
+    const { slug } = ctx.params
+    const data = await this.publicService.getPublicArticleBySlug(slug)
+    return successResponse(ctx, data)
+  }
 }

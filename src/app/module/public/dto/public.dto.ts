@@ -61,3 +61,18 @@ export interface PublicProfileResponse {
   courses: CourseResponse[]
   awards: AwardResponse[]
 }
+
+export interface PublicArticleAuthorDto {
+  fullName: string;
+  avatarUrl: string | null;
+}
+
+export interface PublicArticleDetailDto {
+  title: string;
+  slug: string;
+  content: string;
+  thumbnail: string | null;
+  tags: string[];
+  publishedAt: Date | null;
+  author: PublicArticleAuthorDto;
+}

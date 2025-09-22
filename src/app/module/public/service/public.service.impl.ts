@@ -1,6 +1,6 @@
 import { injectable, inject } from 'tsyringe'
 import type { UserRepository } from '@module/user/repository/user.repository'
-import { PublicProfileResponse } from '@module/public/dto/public.dto'
+import { PublicArticleDetailDto, PublicProfileResponse } from '@module/public/dto/public.dto'
 import {
   toSkillResponse,
   toWorkExperienceResponse,
@@ -15,13 +15,15 @@ import { PublicService } from '@module/public/service/public.service'
 import { PdfService } from '@core/service/pdf.service'
 import { PortfolioDetailResponse } from '@module/portfolio/dto/portfolio.dto'
 import type { PortfolioRepository } from '@module/portfolio/repository/portfolio.repository'
+import type { ArticleRepository } from '@module/article/repository/article.repository'
 
 @injectable()
 export class PublicServiceImpl implements PublicService {
   constructor(
     @inject('UserRepository') private readonly userRepository: UserRepository,
     @inject('PdfService') private readonly pdfService: PdfService,
-    @inject('PortfolioRepository') private readonly portfolioRepository: PortfolioRepository
+    @inject('PortfolioRepository') private readonly portfolioRepository: PortfolioRepository,
+    @inject('ArticleRepository') private readonly articleRepository: ArticleRepository
   ) {}
 
   async getPublicProfile(username: string): Promise<PublicProfileResponse> {
@@ -111,5 +113,25 @@ export class PublicServiceImpl implements PublicService {
       throw new AppException('PORTFOLIO-001', 'Portfolio not found or not public')
     }
     return toPortfolioDetailResponse(portfolio)
+  }
+
+  async getPublicArticleBySlug(slug: string): Promise<PublicArticleDetailDto> {
+    const article = await this.articleRepository.findPublicBySlug(slug)
+    if (!article) {
+      throw new AppException('ARTICLE-001', 'Article not found or not published.')
+    }
+
+    return {
+      title: article.title,
+      slug: article.slug!,
+      content: article.content ?? '',
+      thumbnail: cdnUrl(article.thumbnail),
+      tags: article.tags ?? [],
+      publishedAt: article.publishedAt,
+      author: {
+        fullName: article.user.profile?.fullName ?? article.user.name,
+        avatarUrl: cdnUrl(article.user.profile?.avatar),
+      },
+    }
   }
 }

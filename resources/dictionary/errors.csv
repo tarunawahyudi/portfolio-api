@@ -33,3 +33,5 @@ COURSE-001,COURSE,Course not found,warn,404
 SETTING-001,SETTING,Setting not found,warn,404
 ARTICLE-001,ARTICLE,Article not found,warn,404
 GALLERY-001,PORTFOLIO,Gallery image not found,warn,404
+CONFIG-001,COMMON,Server configuration error,error,500
+CAPTCHA-001,COMMON,Verification failed,warn,403

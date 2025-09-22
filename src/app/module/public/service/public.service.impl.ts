@@ -21,7 +21,7 @@ import { PortfolioDetailResponse } from '@module/portfolio/dto/portfolio.dto'
 import type { PortfolioRepository } from '@module/portfolio/repository/portfolio.repository'
 import type { ArticleRepository } from '@module/article/repository/article.repository'
 import { EmailService } from '@core/service/email.service'
-import { logger } from '@shared/util/logger.util'
+import { verifyCaptcha } from '@lib/captcha'
 
 @injectable()
 export class PublicServiceImpl implements PublicService {
@@ -32,34 +32,6 @@ export class PublicServiceImpl implements PublicService {
     @inject('PortfolioRepository') private readonly portfolioRepository: PortfolioRepository,
     @inject('ArticleRepository') private readonly articleRepository: ArticleRepository,
   ) {}
-
-  private async verifyCaptcha(token: string, ip?: string) {
-    const secret = process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY
-    if (!secret) {
-      logger.error('CLOUDFLARE_TURNSTILE_SECRET_KEY tidak diatur.')
-      throw new AppException('CONFIG-001', 'Server configuration error.')
-    }
-
-    const body = new FormData()
-    body.append('secret', secret)
-    body.append('response', token)
-    if (ip) {
-      body.append('remoteip', ip)
-    }
-
-    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      body,
-    })
-
-    const result = (await response.json()) as { success: boolean; 'error-codes'?: string[] }
-
-    if (!result.success) {
-      logger.warn(`Verifikasi Turnstile gagal: ${result['error-codes']}`)
-      throw new AppException('CAPTCHA-001', 'Verifikasi CAPTCHA gagal. Silakan coba lagi.')
-    }
-    logger.info('Verifikasi Turnstile berhasil.')
-  }
 
   async getPublicProfile(username: string): Promise<PublicProfileResponse> {
     const userWithRelations = await this.userRepository.findPublicProfileByUsername(username)
@@ -171,7 +143,7 @@ export class PublicServiceImpl implements PublicService {
   }
 
   async sendContactEmail(request: ContactEmailDto): Promise<void> {
-    await this.verifyCaptcha(request.formData.captchaToken, request.clientIp)
+    await verifyCaptcha(request.formData.captchaToken, request.clientIp)
     const user = await this.userRepository.findPublicProfileByUsername(request.username)
     if (!user) {
       throw new AppException('PROFILE-001', 'Profile not found or is private.')

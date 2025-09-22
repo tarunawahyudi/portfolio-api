@@ -3,6 +3,7 @@ export interface CreateUserRequest {
   email: string;
   username: string;
   password: string;
+  captchaToken: string;
 }
 
 export interface UserSignupResponse {

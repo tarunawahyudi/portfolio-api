@@ -14,6 +14,7 @@ import { StorageService } from '@core/service/storage.service'
 import { cdnUrl } from '@shared/util/common.util'
 import { logger } from '@sentry/bun'
 import { toProfileResponse } from '@module/user/mapper/profile.mapper'
+import { verifyCaptcha } from '@lib/captcha'
 
 @injectable()
 export class UserServiceImpl implements UserService {
@@ -54,7 +55,8 @@ export class UserServiceImpl implements UserService {
   }
 
   @Transactional()
-  async create(request: any): Promise<UserSignupResponse> {
+  async create(request: any, clientIp: string | undefined): Promise<UserSignupResponse> {
+    await verifyCaptcha(request.captchaToken, clientIp)
     const data = request as CreateUserRequest
     await this.validate(data.username, data.email)
     const passwordHash = await Bun.password.hash(data.password, {

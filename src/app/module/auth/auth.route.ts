@@ -21,6 +21,7 @@ export function registerAuthRoutes(app: Elysia) {
             username: t.String({ required: true }),
             email: t.String({ required: true, format: "email" }),
             password: t.String({ minLength: 6 }),
+            captchaToken: t.String(),
           }),
           detail: {
             tags: ["Authentication"],

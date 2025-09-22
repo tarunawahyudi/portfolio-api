@@ -19,7 +19,8 @@ export class AuthControllerImpl implements AuthController {
 
   async postSignUp(ctx: Context): Promise<AppResponse> {
     const data = ctx.body as CreateUserRequest
-    const user = await this.userService.create(data)
+    const clientIp = ctx.request.headers.get('CF-Connecting-IP') ?? ctx.request.headers.get('x-forwarded-for') ?? undefined
+    const user = await this.userService.create(data, clientIp)
     return successResponse(ctx, user, 'User created successfully', 201)
   }
 

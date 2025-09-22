@@ -1,6 +1,10 @@
 import { injectable, inject } from 'tsyringe'
 import type { UserRepository } from '@module/user/repository/user.repository'
-import { PublicArticleDetailDto, PublicProfileResponse } from '@module/public/dto/public.dto'
+import {
+  ContactEmailDto,
+  PublicArticleDetailDto,
+  PublicProfileResponse,
+} from '@module/public/dto/public.dto'
 import {
   toSkillResponse,
   toWorkExperienceResponse,
@@ -16,10 +20,12 @@ import { PdfService } from '@core/service/pdf.service'
 import { PortfolioDetailResponse } from '@module/portfolio/dto/portfolio.dto'
 import type { PortfolioRepository } from '@module/portfolio/repository/portfolio.repository'
 import type { ArticleRepository } from '@module/article/repository/article.repository'
+import { EmailService } from '@core/service/email.service'
 
 @injectable()
 export class PublicServiceImpl implements PublicService {
   constructor(
+    @inject('EmailService') private readonly emailService: EmailService,
     @inject('UserRepository') private readonly userRepository: UserRepository,
     @inject('PdfService') private readonly pdfService: PdfService,
     @inject('PortfolioRepository') private readonly portfolioRepository: PortfolioRepository,
@@ -133,5 +139,21 @@ export class PublicServiceImpl implements PublicService {
         avatarUrl: cdnUrl(article.user.profile?.avatar),
       },
     }
+  }
+
+  async sendContactEmail(request: ContactEmailDto): Promise<void> {
+    const user = await this.userRepository.findPublicProfileByUsername(request.username)
+    if (!user) {
+      throw new AppException('PROFILE-001', 'Profile not found or is private.')
+    }
+
+    await this.emailService.sendContactFormEmail({
+      to: user.email,
+      profileOwnerName: user.profile?.fullName ?? user.name,
+      fromName: request.formData.name,
+      fromEmail: request.formData.email,
+      subject: request.formData.subject,
+      message: request.formData.message,
+    })
   }
 }

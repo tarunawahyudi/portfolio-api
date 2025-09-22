@@ -1,6 +1,7 @@
 import { Elysia, t } from 'elysia'
 import { container } from 'tsyringe'
 import { PublicControllerImpl } from '@module/public/controller/public.controller.impl'
+import { rateLimit } from 'elysia-rate-limit'
 
 export function registerPublicRoutes(app: Elysia) {
   const publicController = container.resolve(PublicControllerImpl)
@@ -29,6 +30,17 @@ export function registerPublicRoutes(app: Elysia) {
       .get('/article/:slug', publicController.getArticleBySlug.bind(publicController), {
         params: t.Object({ slug: t.String() }),
         detail: { tags: ["Public"], summary: "Get a single published article by slug" }
+      })
+      .use(rateLimit({ duration: 60 * 1000, max: 3 }))
+      .post('/contact/:username', publicController.sendContactMessage.bind(publicController), {
+        body: t.Object({
+          name: t.String({ minLength: 2 }),
+          email: t.String({ format: 'email' }),
+          subject: t.String({ minLength: 3 }),
+          message: t.String(),
+        }),
+        params: t.Object({ username: t.String() }),
+        detail: { tags: ["Public"], summary: "Send a contact message to a user" }
       })
   )
 }

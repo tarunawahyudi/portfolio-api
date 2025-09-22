@@ -5,6 +5,15 @@ import { injectable } from 'tsyringe'
 import config from '@core/config'
 import { logger } from '@shared/util/logger.util'
 
+interface ContactEmailPayload {
+  to: string;
+  profileOwnerName: string;
+  fromName: string;
+  fromEmail: string;
+  subject: string;
+  message: string;
+}
+
 @injectable()
 export class EmailService {
   private transporter
@@ -52,8 +61,34 @@ export class EmailService {
     })
   }
 
+  async sendContactFormEmail(payload: ContactEmailPayload): Promise<void> {
+    const { to, profileOwnerName, fromName, fromEmail, subject, message } = payload
 
-  async sendPasswordResetEmail(recipientEmail: string, recipientName: string, resetUrl: string): Promise<void> {
+    const html = await this.loadTemplate('contact-notification', {
+      profileOwnerName,
+      fromName,
+      fromEmail,
+      subject,
+      message,
+      YEAR: new Date().getFullYear().toString(),
+      appName: config.app.name,
+    })
+
+    logger.info(`[EmailService] Sending contact form email to: ${to}`)
+    await this.transporter.sendMail({
+      from: `"${config.app.name} Contact Form" <${process.env.SMTP_USER}>`,
+      to: to,
+      subject: `Pesan Baru dari Portfolio: ${subject}`,
+      html,
+      replyTo: fromEmail,
+    })
+  }
+
+  async sendPasswordResetEmail(
+    recipientEmail: string,
+    recipientName: string,
+    resetUrl: string,
+  ): Promise<void> {
     const html = await this.loadTemplate('reset-password', {
       RECIPIENT_NAME: recipientName,
       RESET_URL: resetUrl,

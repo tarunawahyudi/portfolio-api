@@ -1,7 +1,7 @@
 import { injectable, inject } from 'tsyringe'
 import { Context } from 'elysia'
 import { AppResponse } from '@shared/type/global'
-import { successResponse } from '@shared/util/response.util'
+import { noResponse, successResponse } from '@shared/util/response.util'
 import { PublicController } from '@module/public/controller/public.controller'
 import type { PublicService } from '@module/public/service/public.service'
 
@@ -35,5 +35,13 @@ export class PublicControllerImpl implements PublicController {
     const { slug } = ctx.params
     const data = await this.publicService.getPublicArticleBySlug(slug)
     return successResponse(ctx, data)
+  }
+
+  async sendContactMessage(ctx: Context): Promise<AppResponse> {
+    const { username } = ctx.params
+    const formData = ctx.body as { name: string; email: string; subject: string; message: string }
+
+    await this.publicService.sendContactEmail({ username, formData })
+    return noResponse(ctx, 'Message sent successfully')
   }
 }

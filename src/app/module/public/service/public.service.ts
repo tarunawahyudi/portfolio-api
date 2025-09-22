@@ -1,4 +1,8 @@
-import { PublicArticleDetailDto, PublicProfileResponse } from '@module/public/dto/public.dto'
+import {
+  ContactEmailDto,
+  PublicArticleDetailDto,
+  PublicProfileResponse,
+} from '@module/public/dto/public.dto'
 import { PortfolioDetailResponse } from '@module/portfolio/dto/portfolio.dto'
 
 export interface PublicService {
@@ -6,4 +10,5 @@ export interface PublicService {
   generateCvAsPdf(username: string): Promise<Buffer>
   getPublicPortfolioDetail(id: string): Promise<PortfolioDetailResponse>
   getPublicArticleBySlug(slug: string): Promise<PublicArticleDetailDto>
+  sendContactEmail(request: ContactEmailDto): Promise<void>
 }

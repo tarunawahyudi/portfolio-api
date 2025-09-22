@@ -76,3 +76,16 @@ export interface PublicArticleDetailDto {
   publishedAt: Date | null;
   author: PublicArticleAuthorDto;
 }
+
+
+interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+export interface ContactEmailDto {
+  username: string;
+  formData: ContactFormData
+}

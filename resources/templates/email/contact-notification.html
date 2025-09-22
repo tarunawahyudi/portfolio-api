@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+    .container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eeeeee; }
+    .content { padding: 20px 0; }
+    .message-box { background-color: #f9f9f9; border: 1px solid #dddddd; padding: 15px; border-radius: 4px; white-space: pre-wrap; }
+    .footer { text-align: center; font-size: 12px; color: #888888; padding-top: 20px; border-top: 1px solid #eeeeee; }
+    strong { color: #333333; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h2>Pesan Baru dari Halaman Profil Anda</h2>
+  </div>
+  <div class="content">
+    <p>Halo {{profileOwnerName}},</p>
+    <p>Anda telah menerima pesan baru melalui formulir kontak di halaman profil publik Anda. Balas email ini untuk merespons langsung ke pengirim.</p>
+    <hr style="border: none; border-top: 1px solid #eeeeee; margin: 20px 0;">
+    <p><strong>Nama Pengirim:</strong> {{fromName}}</p>
+    <p><strong>Email Pengirim:</strong> {{fromEmail}}</p>
+    <p><strong>Subjek:</strong> {{subject}}</p>
+    <br>
+    <p><strong>Pesan:</strong></p>
+    <div class="message-box">
+      {{message}}
+    </div>
+  </div>
+  <div class="footer">
+    <p>&copy; {{YEAR}} {{appName}}. All rights reserved.</p>
+  </div>
+</div>
+</body>
+</html>

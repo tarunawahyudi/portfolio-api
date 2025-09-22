@@ -7,17 +7,21 @@ import {
   toEducationResponse,
   toCourseResponse,
   toAwardResponse,
+  toPortfolioDetailResponse,
 } from '@module/output/mapper'
 import { AppException } from '@core/exception/app.exception'
 import { cdnUrl } from '@shared/util/common.util'
 import { PublicService } from '@module/public/service/public.service'
 import { PdfService } from '@core/service/pdf.service'
+import { PortfolioDetailResponse } from '@module/portfolio/dto/portfolio.dto'
+import type { PortfolioRepository } from '@module/portfolio/repository/portfolio.repository'
 
 @injectable()
 export class PublicServiceImpl implements PublicService {
   constructor(
     @inject('UserRepository') private readonly userRepository: UserRepository,
     @inject('PdfService') private readonly pdfService: PdfService,
+    @inject('PortfolioRepository') private readonly portfolioRepository: PortfolioRepository
   ) {}
 
   async getPublicProfile(username: string): Promise<PublicProfileResponse> {
@@ -95,5 +99,13 @@ export class PublicServiceImpl implements PublicService {
   async generateCvAsPdf(username: string): Promise<Buffer> {
     const publicData = await this.getPublicProfile(username)
     return this.pdfService.generateCv(publicData)
+  }
+
+  async getPublicPortfolioDetail(id: string): Promise<PortfolioDetailResponse> {
+    const portfolio = await this.portfolioRepository.findPublicById(id)
+    if (!portfolio) {
+      throw new AppException('PORTFOLIO-001', 'Portfolio not found or not public')
+    }
+    return toPortfolioDetailResponse(portfolio)
   }
 }

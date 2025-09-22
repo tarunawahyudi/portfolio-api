@@ -112,4 +112,20 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
   async logView(data: NewPortfolioView): Promise<void> {
     await db.insert(portfolioViews).values(data)
   }
+
+  async findPublicById(id: string): Promise<any | null> {
+    const row = await db.query.portfolios.findFirst({
+      where: and(
+        eq(portfolios.id, id),
+        eq(portfolios.status, 'published'),
+        eq(portfolios.visibility, 'public'),
+      ),
+      with: {
+        gallery: {
+          orderBy: (g, { asc }) => [asc(g.order)],
+        },
+      },
+    })
+    return row ?? null
+  }
 }

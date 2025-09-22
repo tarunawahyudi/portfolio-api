@@ -20,4 +20,5 @@ export interface PortfolioRepository {
   updateThumbnail(id: string, userId: string, thumbnailKey: string): Promise<Portfolio>
   logView(data: NewPortfolioView): Promise<void>
   findByIdWithGallery(id: string, userId: string): Promise<PortfolioWithGallery | undefined>
+  findPublicById(id: string): Promise<any | null>
 }

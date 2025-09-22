@@ -7,7 +7,7 @@ import type { PublicService } from '@module/public/service/public.service'
 
 @injectable()
 export class PublicControllerImpl implements PublicController {
-  constructor(@inject("PublicService") private readonly publicService: PublicService) {}
+  constructor(@inject('PublicService') private readonly publicService: PublicService) {}
 
   async getByUsername(ctx: Context): Promise<AppResponse> {
     const { username } = ctx.params
@@ -23,5 +23,11 @@ export class PublicControllerImpl implements PublicController {
     ctx.set.headers['Content-Disposition'] = `attachment; filename="cv-${username}.pdf"`
 
     return pdfBuffer
+  }
+
+  async getPortfolioById(ctx: Context): Promise<AppResponse> {
+    const { id } = ctx.params
+    const data = await this.publicService.getPublicPortfolioDetail(id)
+    return successResponse(ctx, data)
   }
 }

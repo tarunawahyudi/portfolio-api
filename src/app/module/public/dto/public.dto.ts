@@ -83,9 +83,11 @@ interface ContactFormData {
   email: string;
   subject: string;
   message: string;
+  captchaToken: string;
 }
 
 export interface ContactEmailDto {
   username: string;
   formData: ContactFormData
+  clientIp?: string;
 }

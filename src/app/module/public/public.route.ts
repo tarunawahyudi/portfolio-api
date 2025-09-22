@@ -38,6 +38,7 @@ export function registerPublicRoutes(app: Elysia) {
           email: t.String({ format: 'email' }),
           subject: t.String({ minLength: 3 }),
           message: t.String(),
+          captchaToken: t.String(),
         }),
         params: t.Object({ username: t.String() }),
         detail: { tags: ["Public"], summary: "Send a contact message to a user" }

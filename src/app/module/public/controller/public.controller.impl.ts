@@ -39,9 +39,16 @@ export class PublicControllerImpl implements PublicController {
 
   async sendContactMessage(ctx: Context): Promise<AppResponse> {
     const { username } = ctx.params
-    const formData = ctx.body as { name: string; email: string; subject: string; message: string }
+    const formData = ctx.body as {
+      name: string;
+      email: string;
+      subject: string;
+      message: string;
+      captchaToken: string;
+    }
+    const clientIp = ctx.request.headers.get('CF-Connecting-IP') ?? ctx.request.headers.get('x-forwarded-for') ?? undefined
 
-    await this.publicService.sendContactEmail({ username, formData })
+    await this.publicService.sendContactEmail({ username, formData, clientIp })
     return noResponse(ctx, 'Message sent successfully')
   }
 }

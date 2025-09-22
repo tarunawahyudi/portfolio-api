@@ -86,6 +86,10 @@ export class PublicServiceImpl implements PublicService {
           title: cert.title,
           organization: cert.organization ?? '',
           display: display,
+          issueDate: cert.issueDate ?? '',
+          credentialId: cert.credentialId ?? '',
+          credentialUrl: cert.credentialUrl ?? '',
+          certificateImage: cdnUrl(cert.certificateImage)
         }
       }),
       skills: skills?.map(toSkillResponse) ?? [],

@@ -40,10 +40,14 @@ export interface PublicPortfolioItemDto {
 }
 
 export interface PublicCertificateItemDto {
-  id: string
-  title: string
-  organization: string
-  display: CertificateDisplay
+  id: string;
+  title: string;
+  organization: string;
+  issueDate: string;
+  credentialId: string;
+  credentialUrl: string;
+  display: CertificateDisplay;
+  certificateImage: string | null
 }
 
 export interface PublicProfileResponse {

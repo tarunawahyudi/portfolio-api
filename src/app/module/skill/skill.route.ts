@@ -13,7 +13,7 @@ export function registerSkillRoutes(app: Elysia) {
         beforeHandle: authGuard as any,
         query: t.Object({
           page: t.Optional(t.Number({ default: 1, minimum: 1 })),
-          limit: t.Optional(t.Number({ default: 10, minimum: 1, maximum: 100 })),
+          limit: t.Optional(t.Number({ default: 10, minimum: 1 })),
         }),
         detail: { tags: ['Skill'], summary: 'Get list skill of users' },
       })

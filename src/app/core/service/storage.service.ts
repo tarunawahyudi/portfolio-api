@@ -1,17 +1,21 @@
 import { injectable } from 'tsyringe'
 import {
   DeleteObjectCommand,
-  DeleteObjectsCommand, GetObjectCommand,
+  DeleteObjectsCommand,
+  GetObjectCommand,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3'
-import { extname } from 'path'
+import path from 'path'
 import { randomBytes } from 'crypto'
 import { logger } from '@shared/util/logger.util'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
 export interface UploadOptions {
-  file: File
+  file?: File
+  buffer?: Buffer
+  fileName?: string
+  mimeType?: string
   module: string
   collection: string
 }
@@ -37,19 +41,32 @@ export class StorageService {
   }
 
   async upload(options: UploadOptions): Promise<{ key: string }> {
-    const { file, module, collection } = options
+    const { file, buffer, module, collection } = options
 
-    const fileBuffer = await file.arrayBuffer()
-    const fileExtension = extname(file.name)
-    const uniqueFileName = `${randomBytes(16).toString('hex')}${fileExtension}`
+    let fileBuffer: Buffer
+    let fileType: string
+    let fileName: string
 
-    const key = `${module}/${collection}/${uniqueFileName}`
+    if (buffer) {
+      fileBuffer = buffer
+      fileType = options.mimeType!
+      fileName = options.fileName!
+    } else if (file) {
+      fileBuffer = Buffer.from(await file.arrayBuffer())
+      fileType = file.type
+      const fileExtension = path.extname(file.name)
+      fileName = `${randomBytes(16).toString('hex')}${fileExtension}`
+    } else {
+      throw new Error("Either 'file' or 'buffer' must be provided for upload.")
+    }
+
+    const key = `${module}/${collection}/${fileName}`
 
     const command = new PutObjectCommand({
       Bucket: this.bucketName,
       Key: key,
-      Body: Buffer.from(fileBuffer),
-      ContentType: file.type,
+      Body: fileBuffer,
+      ContentType: fileType,
     })
 
     await this.s3.send(command)

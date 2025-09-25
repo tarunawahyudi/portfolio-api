@@ -14,11 +14,13 @@ import { NewArticle } from '@module/article/entity/article'
 import { toArticleResponse } from '@module/article/mapper/article.mapper'
 import { AppException } from '@core/exception/app.exception'
 import { logger } from '@shared/util/logger.util'
+import { ImageService } from '@core/service/image.service'
 
 @injectable()
 export class ArticleServiceImpl implements ArticleService {
   constructor(
     @inject('ArticleRepository') private readonly articleRepository: ArticleRepository,
+    @inject('ImageService') private readonly imageService: ImageService,
     @inject('StorageService') private readonly storageService: StorageService,
   ) {}
 
@@ -75,8 +77,16 @@ export class ArticleServiceImpl implements ArticleService {
         .catch((err) => logger.error(`Failed to delete old thumbnail: ${err}`))
     }
 
+    const processedImage = await this.imageService.processUpload(file, {
+      format: 'webp',
+      quality: 80,
+      resize: { width: 1280 }
+    })
+
     const { key } = await this.storageService.upload({
-      file,
+      buffer: processedImage.buffer,
+      fileName: processedImage.fileName,
+      mimeType: processedImage.mimeType,
       module: 'article',
       collection: 'thumbnail',
     })

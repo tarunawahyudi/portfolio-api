@@ -7,12 +7,15 @@ import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { NewAward } from '@module/award/entity/award'
 import { toAwardResponse } from '@module/award/mapper/award.mapper'
 import { AppException } from '@core/exception/app.exception'
+import { ImageService } from '@core/service/image.service'
+import { logger } from '@shared/util/logger.util'
 
 @injectable()
 export class AwardServiceImpl implements AwardService {
   constructor(
     @inject('AwardRepository') private readonly awardRepository: AwardRepository,
     @inject('StorageService') private readonly storageService: StorageService,
+    @inject('ImageService') private readonly imageService: ImageService,
   ) {}
 
   private async findAndValidate(id: string, userId: string) {
@@ -55,23 +58,38 @@ export class AwardServiceImpl implements AwardService {
 
   async uploadImages(id: string, userId: string, files: File[]): Promise<AwardResponse> {
     await this.findAndValidate(id, userId)
-    const uploadPromises = files.map((file) =>
+
+    logger.info(`Processing ${files.length} award images...`)
+    const processPromises = files.map((file) =>
+      this.imageService.processUpload(file, {
+        format: 'webp',
+        quality: 85,
+        resize: { width: 1920 },
+      }),
+    )
+    const processedImages = await Promise.all(processPromises)
+
+    logger.info(`Uploading ${processedImages.length} processed files to storage...`)
+    const uploadPromises = processedImages.map((img) =>
       this.storageService.upload({
-        file,
+        buffer: img.buffer,
+        fileName: img.fileName,
+        mimeType: img.mimeType,
         module: 'award',
         collection: 'gallery',
       }),
     )
     const uploadResults = await Promise.all(uploadPromises)
+
     const imageKeys = uploadResults.map((result) => result.key)
     const updated = await this.awardRepository.addImages(id, imageKeys)
+
     return toAwardResponse(updated)
   }
 
   async removeImage(id: string, userId: string, imageKey: string): Promise<AwardResponse> {
     const record = await this.findAndValidate(id, userId)
-    if (!record.images?.includes(imageKey))
-      throw new AppException('AWARD-002')
+    if (!record.images?.includes(imageKey)) throw new AppException('AWARD-002')
 
     await this.storageService.delete(imageKey)
     const updated = await this.awardRepository.removeImage(id, imageKey)

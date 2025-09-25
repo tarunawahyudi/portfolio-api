@@ -13,10 +13,12 @@ import { toCertificateResponse } from '@module/certificate/mapper/certificate.ma
 import { AppException } from '@core/exception/app.exception'
 import { cdnUrl } from '@shared/util/common.util'
 import { logger } from '@shared/util/logger.util'
+import { ImageService } from '@core/service/image.service'
 
 @injectable()
 export class CertificateServiceImpl implements CertificateService {
   constructor(
+    @inject('ImageService') private readonly imageService: ImageService,
     @inject('StorageService') private readonly storageService: StorageService,
     @inject('CertificateRepository') private readonly certificateRepository: CertificateRepository,
   ) {}
@@ -80,20 +82,27 @@ export class CertificateServiceImpl implements CertificateService {
     image: File,
   ): Promise<{ imageUrl: string | null }> {
     const record = await this.findAndValidate(id, userId)
-    const oldImageKey = record.certificateImage
+    if (record.certificateImage) {
+      this.storageService
+        .delete(record.certificateImage)
+        .catch((err) => logger.error(`Failed to delete old certificate image: ${err}`))
+    }
+
+    const processedImage = await this.imageService.processUpload(image, {
+      format: 'webp',
+      quality: 90,
+      resize: { width: 1920 },
+    })
 
     const { key: newImageKey } = await this.storageService.upload({
-      file: image,
+      buffer: processedImage.buffer,
+      fileName: processedImage.fileName,
+      mimeType: processedImage.mimeType,
       module: 'certificate',
       collection: 'image',
     })
 
     await this.certificateRepository.update(id, userId, { certificateImage: newImageKey })
-    if (oldImageKey) {
-      this.storageService
-        .delete(oldImageKey)
-        .catch((err) => logger.error(`Failed to delete old certificate image: ${err}`))
-    }
 
     return { imageUrl: cdnUrl(newImageKey) }
   }
@@ -106,8 +115,16 @@ export class CertificateServiceImpl implements CertificateService {
         .catch((err) => logger.error(`Failed to delete old display image: ${err}`))
     }
 
+    const processedImage = await this.imageService.processUpload(image, {
+      format: 'webp',
+      quality: 80,
+      resize: { width: 600 },
+    })
+
     const { key: newImageKey } = await this.storageService.upload({
-      file: image,
+      buffer: processedImage.buffer,
+      fileName: processedImage.fileName,
+      mimeType: processedImage.mimeType,
       module: 'certificate',
       collection: 'display',
     })
@@ -115,6 +132,6 @@ export class CertificateServiceImpl implements CertificateService {
     const newDisplay = { type: 'upload' as const, value: newImageKey }
     const updated = await this.certificateRepository.update(id, userId, { display: newDisplay })
 
-    return { display: updated.display }
+    return { display: toCertificateResponse(updated).display }
   }
 }

@@ -15,10 +15,12 @@ import { cdnUrl } from '@shared/util/common.util'
 import { logger } from '@sentry/bun'
 import { toProfileResponse } from '@module/user/mapper/profile.mapper'
 import { verifyCaptcha } from '@lib/captcha'
+import { ImageService } from '@core/service/image.service'
 
 @injectable()
 export class UserServiceImpl implements UserService {
   constructor(
+    @inject('ImageService') private readonly imageService: ImageService,
     @inject('StorageService') private readonly storageService: StorageService,
     @inject('EmailService') private readonly emailService: EmailService,
     @inject('UserRepository') private readonly userRepository: UserRepository,
@@ -132,8 +134,19 @@ export class UserServiceImpl implements UserService {
     if (!profile) throw new AppException('USER-002')
     const oldAvatar = profile.avatar
 
+    const processedImage = await this.imageService.processUpload(avatarFile, {
+      format: 'webp',
+      quality: 80,
+      resize: {
+        width: 512,
+        height: 512,
+      }
+    })
+
     const { key: newImageKey } = await this.storageService.upload({
-      file: avatarFile,
+      buffer: processedImage.buffer,
+      fileName: processedImage.fileName,
+      mimeType: processedImage.mimeType,
       module: 'user',
       collection: 'avatar',
     })

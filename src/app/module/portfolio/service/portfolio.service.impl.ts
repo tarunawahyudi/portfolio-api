@@ -23,15 +23,18 @@ import { cdnUrl } from '@shared/util/common.util'
 import { logger } from '@shared/util/logger.util'
 import { NewPortfolioGallery } from '@module/portfolio/entity/portfolio-gallery'
 import type { PortfolioGalleryRepository } from '@module/portfolio/repository/portfolio-gallery.repository'
+import { ImageService } from '@core/service/image.service'
 
 @injectable()
 export class PortfolioServiceImpl implements PortfolioService {
   constructor(
     @inject('StorageService') private readonly storageService: StorageService,
+    @inject('ImageService') private readonly imageService: ImageService,
     @inject('PortfolioRepository') private readonly portfolioRepository: PortfolioRepository,
     @inject('PortfolioGalleryRepository')
     private readonly portfolioGalleryRepository: PortfolioGalleryRepository,
   ) {}
+
   async fetch(
     userId: string,
     options: PaginationOptions,
@@ -121,23 +124,31 @@ export class PortfolioServiceImpl implements PortfolioService {
     file: File,
   ): Promise<{ thumbnailUrl: string | null }> {
     const portfolio = await this.portfolioRepository.findById(portfolioId, userId)
-    if (!portfolio) {
-      throw new AppException('PORTFOLIO-001')
+    if (!portfolio) throw new AppException('PORTFOLIO-001')
+
+    if (portfolio.thumbnail) {
+      this.storageService
+        .delete(portfolio.thumbnail)
+        .catch((err) =>
+          logger.error(`Failed to delete old thumbnail ${portfolio.thumbnail}: ${err}`),
+        )
     }
 
-    const oldThumbnailKey = portfolio.thumbnail
+    const processedImage = await this.imageService.processUpload(file, {
+      format: 'webp',
+      quality: 80,
+      resize: { width: 1280 },
+    })
+
     const { key: newThumbnailKey } = await this.storageService.upload({
-      file,
+      buffer: processedImage.buffer,
+      fileName: processedImage.fileName,
+      mimeType: processedImage.mimeType,
       module: 'portfolio',
       collection: 'thumbnail',
     })
 
     await this.portfolioRepository.update(portfolioId, userId, { thumbnail: newThumbnailKey })
-    if (oldThumbnailKey) {
-      logger.info(`[PortfolioService] Deleting old thumbnail: ${oldThumbnailKey}`)
-      await this.storageService.delete(oldThumbnailKey)
-    }
-
     return { thumbnailUrl: cdnUrl(newThumbnailKey) }
   }
 
@@ -159,27 +170,43 @@ export class PortfolioServiceImpl implements PortfolioService {
     await this.portfolioRepository.deleteGalleryImage(imageId)
   }
 
-  async uploadGallery(portfolioId: string, userId: string, files: File[]): Promise<PortfolioGalleryItemResponse[]> {
+  async uploadGallery(
+    portfolioId: string,
+    userId: string,
+    files: File[],
+  ): Promise<PortfolioGalleryItemResponse[]> {
     const portfolio = await this.portfolioRepository.findById(portfolioId, userId)
     if (!portfolio) throw new AppException('PORTFOLIO-001')
 
-    logger.info(`uploading ${files.length} files in parallel...`)
-    const uploadPromises = files.map((file) =>
+    logger.info(`Processing ${files.length} gallery images...`)
+    const processPromises = files.map((file) =>
+      this.imageService.processUpload(file, {
+        format: 'webp',
+        quality: 85,
+        resize: { width: 1920 },
+      }),
+    )
+    const processedImages = await Promise.all(processPromises)
+    logger.info('All gallery images processed.')
+
+    logger.info(`Uploading ${processedImages.length} processed files to storage...`)
+    const uploadPromises = processedImages.map((img) =>
       this.storageService.upload({
-        file,
+        buffer: img.buffer,
+        fileName: img.fileName,
+        mimeType: img.mimeType,
         module: 'portfolio',
         collection: 'gallery',
       }),
     )
-
     const uploadResults = await Promise.all(uploadPromises)
-    logger.info('All files uploaded to storage')
+    logger.info('All processed files uploaded to storage.')
 
     const galleryItemsToSave: NewPortfolioGallery[] = uploadResults.map((result, index) => ({
       portfolioId: portfolioId,
       path: result.key,
-      fileType: files[index].type,
-      size: files[index].size,
+      fileType: processedImages[index].mimeType,
+      size: processedImages[index].buffer.length,
       order: index,
     }))
 

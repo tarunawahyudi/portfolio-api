@@ -21,4 +21,5 @@ export interface PortfolioRepository {
   logView(data: NewPortfolioView): Promise<void>
   findByIdWithGallery(id: string, userId: string): Promise<PortfolioWithGallery | undefined>
   findPublicById(id: string): Promise<any | null>
+  findAllPublicPortfolios(userId: string, options: PaginationOptions): Promise<PaginatedResponse<Portfolio>>
 }

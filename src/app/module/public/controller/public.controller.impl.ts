@@ -1,9 +1,10 @@
 import { injectable, inject } from 'tsyringe'
 import { Context } from 'elysia'
-import { AppResponse } from '@shared/type/global'
-import { noResponse, successResponse } from '@shared/util/response.util'
+import { AppResponse, PageResponse } from '@shared/type/global'
+import { noResponse, paginateResponse, successResponse } from '@shared/util/response.util'
 import { PublicController } from '@module/public/controller/public.controller'
 import type { PublicService } from '@module/public/service/public.service'
+import { parsePaginationOptions } from '@shared/util/pagination.util'
 
 @injectable()
 export class PublicControllerImpl implements PublicController {
@@ -40,15 +41,25 @@ export class PublicControllerImpl implements PublicController {
   async sendContactMessage(ctx: Context): Promise<AppResponse> {
     const { username } = ctx.params
     const formData = ctx.body as {
-      name: string;
-      email: string;
-      subject: string;
-      message: string;
-      captchaToken: string;
+      name: string
+      email: string
+      subject: string
+      message: string
+      captchaToken: string
     }
-    const clientIp = ctx.request.headers.get('CF-Connecting-IP') ?? ctx.request.headers.get('x-forwarded-for') ?? undefined
+    const clientIp =
+      ctx.request.headers.get('CF-Connecting-IP') ??
+      ctx.request.headers.get('x-forwarded-for') ??
+      undefined
 
     await this.publicService.sendContactEmail({ username, formData, clientIp })
     return noResponse(ctx, 'Message sent successfully')
+  }
+
+  async getPortfoliosByUsername(ctx: Context): Promise<PageResponse<any>> {
+    const { username } = ctx.params
+    const options = parsePaginationOptions(ctx.query)
+    const paginatedData = await this.publicService.getPublicPortfolios(username, options)
+    return paginateResponse(ctx, paginatedData)
   }
 }

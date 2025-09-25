@@ -31,6 +31,16 @@ export function registerPublicRoutes(app: Elysia) {
         params: t.Object({ slug: t.String() }),
         detail: { tags: ["Public"], summary: "Get a single published article by slug" }
       })
+      .get('/portfolios/by-username/:username', publicController.getPortfoliosByUsername.bind(publicController), {
+        params: t.Object({ username: t.String() }),
+        query: t.Object({
+          page: t.Optional(t.Number({ default: 1, minimum: 1 })),
+          limit: t.Optional(t.Number({ default: 9, minimum: 1 })),
+          search: t.Optional(t.String()),
+          category: t.Optional(t.String()),
+        }),
+        detail: { tags: ["Public"], summary: "Get a user's all public portfolios with filter & pagination" }
+      })
       .use(rateLimit({ duration: 60 * 1000, max: 3 }))
       .post('/contact/:username', publicController.sendContactMessage.bind(publicController), {
         body: t.Object({

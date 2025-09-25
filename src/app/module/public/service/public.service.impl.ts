@@ -3,6 +3,7 @@ import type { UserRepository } from '@module/user/repository/user.repository'
 import {
   ContactEmailDto,
   PublicArticleDetailDto,
+  PublicPortfolioItemDto,
   PublicProfileResponse,
 } from '@module/public/dto/public.dto'
 import {
@@ -22,6 +23,8 @@ import type { PortfolioRepository } from '@module/portfolio/repository/portfolio
 import type { ArticleRepository } from '@module/article/repository/article.repository'
 import { EmailService } from '@core/service/email.service'
 import { verifyCaptcha } from '@lib/captcha'
+import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
+import { toPublicPortfolioItem } from '@module/public/mapper/public.mapper'
 
 @injectable()
 export class PublicServiceImpl implements PublicService {
@@ -157,5 +160,20 @@ export class PublicServiceImpl implements PublicService {
       subject: request.formData.subject,
       message: request.formData.message,
     })
+  }
+
+  async getPublicPortfolios(
+    username: string,
+    options: PaginationOptions,
+  ): Promise<PaginatedResponse<PublicPortfolioItemDto>> {
+    const user = await this.userRepository.findByUsername(username)
+    if (!user) throw new AppException('USER-002', 'User not found or not published.')
+
+    const paginatedResult = await this.portfolioRepository.findAllPublicPortfolios(user.id, options)
+
+    return {
+      data: paginatedResult.data.map(toPublicPortfolioItem),
+      pagination: paginatedResult.pagination,
+    }
   }
 }

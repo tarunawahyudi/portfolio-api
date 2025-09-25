@@ -31,12 +31,14 @@ export interface PublicArticleItemDto {
 }
 
 export interface PublicPortfolioItemDto {
+  id: string;
   title: string
   category: string
   thumbnail: string | null
   summary: string | null
   repoUrl: string | null
   projectUrl: string | null
+  techStack: string[]
 }
 
 export interface PublicCertificateItemDto {

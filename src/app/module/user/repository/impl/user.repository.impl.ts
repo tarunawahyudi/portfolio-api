@@ -89,9 +89,12 @@ export class UserRepositoryImpl implements UserRepository {
             projectUrl: true,
             techStack: true,
           },
-          where: and(eq(portfolios.visibility, 'public'), eq(portfolios.status, 'published')),
+          where: and(
+            eq(portfolios.visibility, 'public'),
+            eq(portfolios.status, 'published'),
+            eq(portfolios.isFeatured, true)
+          ),
           orderBy: (p, { desc }) => [desc(p.createdAt)],
-          limit: 6,
         },
 
         certificates: {

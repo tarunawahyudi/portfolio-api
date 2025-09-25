@@ -109,6 +109,28 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
     })
   }
 
+  async findAllPublicPortfolios(userId: string, options: PaginationOptions): Promise<PaginatedResponse<Portfolio>> {
+    const conditions = [
+      eq(portfolios.userId, userId),
+      eq(portfolios.visibility, 'public'),
+      eq(portfolios.status, 'published')
+    ]
+
+    const searchColumns = [portfolios.title, portfolios.category, portfolios.summary]
+
+    if (!options.sort) {
+      options.sort = { createdAt: 'desc' }
+    }
+
+    return paginate(
+      db,
+      portfolios,
+      options,
+      searchColumns,
+      and(...conditions)
+    )
+  }
+
   async logView(data: NewPortfolioView): Promise<void> {
     await db.insert(portfolioViews).values(data)
   }

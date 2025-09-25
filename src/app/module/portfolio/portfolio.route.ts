@@ -68,9 +68,9 @@ export function registerPortfolioRoutes(app: Elysia) {
           summary: t.Optional(t.String({ maxLength: 500 })),
           description: t.Optional(t.String()),
           techStack: t.Optional(t.Array(t.String())),
-          projectUrl: t.Optional(t.String({ format: 'uri' })),
-          repoUrl: t.Optional(t.String({ format: 'uri' })),
-          demoUrl: t.Optional(t.String({ format: 'uri' })),
+          projectUrl: t.Optional(t.String()),
+          repoUrl: t.Optional(t.String()),
+          demoUrl: t.Optional(t.String()),
         }),
         detail: {
           tags: ["Portfolio"],

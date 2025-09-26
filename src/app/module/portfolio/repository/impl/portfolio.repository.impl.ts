@@ -113,7 +113,7 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
     const conditions = [
       eq(portfolios.userId, userId),
       eq(portfolios.visibility, 'public'),
-      eq(portfolios.status, 'published')
+      eq(portfolios.status, 'published'),
     ]
 
     const searchColumns = [portfolios.title, portfolios.category, portfolios.summary]
@@ -149,5 +149,19 @@ export class PortfolioRepositoryImpl implements PortfolioRepository {
       },
     })
     return row ?? null
+  }
+
+  async findUniqueCategoriesByUserId(userId: string): Promise<string[]> {
+    const result = await db
+      .selectDistinct({ category: portfolios.category })
+      .from(portfolios)
+      .where(
+        and(
+          eq(portfolios.userId, userId),
+          eq(portfolios.status, 'published'),
+          eq(portfolios.visibility, 'public'),
+        ),
+      )
+    return result.map((r) => r.category)
   }
 }

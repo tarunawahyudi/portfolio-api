@@ -176,4 +176,10 @@ export class PublicServiceImpl implements PublicService {
       pagination: paginatedResult.pagination,
     }
   }
+
+  async getPortfolioCategories(username: string): Promise<string[]> {
+    const user = await this.userRepository.findByUsername(username)
+    if (!user) throw new AppException('USER-002')
+    return this.portfolioRepository.findUniqueCategoriesByUserId(user.id)
+  }
 }

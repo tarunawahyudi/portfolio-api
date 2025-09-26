@@ -14,4 +14,5 @@ export interface PublicService {
   getPublicArticleBySlug(slug: string): Promise<PublicArticleDetailDto>
   sendContactEmail(request: ContactEmailDto): Promise<void>
   getPublicPortfolios(username: string, options: PaginationOptions): Promise<PaginatedResponse<PublicPortfolioItemDto>>
+  getPortfolioCategories(username: string): Promise<string[]>
 }

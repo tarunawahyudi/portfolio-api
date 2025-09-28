@@ -31,7 +31,7 @@ export function registerWorkerExperienceRoutes(app: Elysia) {
           startDate: t.String({ format: 'date' }),
           endDate: t.Optional(t.Nullable(t.String({ format: 'date' }))),
           isCurrent: t.Optional(t.Boolean()),
-          jobDescription: t.Optional(t.String()),
+          jobDesk: t.Optional(t.Array(t.String())),
         }),
         detail: {
           tags: ["Work Experience"],
@@ -47,7 +47,7 @@ export function registerWorkerExperienceRoutes(app: Elysia) {
           startDate: t.Optional(t.String({ format: 'date' })),
           endDate: t.Optional(t.Nullable(t.String({ format: 'date' }))),
           isCurrent: t.Optional(t.Boolean()),
-          jobDescription: t.Optional(t.String())
+          jobDesk: t.Optional(t.Array(t.String()))
         }),
         detail: {
           tags: ["Work Experience"],

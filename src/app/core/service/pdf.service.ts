@@ -17,39 +17,18 @@ export class PdfService {
 
     let browser: Browser | null = null
     try {
-      let executablePath: string | null
+      let executablePath = ''
 
       if (process.env.NODE_ENV === 'production') {
-        logger.info('Mode PRODUKSI: menggunakan Chromium dari @sparticuz/chromium')
+        logger.info('Production mode using: @sparticuz/chromium')
         executablePath = await chromium.executablePath()
       } else {
-        logger.info('Mode DEVELOPMENT: mencoba pakai Chrome/Chromium lokal')
-
-        if (process.platform === 'win32') {
-          // Windows
-          executablePath =
-            process.env.CHROME_PATH ||
-            'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-        } else if (process.platform === 'darwin') {
-          // MacOS
-          executablePath =
-            process.env.CHROME_PATH ||
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-        } else {
-          // Linux
-          executablePath =
-            // eslint-disable-next-line no-constant-binary-expression
-            process.env.CHROME_PATH ||
-            '/usr/bin/google-chrome' ||
-            '/usr/bin/chromium-browser'
-        }
+        logger.info('Development mode: using puppeteer that installed in devDependencies')
+        const puppeteerFull = await import('puppeteer')
+        executablePath = puppeteerFull.executablePath()
       }
 
-      if (!executablePath) {
-        throw new Error('Tidak menemukan path Chrome/Chromium di environment ini.')
-      }
-
-      logger.info(`Menjalankan browser dari: ${executablePath}`)
+      logger.info(`Running browser from: ${executablePath}`)
 
       browser = await puppeteer.launch({
         args: chromium.args,
@@ -57,7 +36,7 @@ export class PdfService {
         headless: true,
       })
 
-      logger.info('Browser berhasil dijalankan.')
+      logger.info('Browser running success.')
 
       const page = await browser.newPage()
       await page.setViewport({ width: 1280, height: 800 })
@@ -71,8 +50,8 @@ export class PdfService {
 
       return Buffer.from(pdfUint8Array)
     } catch (error) {
-      logger.error(`Gagal saat proses pembuatan PDF: ${error}`)
-      throw new Error('Gagal membuat file PDF. Periksa log server untuk detail.')
+      logger.error(`Failed creation PDF: ${error}`)
+      throw new Error('Failed creation PDF')
     } finally {
       if (browser) {
         await browser.close()

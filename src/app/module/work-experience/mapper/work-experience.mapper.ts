@@ -10,6 +10,6 @@ export function toWorkExperienceResponse(workExperience: WorkExperience): WorkEx
     startDate: workExperience.startDate,
     endDate: workExperience.endDate ?? '',
     isCurrent: workExperience.isCurrent ?? false,
-    jobDescription: workExperience.jobDescription ?? '',
+    jobDesk: workExperience.jobDesk ?? [],
   }
 }

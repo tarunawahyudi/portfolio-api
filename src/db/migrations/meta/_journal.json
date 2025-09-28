@@ -50,6 +50,13 @@
       "when": 1758433634407,
       "tag": "0006_narrow_synch",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1759005785336,
+      "tag": "0007_mighty_penance",
+      "breakpoints": true
     }
   ]
 }

@@ -6,7 +6,7 @@ export interface WorkExperienceResponse {
   startDate: string;
   endDate?: string;
   isCurrent?: boolean;
-  jobDescription?: string;
+  jobDesk?: string[];
 }
 
 export interface CreateWorkExperienceRequest {
@@ -16,7 +16,7 @@ export interface CreateWorkExperienceRequest {
   startDate: string;
   endDate?: string;
   isCurrent?: boolean;
-  jobDescription?: string;
+  jobDesk?: string[];
 }
 
 export type UpdateWorkExperienceRequest = {
@@ -25,5 +25,5 @@ export type UpdateWorkExperienceRequest = {
   startDate?: string;
   endDate?: string | null;
   isCurrent?: boolean;
-  jobDescription?: string;
+  jobDesk?: string[];
 };

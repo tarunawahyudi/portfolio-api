@@ -18,4 +18,8 @@ export interface ArticleRepository {
   updateStatus(id: string, userId: string, status: ArticleStatus): Promise<Article>
   updateThumbnail(id: string, userId: string, thumbnailUrl: string | null): Promise<Article>
   findPublicBySlug(slug: string): Promise<ArticleWithAuthor | null>
+  findAllPublicByUserId(
+    userId: string,
+    options: PaginationOptions,
+  ): Promise<PaginatedResponse<Article>>
 }

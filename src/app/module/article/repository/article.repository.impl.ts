@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe'
-import { and, eq, not, SQL } from 'drizzle-orm'
+import { and, arrayOverlaps, eq, not, SQL } from 'drizzle-orm'
 import { articles } from '@db/schema'
 import { ArticleRepository } from '@module/article/repository/article.repository'
 import { UpdateArticleRequest, ArticleStatus } from '@module/article/dto/article.dto'
@@ -7,11 +7,7 @@ import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { paginate } from '@shared/util/pagination.util'
 import { db } from '@db/index'
 import { AppException } from '@core/exception/app.exception'
-import {
-  Article,
-  ArticleWithAuthor,
-  NewArticle,
-} from '@module/article/entity/article'
+import { Article, ArticleWithAuthor, NewArticle } from '@module/article/entity/article'
 
 @injectable()
 export class ArticleRepositoryImpl implements ArticleRepository {
@@ -90,5 +86,29 @@ export class ArticleRepositoryImpl implements ArticleRepository {
       },
     })
     return row ?? null
+  }
+
+  async findAllPublicByUserId(
+    userId: string,
+    options: PaginationOptions,
+  ): Promise<PaginatedResponse<Article>> {
+    const conditions = [
+      eq(articles.userId, userId),
+      eq(articles.status, 'published'),
+    ]
+
+    const searchColumns = [articles.title]
+
+    if (!options.sort) {
+      options.sort = { publishedAt: 'desc' }
+    }
+
+    return paginate(
+      db,
+      articles,
+      options,
+      searchColumns,
+      and(...conditions.filter((c): c is SQL => !!c)),
+    )
   }
 }

@@ -73,7 +73,10 @@ export class UserRepositoryImpl implements UserRepository {
             tags: true,
             slug: true,
           },
-          where: eq(articles.status, 'published'),
+          where: and(
+            eq(articles.status, 'published'),
+            eq(articles.isFeatured, true),
+          ),
           orderBy: (art, { desc }) => [desc(art.publishedAt)],
           limit: 6,
         },

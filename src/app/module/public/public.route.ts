@@ -54,6 +54,16 @@ export function registerPublicRoutes(app: Elysia) {
         params: t.Object({ id: t.String({ format: 'uuid' }) }),
         detail: { tags: ['Public'], summary: "Get a single public certificate detail" }
       })
+      .get('/articles/by-username/:username', publicController.getArticlesByUsername.bind(publicController), {
+        params: t.Object({ username: t.String() }),
+        query: t.Object({
+          page: t.Optional(t.Numeric({ default: 1 })),
+          limit: t.Optional(t.Numeric({ default: 9 })),
+          search: t.Optional(t.String()),
+          tag: t.Optional(t.String()),
+        }),
+        detail: { tags: ["Public"], summary: "Get a user's all public articles" }
+      })
       .use(rateLimit({ duration: 60 * 1000, max: 3 }))
       .post('/contact/:username', publicController.sendContactMessage.bind(publicController), {
         body: t.Object({

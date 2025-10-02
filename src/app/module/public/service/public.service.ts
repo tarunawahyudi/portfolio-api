@@ -1,6 +1,7 @@
 import {
   ContactEmailDto,
   PublicArticleDetailDto,
+  PublicArticleItemDto,
   PublicPortfolioItemDto,
   PublicProfileResponse,
 } from '@module/public/dto/public.dto'
@@ -18,4 +19,8 @@ export interface PublicService {
   getPortfolioCategories(username: string): Promise<string[]>
   getPublicCertificates(username: string, options: PaginationOptions): Promise<PaginatedResponse<any>>
   getPublicCertificateDetail(id: string): Promise<CertificateResponse>
+  getPublicArticles(
+    username: string,
+    options: PaginationOptions,
+  ): Promise<PaginatedResponse<PublicArticleItemDto>>
 }

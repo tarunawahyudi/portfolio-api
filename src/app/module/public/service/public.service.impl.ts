@@ -3,6 +3,7 @@ import type { UserRepository } from '@module/user/repository/user.repository'
 import {
   ContactEmailDto,
   PublicArticleDetailDto,
+  PublicArticleItemDto,
   PublicPortfolioItemDto,
   PublicProfileResponse,
 } from '@module/public/dto/public.dto'
@@ -14,6 +15,7 @@ import {
   toAwardResponse,
   toPortfolioDetailResponse,
   toCertificateResponse,
+  toArticleResponse,
 } from '@module/output/mapper'
 import { AppException } from '@core/exception/app.exception'
 import { cdnUrl } from '@shared/util/common.util'
@@ -203,10 +205,24 @@ export class PublicServiceImpl implements PublicService {
   async getPublicCertificateDetail(id: string): Promise<CertificateResponse> {
     const certificate = await this.certificateRepository.findPublicById(id)
 
-    if (!certificate ) {
+    if (!certificate) {
       throw new AppException('CERT-001', 'Certificate not found or is private.')
     }
 
     return toCertificateResponse(certificate)
+  }
+
+  async getPublicArticles(
+    username: string,
+    options: PaginationOptions,
+  ): Promise<PaginatedResponse<PublicArticleItemDto>> {
+    const user = await this.userRepository.findByUsername(username)
+    if (!user) throw new AppException('PROFILE-001')
+
+    const paginatedResult = await this.articleRepository.findAllPublicByUserId(user.id, options)
+    return {
+      data: paginatedResult.data.map(toArticleResponse),
+      pagination: paginatedResult.pagination,
+    }
   }
 }

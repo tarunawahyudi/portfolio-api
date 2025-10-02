@@ -15,4 +15,5 @@ export interface PublicService {
   sendContactEmail(request: ContactEmailDto): Promise<void>
   getPublicPortfolios(username: string, options: PaginationOptions): Promise<PaginatedResponse<PublicPortfolioItemDto>>
   getPortfolioCategories(username: string): Promise<string[]>
+  getPublicCertificates(username: string, options: PaginationOptions): Promise<PaginatedResponse<any>>
 }

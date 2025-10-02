@@ -5,6 +5,7 @@ import { noResponse, paginateResponse, successResponse } from '@shared/util/resp
 import { PublicController } from '@module/public/controller/public.controller'
 import type { PublicService } from '@module/public/service/public.service'
 import { parsePaginationOptions } from '@shared/util/pagination.util'
+import { PublicCertificateItemDto } from '@module/public/dto/public.dto'
 
 @injectable()
 export class PublicControllerImpl implements PublicController {
@@ -60,6 +61,13 @@ export class PublicControllerImpl implements PublicController {
     const { username } = ctx.params
     const options = parsePaginationOptions(ctx.query)
     const paginatedData = await this.publicService.getPublicPortfolios(username, options)
+    return paginateResponse(ctx, paginatedData)
+  }
+
+  async getCertificatesByUsername(ctx: Context): Promise<PageResponse<PublicCertificateItemDto>> {
+    const { username } = ctx.params
+    const options = parsePaginationOptions(ctx.query)
+    const paginatedData = await this.publicService.getPublicCertificates(username, options)
     return paginateResponse(ctx, paginatedData)
   }
 }

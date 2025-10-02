@@ -2,7 +2,7 @@ import { NewUser, User, UserWithRelations } from '@module/user/entity/user'
 import { injectable } from 'tsyringe'
 import type { UserRepository } from '@module/user/repository/user.repository'
 import { db } from '@db/index'
-import { articles, portfolios, users } from '@db/schema'
+import { articles, certificates, portfolios, users } from '@db/schema'
 import { and, eq } from 'drizzle-orm'
 import { getDbOrTx } from '@shared/decorator/transactional.decorator'
 
@@ -98,6 +98,7 @@ export class UserRepositoryImpl implements UserRepository {
         },
 
         certificates: {
+          where: eq(certificates.isFeatured, true),
           columns: {
             id: true,
             title: true,

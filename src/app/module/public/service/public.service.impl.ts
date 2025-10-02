@@ -13,6 +13,7 @@ import {
   toCourseResponse,
   toAwardResponse,
   toPortfolioDetailResponse,
+  toCertificateResponse,
 } from '@module/output/mapper'
 import { AppException } from '@core/exception/app.exception'
 import { cdnUrl } from '@shared/util/common.util'
@@ -25,6 +26,7 @@ import { EmailService } from '@core/service/email.service'
 import { verifyCaptcha } from '@lib/captcha'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { toPublicPortfolioItem } from '@module/public/mapper/public.mapper'
+import type { CertificateRepository } from '@module/certificate/repository/certificate.repository'
 
 @injectable()
 export class PublicServiceImpl implements PublicService {
@@ -34,6 +36,7 @@ export class PublicServiceImpl implements PublicService {
     @inject('PdfService') private readonly pdfService: PdfService,
     @inject('PortfolioRepository') private readonly portfolioRepository: PortfolioRepository,
     @inject('ArticleRepository') private readonly articleRepository: ArticleRepository,
+    @inject('CertificateRepository') private readonly certificateRepository: CertificateRepository,
   ) {}
 
   async getPublicProfile(username: string): Promise<PublicProfileResponse> {
@@ -181,5 +184,18 @@ export class PublicServiceImpl implements PublicService {
     const user = await this.userRepository.findByUsername(username)
     if (!user) throw new AppException('USER-002')
     return this.portfolioRepository.findUniqueCategoriesByUserId(user.id)
+  }
+
+  async getPublicCertificates(
+    username: string,
+    options: PaginationOptions,
+  ): Promise<PaginatedResponse<any>> {
+    const user = await this.userRepository.findByUsername(username)
+    if (!user) throw new AppException('USER-001')
+    const paginatedResult = await this.certificateRepository.findAllPublicByUserId(user.id, options)
+    return {
+      data: paginatedResult.data.map(toCertificateResponse),
+      pagination: paginatedResult.pagination,
+    }
   }
 }

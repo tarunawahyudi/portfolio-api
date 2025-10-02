@@ -8,4 +8,6 @@ export interface CertificateRepository {
   update(id: string, userId: string, data: UpdateCertificateRequest): Promise<Certificate>
   delete(id: string, userId: string): Promise<void>
   findByIdAndUser(id: string, userId: string): Promise<Certificate | null>
+  findAllPublicByUserId(userId: string, options: PaginationOptions): Promise<PaginatedResponse<Certificate>>
+
 }

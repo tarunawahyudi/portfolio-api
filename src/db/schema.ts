@@ -154,6 +154,7 @@ export const certificates = pgTable('certificates', {
   credentialId: varchar('credential_id', { length: 255 }),
   credentialUrl: varchar('credential_url', { length: 500 }),
   description: text('description'),
+  isFeatured: boolean('is_featured').default(false).notNull(),
   display: jsonb('display').$type<CertificateDisplay>().default({ type: 'default', value: 'award' }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),

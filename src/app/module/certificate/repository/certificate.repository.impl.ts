@@ -49,4 +49,13 @@ export class CertificateRepositoryImpl implements CertificateRepository {
       .delete(certificates)
       .where(and(eq(certificates.id, id), eq(certificates.userId, userId)))
   }
+
+  async findAllPublicByUserId(
+    userId: string,
+    options: PaginationOptions,
+  ): Promise<PaginatedResponse<Certificate>> {
+    const conditions = [eq(certificates.userId, userId)]
+    const searchColumns = [certificates.title, certificates.organization]
+    return paginate(db, certificates, options, searchColumns, and(...conditions))
+  }
 }

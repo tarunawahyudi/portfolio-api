@@ -41,6 +41,15 @@ export function registerPublicRoutes(app: Elysia) {
         }),
         detail: { tags: ["Public"], summary: "Get a user's all public portfolios with filter & pagination" }
       })
+      .get('/certificates/by-username/:username', publicController.getCertificatesByUsername.bind(publicController), {
+        params: t.Object({ username: t.String() }),
+        query: t.Object({
+          page: t.Optional(t.Numeric({ default: 1, minimum: 1 })),
+          limit: t.Optional(t.Numeric({ default: 9, minimum: 1, maximum: 100 })),
+          search: t.Optional(t.String()),
+        }),
+        detail: { tags: ["Public"], summary: "Get a user's all public certificates with filter & pagination" }
+      })
       .use(rateLimit({ duration: 60 * 1000, max: 3 }))
       .post('/contact/:username', publicController.sendContactMessage.bind(publicController), {
         body: t.Object({

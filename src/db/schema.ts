@@ -134,6 +134,7 @@ export const articles = pgTable('articles', {
   slug: varchar('slug', { length: 255 }).unique(),
   content: text('content'),
   thumbnail: text('thumbnail'),
+  isFeatured: boolean('is_featured').default(false).notNull(),
   tags: text('tags').array(),
   status: articleStatusEnum('status').default('draft'),
   publishedAt: timestamp('published_at', { withTimezone: true }),

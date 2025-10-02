@@ -1,0 +1,1 @@
+ALTER TABLE "articles" ADD COLUMN "is_featured" boolean DEFAULT false NOT NULL;

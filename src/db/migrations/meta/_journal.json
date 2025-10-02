@@ -64,6 +64,13 @@
       "when": 1759040194191,
       "tag": "0008_easy_butterfly",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1759411092360,
+      "tag": "0009_eminent_jackpot",
+      "breakpoints": true
     }
   ]
 }

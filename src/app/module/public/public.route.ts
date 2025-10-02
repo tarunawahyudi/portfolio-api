@@ -50,6 +50,10 @@ export function registerPublicRoutes(app: Elysia) {
         }),
         detail: { tags: ["Public"], summary: "Get a user's all public certificates with filter & pagination" }
       })
+      .get('/certificate/:id', publicController.getCertificateById.bind(publicController), {
+        params: t.Object({ id: t.String({ format: 'uuid' }) }),
+        detail: { tags: ['Public'], summary: "Get a single public certificate detail" }
+      })
       .use(rateLimit({ duration: 60 * 1000, max: 3 }))
       .post('/contact/:username', publicController.sendContactMessage.bind(publicController), {
         body: t.Object({

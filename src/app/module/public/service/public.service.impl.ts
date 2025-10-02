@@ -27,6 +27,7 @@ import { verifyCaptcha } from '@lib/captcha'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { toPublicPortfolioItem } from '@module/public/mapper/public.mapper'
 import type { CertificateRepository } from '@module/certificate/repository/certificate.repository'
+import { CertificateResponse } from '@module/certificate/dto/certificate.dto'
 
 @injectable()
 export class PublicServiceImpl implements PublicService {
@@ -197,5 +198,15 @@ export class PublicServiceImpl implements PublicService {
       data: paginatedResult.data.map(toCertificateResponse),
       pagination: paginatedResult.pagination,
     }
+  }
+
+  async getPublicCertificateDetail(id: string): Promise<CertificateResponse> {
+    const certificate = await this.certificateRepository.findPublicById(id)
+
+    if (!certificate ) {
+      throw new AppException('CERT-001', 'Certificate not found or is private.')
+    }
+
+    return toCertificateResponse(certificate)
   }
 }

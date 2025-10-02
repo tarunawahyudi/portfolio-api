@@ -1,4 +1,8 @@
-import { Certificate, NewCertificate } from '@module/certificate/entity/certificate'
+import {
+  Certificate,
+  CertificateWithUser,
+  NewCertificate,
+} from '@module/certificate/entity/certificate'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { UpdateCertificateRequest } from '@module/certificate/dto/certificate.dto'
 
@@ -9,5 +13,5 @@ export interface CertificateRepository {
   delete(id: string, userId: string): Promise<void>
   findByIdAndUser(id: string, userId: string): Promise<Certificate | null>
   findAllPublicByUserId(userId: string, options: PaginationOptions): Promise<PaginatedResponse<Certificate>>
-
+  findPublicById(id: string): Promise<CertificateWithUser | null>
 }

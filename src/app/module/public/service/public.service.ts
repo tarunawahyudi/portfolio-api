@@ -6,6 +6,7 @@ import {
 } from '@module/public/dto/public.dto'
 import { PortfolioDetailResponse } from '@module/portfolio/dto/portfolio.dto'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
+import { CertificateResponse } from '@module/certificate/dto/certificate.dto'
 
 export interface PublicService {
   getPublicProfile(username: string): Promise<PublicProfileResponse>
@@ -16,4 +17,5 @@ export interface PublicService {
   getPublicPortfolios(username: string, options: PaginationOptions): Promise<PaginatedResponse<PublicPortfolioItemDto>>
   getPortfolioCategories(username: string): Promise<string[]>
   getPublicCertificates(username: string, options: PaginationOptions): Promise<PaginatedResponse<any>>
+  getPublicCertificateDetail(id: string): Promise<CertificateResponse>
 }

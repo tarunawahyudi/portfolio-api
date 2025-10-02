@@ -70,4 +70,10 @@ export class PublicControllerImpl implements PublicController {
     const paginatedData = await this.publicService.getPublicCertificates(username, options)
     return paginateResponse(ctx, paginatedData)
   }
+
+  async getCertificateById(ctx: Context): Promise<AppResponse> {
+    const { id } = ctx.params
+    const data = await this.publicService.getPublicCertificateDetail(id)
+    return successResponse(ctx, data)
+  }
 }

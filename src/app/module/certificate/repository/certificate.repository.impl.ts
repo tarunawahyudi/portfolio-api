@@ -2,7 +2,11 @@ import { injectable } from 'tsyringe'
 import { and, eq } from 'drizzle-orm'
 import { db } from '@db/index'
 import { certificates } from '@db/schema'
-import { Certificate, NewCertificate } from '@module/certificate/entity/certificate'
+import {
+  Certificate,
+  CertificateWithUser,
+  NewCertificate,
+} from '@module/certificate/entity/certificate'
 import { UpdateCertificateRequest } from '@module/certificate/dto/certificate.dto'
 import { CertificateRepository } from '@module/certificate/repository/certificate.repository'
 import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
@@ -57,5 +61,16 @@ export class CertificateRepositoryImpl implements CertificateRepository {
     const conditions = [eq(certificates.userId, userId)]
     const searchColumns = [certificates.title, certificates.organization]
     return paginate(db, certificates, options, searchColumns, and(...conditions))
+  }
+
+  async findPublicById(id: string): Promise<CertificateWithUser | null> {
+    const row = await db.query.certificates.findFirst({
+      where: eq(certificates.id, id),
+      with: {
+        user: true,
+      }
+    })
+
+    return row ?? null
   }
 }

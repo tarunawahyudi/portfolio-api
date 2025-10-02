@@ -10,4 +10,5 @@ export interface PublicController {
   getPortfoliosByUsername(ctx: Context): Promise<PageResponse<any>>
   sendContactMessage(ctx: Context): Promise<AppResponse>
   getCertificatesByUsername(ctx: Context): Promise<PageResponse<PublicCertificateItemDto>>
+  getCertificateById(ctx: Context): Promise<AppResponse>
 }

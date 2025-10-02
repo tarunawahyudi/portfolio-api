@@ -14,6 +14,7 @@ export interface CreateCertificateRequest {
   credentialId?: string;
   credentialUrl?: string;
   description?: string;
+  isFeatured?: boolean;
   display?: CertificateDisplay;
 }
 
@@ -26,6 +27,7 @@ export interface UpdateCertificateRequest {
   credentialUrl?: string;
   description?: string;
   display?: CertificateDisplay;
+  isFeatured?: boolean;
   certificateImage?: string | null;
 }
 
@@ -39,5 +41,6 @@ export interface CertificateResponse {
   credentialUrl: string;
   certificateImage: string | null;
   description: string;
+  isFeatured: boolean;
   display: CertificateDisplay;
 }

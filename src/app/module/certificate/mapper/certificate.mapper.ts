@@ -18,6 +18,7 @@ export function toCertificateResponse(certificate: Certificate): CertificateResp
     credentialUrl: certificate.credentialUrl ?? '',
     credentialId: certificate.credentialId ?? '',
     display: displayResponse,
+    isFeatured: certificate.isFeatured ?? false,
     description: certificate.description ?? '',
   }
 }

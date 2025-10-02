@@ -22,6 +22,7 @@ export function registerCertificateRoutes(app: Elysia) {
     credentialId: t.Optional(t.String()),
     credentialUrl: t.Optional(t.String()),
     description: t.Optional(t.String()),
+    isFeatured: t.Optional(t.Boolean()),
     display: t.Optional(displaySchema),
   }
 

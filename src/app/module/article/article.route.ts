@@ -14,6 +14,7 @@ export function registerArticleRoutes(app: Elysia) {
     content: t.String(),
     tags: t.Optional(t.Array(t.String())),
     status: t.Optional(t.UnionEnum(['draft', 'published'])),
+    isFeatured: t.Optional(t.Boolean()),
   })
 
   return app.group('/articles', (group) =>

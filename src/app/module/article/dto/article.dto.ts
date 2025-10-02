@@ -6,6 +6,7 @@ export interface CreateArticleRequest {
   slug: string;
   content: string;
   tags?: string[];
+  isFeatured?: boolean;
   status?: Extract<ArticleStatus, 'draft' | 'published'>;
 }
 
@@ -14,6 +15,7 @@ export interface UpdateArticleRequest {
   slug?: string;
   content?: string;
   tags?: string[];
+  isFeatured?: boolean;
 }
 
 export interface ArticleResponse {
@@ -25,6 +27,7 @@ export interface ArticleResponse {
   tags: string[];
   status: ArticleStatus;
   publishedAt: Date | null;
+  isFeatured: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,6 +1,6 @@
-import { Article } from '@module/article/entity/article';
-import { ArticleResponse } from '@module/article/dto/article.dto';
-import { cdnUrl } from '@shared/util/common.util';
+import { Article } from '@module/article/entity/article'
+import { ArticleResponse } from '@module/article/dto/article.dto'
+import { cdnUrl } from '@shared/util/common.util'
 
 export function toArticleResponse(article: Article): ArticleResponse {
   return {
@@ -12,7 +12,8 @@ export function toArticleResponse(article: Article): ArticleResponse {
     tags: article.tags ?? [],
     status: article.status ?? 'draft',
     publishedAt: article.publishedAt,
+    isFeatured: article.isFeatured ?? false,
     createdAt: article.createdAt!,
     updatedAt: article.updatedAt!,
-  };
+  }
 }

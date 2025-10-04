@@ -31,8 +31,10 @@ export function registerCertificateRoutes(app: Elysia) {
       .get(ROOT, certificateController.get.bind(certificateController), {
         beforeHandle: authGuard as any,
         query: t.Object({
-          page: t.Optional(t.Number({ min: 1 })),
-          limit: t.Optional(t.Number({ min: 1, max: 100 })),
+          page: t.Optional(t.Number({ default: 1, minimum: 1 })),
+          limit: t.Optional(t.Number({ default: 10, minimum: 1, maximum: 100 })),
+          sort: t.Optional(t.String()),
+          search: t.Optional(t.String()),
         }),
         detail: { tags: ['Certificate'], summary: "Get list of user's certificates" },
       })

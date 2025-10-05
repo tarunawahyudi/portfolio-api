@@ -1,0 +1,14 @@
+{
+  "CV": {
+    "contact": "Contact",
+    "email": "Email",
+    "phone": "Phone",
+    "website": "Website",
+    "address": "Address",
+    "skills": "Skills",
+    "profile": "Profile",
+    "workExperience": "Work Experience",
+    "education": "Education",
+    "present": "Present"
+  }
+}

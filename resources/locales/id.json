@@ -1,0 +1,15 @@
+{
+  "CV": {
+    "contact": "Kontak",
+    "email": "Email",
+    "phone": "Telepon",
+    "website": "Website",
+    "address": "Alamat",
+    "skills": "Keahlian",
+    "profile": "Profil",
+    "workExperience": "Pengalaman Kerja",
+    "education": "Pendidikan",
+    "present": "Sekarang",
+    "jobDescription": "Deskripsi Pekerjaan"
+  }
+}

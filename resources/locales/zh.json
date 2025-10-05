@@ -1,0 +1,15 @@
+{
+  "CV": {
+    "contact": "联系方式",
+    "email": "邮箱",
+    "phone": "电话",
+    "website": "网站",
+    "address": "地址",
+    "skills": "技能",
+    "profile": "个人简介",
+    "workExperience": "工作经验",
+    "education": "教育背景",
+    "present": "至今",
+    "jobDescription": "工作描述"
+  }
+}

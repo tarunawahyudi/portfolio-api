@@ -1,0 +1,15 @@
+{
+  "CV": {
+    "contact": "連絡先",
+    "email": "メール",
+    "phone": "電話",
+    "website": "ウェブサイト",
+    "address": "住所",
+    "skills": "スキル",
+    "profile": "プロフィール",
+    "workExperience": "職務経験",
+    "education": "学歴",
+    "present": "現在",
+    "jobDescription": "職務内容"
+  }
+}

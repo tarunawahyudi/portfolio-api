@@ -30,6 +30,7 @@ import { PaginatedResponse, PaginationOptions } from '@shared/type/global'
 import { toPublicPortfolioItem } from '@module/public/mapper/public.mapper'
 import type { CertificateRepository } from '@module/certificate/repository/certificate.repository'
 import { CertificateResponse } from '@module/certificate/dto/certificate.dto'
+import { getTranslations } from '@shared/util/i18n.util'
 
 @injectable()
 export class PublicServiceImpl implements PublicService {
@@ -118,9 +119,15 @@ export class PublicServiceImpl implements PublicService {
     }
   }
 
-  async generateCvAsPdf(username: string): Promise<Buffer> {
+  async generateCvAsPdf(username: string, locale: string): Promise<Buffer> {
     const publicData = await this.getPublicProfile(username)
-    return this.pdfService.generateCv(publicData)
+    const t = await getTranslations(locale)
+    const templateDate = {
+      ...publicData,
+      t: t.CV,
+    }
+
+    return this.pdfService.generateCv(templateDate)
   }
 
   async getPublicPortfolioDetail(id: string): Promise<PortfolioDetailResponse> {

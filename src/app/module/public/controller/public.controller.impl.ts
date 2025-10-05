@@ -19,7 +19,8 @@ export class PublicControllerImpl implements PublicController {
 
   async downloadCv(ctx: Context): Promise<Buffer> {
     const { username } = ctx.params
-    const pdfBuffer = await this.publicService.generateCvAsPdf(username)
+    const { lang } = ctx.query
+    const pdfBuffer = await this.publicService.generateCvAsPdf(username, lang || 'id')
 
     ctx.set.headers['Content-Type'] = 'application/pdf'
     ctx.set.headers['Content-Disposition'] = `attachment; filename="cv-${username}.pdf"`

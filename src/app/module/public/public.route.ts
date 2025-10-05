@@ -18,6 +18,9 @@ export function registerPublicRoutes(app: Elysia) {
         },
       })
       .get('/:username/download-cv', publicController.downloadCv.bind(publicController), {
+        query: t.Object({
+          lang: t.Optional(t.String())
+        }),
         detail: {
           tags: ['Public'],
           summary: "Download a user's CV as PDF",

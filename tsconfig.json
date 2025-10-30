@@ -13,7 +13,7 @@
     /* Language and Environment */
     "target": "ES2021",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
     // "lib": [],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */
-    // "jsx": "preserve",                                /* Specify what JSX code is generated. */
+    "jsx": "react-jsx",                                /* Specify what JSX code is generated. */
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     // "jsxFactory": "",                                 /* Specify the JSX factory function used when targeting React JSX emit, e.g. 'React.createElement' or 'h'. */
@@ -30,11 +30,13 @@
     "moduleResolution": "node",                       /* Specify how TypeScript looks up a file from a given module specifier. */
     "baseUrl": "src",
     "paths": {
+      "@app/*": ["app/*"],
       "@core/*": ["app/core/*"],
       "@module/*": ["app/module/*"],
       "@shared/*": ["app/shared/*"],
       "@lib/*": ["app/lib/*"],
-      "@db/*": ["db/*"]
+      "@db/*": ["db/*"],
+      "@resources/*": ["../resources/*"]
     },
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */

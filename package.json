@@ -2,7 +2,7 @@
   "name": "portfolio-api",
   "version": "1.0.0",
   "scripts": {
-    "start": "bun run src/index.ts",
+    "start": "bun run src/app.ts",
     "dev": "bun run --watch src/app.ts",
     "db:gen": "bunx drizzle-kit generate",
     "db:migrate": "bunx drizzle-kit migrate",

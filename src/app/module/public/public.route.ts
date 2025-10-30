@@ -44,6 +44,10 @@ export function registerPublicRoutes(app: Elysia) {
         }),
         detail: { tags: ["Public"], summary: "Get a user's all public portfolios with filter & pagination" }
       })
+      .get('/portfolios/categories/:username', publicController.getPortfolioCategoriesByUsername.bind(publicController), {
+        params: t.Object({ username: t.String() }),
+        detail: { tags: ["Public"], summary: "Get a user's unique public portfolio categories" }
+      })
       .get('/certificates/by-username/:username', publicController.getCertificatesByUsername.bind(publicController), {
         params: t.Object({ username: t.String() }),
         query: t.Object({

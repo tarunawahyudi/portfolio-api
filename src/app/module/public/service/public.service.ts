@@ -23,4 +23,5 @@ export interface PublicService {
     username: string,
     options: PaginationOptions,
   ): Promise<PaginatedResponse<PublicArticleItemDto>>
+  getPublicPortfolioCategories(username: string): Promise<string[]>
 }

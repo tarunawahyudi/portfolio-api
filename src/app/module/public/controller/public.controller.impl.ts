@@ -78,6 +78,12 @@ export class PublicControllerImpl implements PublicController {
     return successResponse(ctx, data)
   }
 
+  async getPortfolioCategoriesByUsername(ctx: Context): Promise<AppResponse> {
+    const { username } = ctx.params
+    const data = await this.publicService.getPublicPortfolioCategories(username)
+    return successResponse(ctx, data)
+  }
+
   async getArticlesByUsername(ctx: Context): Promise<PageResponse<any>> {
     const { username } = ctx.params
     const options = parsePaginationOptions(ctx.query)

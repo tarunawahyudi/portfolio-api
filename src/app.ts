@@ -54,7 +54,10 @@ async function main() {
   startupConfig()
 
   // Start HTTP server
-  app.listen(process.env.APP_PORT ?? 8080)
+  app.listen({
+    port: process.env.PORT || 8080,
+    hostname: '0.0.0.0'
+  })
 }
 
 main()

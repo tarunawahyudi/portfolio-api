@@ -10,6 +10,6 @@ export const corsMiddleware = () => {
   }
 
   return cors({
-    origin: config.cors.origin
+    origin: '*'
   })
 }

@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     color: '#111827',
   },
   section: {
-    marginBottom: 30,
+    marginBottom: 15,
   },
   sectionTitle: {
     fontSize: 20,
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   educationItem: {
-    marginBottom: 20,
+    marginBottom: 10,
   },
   institution: {
     fontSize: 12,

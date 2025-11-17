@@ -364,3 +364,18 @@ export const cdnUrl = (relativePath: string | null | undefined): string | null =
 export function addMinutes(minutes: number): Date {
   return new Date(Date.now() + minutes * 60 * 1000)
 }
+
+export function getYearFromDate(dateString: string | null | undefined): string {
+  if (!dateString) return ''
+  try {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) {
+      const match = dateString.match(/\d{4}/)
+      return match ? match[0] : ''
+    }
+    return date.getFullYear().toString()
+  } catch (error) {
+    console.error(error)
+    return dateString.substring(0, 4)
+  }
+}

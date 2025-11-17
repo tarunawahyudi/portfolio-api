@@ -98,6 +98,24 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: '#6b7280',
   },
+  educationDescription: {
+    fontSize: 10,
+    color: '#4b5563',
+    lineHeight: 1.4,
+    marginBottom: 5,
+  },
+  educationGrade: {
+    fontSize: 10,
+    fontWeight: 'normal',
+    color: '#6b7280',
+    marginBottom: 10,
+  },
+  educationHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginBottom: 5,
+  },
 })
 
 interface MainContentProps {
@@ -118,6 +136,8 @@ interface MainContentProps {
     fieldOfStudy: string
     startDate: string
     endDate: string
+    description?: string
+    grade?: string
   }>
   t: {
     profile: string
@@ -140,13 +160,27 @@ export function MainContent({ profile, experiences, educations, t }: MainContent
         <Text style={styles.sectionTitle}>{t.education}</Text>
         {educations.map((education, index) => (
           <View key={index} style={styles.educationItem}>
-            <Text style={styles.institution}>{education.institution}</Text>
+
+            <View style={styles.educationHeader}>
+              <Text style={styles.institution}>{education.institution}</Text>
+              <Text style={styles.educationDate}>
+                {education.startDate} - {education.endDate}
+              </Text>
+            </View>
+
             <Text style={styles.degree}>
               {education.degree} - {education.fieldOfStudy}
             </Text>
-            <Text style={styles.educationDate}>
-              {education.startDate} - {education.endDate}
-            </Text>
+
+            {education.grade && (
+              <Text style={styles.educationGrade}>
+                Grade: {education.grade}
+              </Text>
+            )}
+
+            {education.description && (
+              <HtmlRenderer html={education.description} style={styles.educationDescription} />
+            )}
           </View>
         ))}
       </View>

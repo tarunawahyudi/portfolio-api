@@ -18,7 +18,7 @@ import {
   toArticleResponse,
 } from '@module/output/mapper'
 import { AppException } from '@core/exception/app.exception'
-import { cdnUrl } from '@shared/util/common.util'
+import { cdnUrl, formatDateToMonthYear } from '@shared/util/common.util'
 import { PublicService } from '@module/public/service/public.service'
 import { PdfService } from '@core/service/pdf.service'
 import { PortfolioDetailResponse } from '@module/portfolio/dto/portfolio.dto'
@@ -121,6 +121,12 @@ export class PublicServiceImpl implements PublicService {
 
   async generateCvAsPdf(username: string, locale: string): Promise<Buffer> {
     const publicData = await this.getPublicProfile(username)
+    publicData.experiences = publicData.experiences.map(experience => ({
+      ...experience,
+      startDate: formatDateToMonthYear(experience.startDate),
+      endDate: formatDateToMonthYear(experience.endDate ?? ''),
+    }))
+
     const t = await getTranslations(locale)
     const templateDate = {
       ...publicData,

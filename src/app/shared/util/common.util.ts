@@ -379,3 +379,14 @@ export function getYearFromDate(dateString: string | null | undefined): string {
     return dateString.substring(0, 4)
   }
 }
+
+export function formatDateToMonthYear(dateString: string): string {
+  if (!dateString) return ''
+
+  const date = new Date(dateString)
+
+  const month = date.toLocaleString('en-US', { month: 'short' })
+  const year = date.getFullYear()
+
+  return `${month} ${year}`
+}

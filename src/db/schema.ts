@@ -227,6 +227,7 @@ export const workExperiences = pgTable('work_experiences', {
   endDate: date('end_date'),
   isCurrent: boolean('isCurrent'),
   jobDesk: text('job_description').array(),
+  overview: text('overview'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 })

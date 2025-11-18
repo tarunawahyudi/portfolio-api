@@ -47,6 +47,7 @@ export function registerWorkerExperienceRoutes(app: Elysia) {
           startDate: t.Optional(t.String({ format: 'date' })),
           endDate: t.Optional(t.Nullable(t.String({ format: 'date' }))),
           isCurrent: t.Optional(t.Boolean()),
+          overview: t.Optional(t.String()),
           jobDesk: t.Optional(t.Array(t.String()))
         }),
         detail: {

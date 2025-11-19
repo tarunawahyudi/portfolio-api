@@ -11,7 +11,7 @@ const HtmlRenderer = ({ html, style }: { html: string; style?: any }) => {
   return (
     <View style={{ ...style }}>
       {lines.map((line, index) => (
-        <Text key={index} style={{ marginBottom: 5 }}>
+        <Text key={index} style={{ marginBottom: 3 }}>
           {line.trim()}
         </Text>
       ))}
@@ -66,19 +66,38 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: 'bold',
     color: '#374151',
+    marginBottom: 5,
+  },
+
+  companyOverview: {
+    fontSize: 9.5,
+    color: '#4b5563',
+    lineHeight: 1.4,
+    marginTop: 5,
     marginBottom: 10,
   },
   jobDescriptionTitle: {
     fontSize: 10,
     fontWeight: 'bold',
     color: '#1f2937',
-    marginBottom: 5,
+    marginBottom: 10,
   },
-  jobDeskItem: {
-    fontSize: 10,
-    color: '#4b5563',
+  jobDeskContainer: {
+    flexDirection: 'row',
     marginBottom: 5,
-    marginLeft: 15,
+    marginLeft: 10,
+    break: 'avoid',
+  },
+  jobDeskBullet: {
+    fontSize: 8.5,
+    width: 10,
+    color: '#4b5563',
+  },
+  jobDeskText: {
+    fontSize: 8.5,
+    flex: 1,
+    color: '#4b5563',
+    lineHeight: 1.3,
   },
   educationItem: {
     marginBottom: 10,
@@ -125,6 +144,7 @@ interface MainContentProps {
   experiences: Array<{
     position: string
     company: string
+    overview?: string
     startDate: string
     endDate?: string
     isCurrent: boolean
@@ -145,6 +165,7 @@ interface MainContentProps {
     education: string
     present: string
     jobDescription: string
+    companyOverview: string
   }
 }
 
@@ -189,22 +210,42 @@ export function MainContent({ profile, experiences, educations, t }: MainContent
         <Text style={styles.sectionTitle}>{t.workExperience}</Text>
         {experiences.map((experience, index) => (
           <View key={index} style={styles.experienceItem}>
+
             <View style={styles.experienceHeader}>
               <Text style={styles.position}>{experience.position}</Text>
               <Text style={styles.date}>
                 {experience.startDate} - {experience.isCurrent ? t.present : experience.endDate}
               </Text>
             </View>
+
             <Text style={styles.company}>{experience.company}</Text>
+
+            {experience.overview && (
+              <>
+                {t.companyOverview && (
+                  <Text style={styles.jobDescriptionTitle}>{t.companyOverview}</Text>
+                )}
+                <Text style={styles.companyOverview}>{experience.overview}</Text>
+              </>
+            )}
 
             {experience.jobDesk && experience.jobDesk.length > 0 && (
               <>
                 <Text style={styles.jobDescriptionTitle}>{t.jobDescription}</Text>
-                {experience.jobDesk.map((jobDeskItem, jobDeskIndex) => (
-                  <Text key={jobDeskIndex} style={styles.jobDeskItem}>
-                    • {jobDeskItem}
-                  </Text>
-                ))}
+
+                <View>
+                  {experience.jobDesk.map((jobDeskItem, jobDeskIndex) => (
+                    <View
+                      key={jobDeskIndex}
+                      style={styles.jobDeskContainer}
+                    >
+                      <Text style={styles.jobDeskBullet}>•</Text>
+                      <Text style={styles.jobDeskText}>
+                        {jobDeskItem}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
               </>
             )}
           </View>
